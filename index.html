@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý & Thí Nghiệm Nhất Thứ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản Lý Thí Nghiệm</title>
     <style>
         :root {
             --primary-color: #0d47a1;
@@ -16,13 +17,12 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             padding-bottom: 40px;
         }
 
-        /* Header */
         header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
@@ -30,12 +30,11 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        header h1 { font-size: 22px; font-weight: 700; margin-bottom: 5px; }
+        header h1 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
         header p { font-size: 13px; opacity: 0.9; }
 
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
 
-        /* Card Thông tin Trạm */
         .info-card {
             background: var(--card-bg);
             border-radius: 10px;
@@ -72,10 +71,8 @@
         }
         .form-group input:focus, .form-group select:focus {
             border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
         }
 
-        /* Danh mục Hạng mục Thí nghiệm (Grid 7 Thiết bị) */
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -93,22 +90,16 @@
             overflow: hidden;
             border: 1px solid var(--border-color);
             box-shadow: 0 3px 6px rgba(0,0,0,0.06);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
             cursor: pointer;
             display: flex;
             flex-direction: column;
         }
-        .module-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.12);
-        }
+        .module-card:hover { transform: translateY(-4px); }
         .module-img {
             width: 100%;
             height: 140px;
             background-color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
         }
         .module-img img {
@@ -122,201 +113,100 @@
         .module-btn {
             background: #e3f2fd;
             color: var(--secondary-color);
-            border: none;
             padding: 8px 12px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 13px;
             text-align: center;
         }
-        .module-card:hover .module-btn {
-            background: var(--secondary-color);
-            color: white;
-        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>HỆ THỐNG QUẢN LÝ THÍ NGHIỆM NHẤT THỨ</h1>
-    <p>Trung Tâm Báo Cáo, Xuất Biên Bản & Cơ Sở Dữ Liệu Thí Nghiệm Hiện Trường</p>
+    <h1>QUẢN LÝ THÍ NGHIỆM</h1>
+    <p>Cơ Sở Dữ Liệu & Xuất Biên Bản Tại Hiện Trường</p>
 </header>
-
-<div class="container">
-    <!-- 1. THÔNG TIN PHIÊN THÍ NGHIỆM -->
-    <div class="info-card">
-        <h2>📍 THÔNG TIN TỔNG QUAN PHIÊN THÍ NGHIỆM</h2>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="select-tram">Chọn Trạm Biến Áp:</label>
-                <select id="select-tram" onchange="saveSessionInfo()">
-                    <!-- Danh sách 25 Trạm sẽ tự động sinh bởi JS -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="input-nganlo">Vị trí / Ngăn lộ / Thiết bị:</label>
-                <input type="text" id="input-nganlo" placeholder="VD: Ngăn đường dây 471 / MBA T1" oninput="saveSessionInfo()">
-            </div>
-            <div class="form-group">
-                <label for="input-ngaydo">Ngày thí nghiệm:</label>
-                <input type="date" id="input-ngaydo" onchange="saveSessionInfo()">
-            </div>
-            <div class="form-group">
-                <label for="input-nguoido">Kỹ thuật viên thực hiện:</label>
-                <input type="text" id="input-nguoido" placeholder="VD: Nguyễn Văn A" oninput="saveSessionInfo()">
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. DANH MỤC HẠNG MỤC THÍ NGHIỆM (7 THIẾT BỊ) -->
-    <div class="section-title">⚡ CHỌN THIẾT BỊ</div>
-    
+ 
+    <!-- 2. DANH MỤC THIẾT BỊ -->
+    <div class="section-title">⚡ CHỌN THIẾT BỊ THÍ NGHIỆM</div>
+    <!-- 
     <div class="modules-grid">
         <!-- 1. MBA -->
-        <div class="module-card" onclick="openModule('may-bien-ap.html')">
-            <div class="module-img">
-                <img src="images/MBA.jpg" alt="Máy biến áp">
-            </div>
+        <!-- <div class="module-card" onclick="openModule('may-bien-ap.html')">
+            <div class="module-img"><img src="images/mba.jpg" alt="MBA"></div>
             <div class="module-body">
                 <div class="module-title">1. Máy Biến Áp (MBA)</div>
-                <div class="module-desc">Tỉ số biến, R_1C cuộn dây, Tỷ số hấp thụ R60/R15, Tanδ & C_x, Điện trở cách điện.</div>
+                <div class="module-desc">Tỉ số biến, R_1C, R60/R15, Tanδ & C_x, R_CĐ.</div>
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
-        </div>
+        </div> -->
 
         <!-- 2. TI -->
-        <div class="module-card" onclick="openModule('ti-ct.html')">
-            <div class="module-img">
-                <img src="https://www.mibotransformer.com/wp-content/uploads/2025/07/CNT-LDZC-10-2.webp" alt="Máy biến dòng">
-            </div>
+        <div class="module-card" onclick="openModule('ti.html')">
+            <!-- <div class="module-img"><img src="images/bd.jpg" alt="TI"></div> -->
             <div class="module-body">
                 <div class="module-title">2. Biến Dòng Điện (TI / CT)</div>
-                <div class="module-desc">Đa cuộn dây (1-8 cuộn), Tỉ số biến, Cực tính, R_1C nhị thứ, Đường cong từ hóa (Knee-point).</div>
+                <!-- <div class="module-desc">Đa cuộn dây (1-8 cuộn), Tỉ số biến, Cực tính, R_1C, Từ hóa.</div> -->
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
         </div>
 
         <!-- 3. TU -->
         <div class="module-card" onclick="openModule('tu-vt.html')">
-            <div class="module-img">
-                <img src="https://vn.hyee-transformado-de-corriente.com/uploads/201815405/110kv-capacitor-voltage-transformer15107212537.jpg" alt="Máy biến điện áp">
-            </div>
+            <!-- <div class="module-img"><img src="images/bda.jpg" alt="TU"></div> -->
             <div class="module-body">
                 <div class="module-title">3. Biến Điện Áp (TU / VT)</div>
-                <div class="module-desc">Cấp 35kV-500kV, Đo 2 lần lấy trung bình, Áp nhị thứ đôi/đơn, Sai số f(%), R_1C.</div>
+                <!-- <div class="module-desc">Tỉ số biến đo 2 lần, R_1C 75°C, R_CĐ nội suy nhiệt độ dầu, Tgδ.</div> -->
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
         </div>
 
-        <!-- 4. MÁY CẮT SF6 -->
+        <!-- 4. MÁY CẮT -->
         <div class="module-card" onclick="openModule('may-cat-sf6.html')">
-            <div class="module-img">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Leistungsschalter_KKK.JPG/960px-Leistungsschalter_KKK.JPG" alt="Máy cắt SF6">
-            </div>
+            <!-- <div class="module-img"><img src="images/mc.jpg" alt="MC"></div> -->
             <div class="module-body">
                 <div class="module-title">4. Máy Cắt SF6 (Breaker)</div>
-                <div class="module-desc">Thời gian đóng/cắt, Độ bất đồng thời, Điện trở tiếp xúc (R_tx), Áp suất khí SF6.</div>
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
         </div>
 
-        <!-- 5. DAO CÁCH LY -->
-        <div class="module-card" onclick="openModule('dao-cach-ly.html')">
-            <div class="module-img">
-                <img src="https://aitcorp.com.vn/images/products/2023/08/02/large/32878-16766724_1690945289.png" alt="Dao cách ly">
-            </div>
+        <!-- 5. DCL -->
+        <!-- <div class="module-card" onclick="openModule('dao-cach-ly.html')">
+            <div class="module-img"><img src="images/dcl.jpg" alt="DCL"></div>
             <div class="module-body">
                 <div class="module-title">5. Dao Cách Ly (DCL / DS)</div>
-                <div class="module-desc">Điện trở tiếp xúc lưỡi dao/tiếp điểm, Điện trở cách điện, Đồng bộ thao tác 3 pha.</div>
+                <div class="module-desc">Điện trở tiếp xúc lưỡi dao, R_CĐ, Đồng bộ 3 pha.</div>
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
-        </div>
+        </div> -->
 
-        <!-- 6. CHỐNG SÉT VAN -->
-        <div class="module-card" onclick="openModule('chong-set-van.html')">
-            <div class="module-img">
-                <img src="https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=500&auto=format&fit=crop&q=60" alt="Chống sét van">
-            </div>
+        <!-- 6. CSV -->
+        <!-- <div class="module-card" onclick="openModule('chong-set-van.html')"> -->
+            <!-- <div class="module-img"><img src="images/csv.jpg" alt="CSV"></div>
             <div class="module-body">
                 <div class="module-title">6. Chống Sét Van (CSV / LA)</div>
-                <div class="module-desc">Đo điện trở cách điện (2500V/5000V), Dòng rò rò tiểu ly ở điện áp vận hành.</div>
+                <div class="module-desc">Đo R_CĐ (2500V/5000V), Dòng rò rò tiểu ly.</div>
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
-        </div>
+        </div> -->
 
-        <!-- 7. DẦU CÁCH ĐIỆN -->
-        <div class="module-card" onclick="openModule('dau-cach-dien.html')">
-            <div class="module-img">
-                <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=500&auto=format&fit=crop&q=60" alt="Dầu cách điện">
-            </div>
+        <!-- 7. DẦU -->
+        <!-- <div class="module-card" onclick="openModule('dau-cach-dien.html')">
+            <div class="module-img"><img src="images/dau.jpg" alt="Dầu"></div>
             <div class="module-body">
                 <div class="module-title">7. Dầu Cách Điện (Oil Test)</div>
-                <div class="module-desc">Điện áp phóng điện đánh thủng (Trung bình 6 lần), Hàm lượng nước (ppm), Tanδ dầu.</div>
+                <div class="module-desc">Điện áp phóng điện đánh thủng (6 lần), Hàm lượng nước (ppm).</div>
                 <div class="module-btn">Vào Thử Nghiệm ➔</div>
             </div>
         </div>
     </div>
-</div>
-
-<script>
-    // 1. Tự động sinh danh sách 25 Trạm biến áp
-    function initTramList() {
-        const selectTram = document.getElementById('select-tram');
-        selectTram.innerHTML = '<option value="">-- Chọn Trạm Biến Áp --</option>';
-        
-        for (let i = 1; i <= 25; i++) {
-            let tramNo = i < 10 ? '0' + i : i;
-            let option = document.createElement('option');
-            option.value = `Trạm Biến Áp ${tramNo}`;
-            option.textContent = `Trạm Biến Áp ${tramNo}`;
-            selectTram.appendChild(option);
-        }
-
-        // Tải lại dữ liệu đã lưu gần nhất (nếu có)
-        loadSessionInfo();
-    }
-
-    // 2. Lưu thông tin phiên đo vào bộ nhớ trình duyệt (localStorage)
-    function saveSessionInfo() {
-        const sessionData = {
-            tram: document.getElementById('select-tram').value,
-            nganLo: document.getElementById('input-nganlo').value,
-            ngayDo: document.getElementById('input-ngaydo').value,
-            nguoiDo: document.getElementById('input-nguoido').value
-        };
-        localStorage.setItem('CURRENT_SESSION', JSON.stringify(sessionData));
-    }
-
-    // 3. Tải lại thông tin phiên đo
-    function loadSessionInfo() {
-        const saved = localStorage.getItem('CURRENT_SESSION');
-        if (saved) {
-            const data = JSON.parse(saved);
-            if(data.tram) document.getElementById('select-tram').value = data.tram;
-            if(data.nganLo) document.getElementById('input-nganlo').value = data.nganLo;
-            if(data.ngayDo) document.getElementById('input-ngaydo').value = data.ngayDo;
-            if(data.nguoiDo) document.getElementById('input-nguoido').value = data.nguoiDo;
-        } else {
-            // Mặc định ngày đo là hôm nay
-            document.getElementById('input-ngaydo').valueAsDate = new Date();
-        }
-    }
-
-    // 4. Mở mô-đun thiết bị tương ứng
-    function openModule(fileName) {
-        const tram = document.getElementById('select-tram').value;
-        if (!tram) {
-            alert("Vui lòng chọn Trạm Biến Áp trước khi vào hạng mục thí nghiệm!");
-            return;
-        }
-        saveSessionInfo();
-        // Chuyển hướng sang file mô-đun trong thư mục modules/
-        window.location.href = `modules/${fileName}`;
-    }
-
-    // Khởi chạy khi tải xong trang
-    window.onload = initTramList;
-</script>
+</div> -->
+ <script>
+     function openModule(fileName) {
+    window.location.href = `modules/${fileName}`;
+     }
+ </script>
 
 </body>
 </html>

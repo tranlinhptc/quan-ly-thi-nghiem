@@ -355,15 +355,37 @@
     }
 
     function renderAllTables() {
-        renderRcdTable();
         renderRdcTable();
+        renderRcdTable();
         renderRatioTable();
         renderTgTable();
         calculateAll();
     }
 
 
-
+function getInterpolatedPriRcd(temp, u1Str) {
+        let points = [];
+        if (u1Str.includes('550') || u1Str.includes('220') || u1Str.includes('110')) {
+            points = [[20, 1200], [30, 600], [40, 300], [50, 150], [60, 75]];
+        } else if (u1Str.includes('35') || u1Str.includes('22')) {
+            points = [[20, 1000], [30, 500], [40, 250], [50, 125], [60, 65]];
+        } else if (u1Str.includes('15')) {
+            points = [[20, 800], [30, 400], [40, 200], [50, 100], [60, 50]];
+        } else {
+            points = [[20, 400], [30, 200], [40, 100], [50, 50], [60, 25]];
+        }
+        for (let p of points) { if (temp === p[0]) return p[1]; }
+        if (temp < points[0][0]) return points[0][1];
+        if (temp > points[points.length - 1][0]) return points[points.length - 1][1];
+        for (let i = 0; i < points.length - 1; i++) {
+            if (temp > points[i][0] && temp < points[i+1][0]) {
+                const t1 = points[i][0], r1 = points[i][1];
+                const t2 = points[i+1][0], r2 = points[i+1][1];
+                return r1 + (r2 - r1) * (temp - t1) / (t2 - t1);
+            }
+        }
+        return 300;
+    }
     // ============================================================
     // BẢNG RDC
     // ============================================================
@@ -397,7 +419,7 @@
     // ============================================================
     function renderRcdTable() {
         const num = parseInt(document.getElementById('tu_num_windings').value);
-        let html = `<table><thead><tr><th>Phép Đo</th><th>Tiêu Chuẩn</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th>Phép Đo</th><th>Rcd min</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
         
         html += `<tr>
             <td><b>Sơ cấp - ∑</b></td>
@@ -691,8 +713,14 @@
                 const u2_do = u1_tn_val / K_do;
                 
                 // Gán vào ô U2 (không gán vào L1/L2 để tránh loạn)
-                const u2El = document.getElementById(`tu_u2_w${winding}_${pha}`);
-                if (u2El) u2El.value = u2_do.toFixed(3);
+                //const u2El = document.getElementById(`tu_u2_w${winding}_${pha}`);
+                // if (u2El) u2El.value = u2_do.toFixed(3);
+                 // SỬA TẠI ĐÂY: Gán vào ô U₂ L1 vì ô U₂ gốc không còn tồn tại
+                const u2El_1 = document.getElementById(`tu_u2_w${winding}_${pha}_1`);
+                if (u2El_1) u2El_1.value = u2_do.toFixed(4);
+                // Cập nhật lại giá trị ẩn để tính toán
+                const hiddenEl = document.getElementById(`tu_u2_avg_hidden_w${winding}_${pha}`);
+                if (hiddenEl) hiddenEl.value = u2_do;
                 
                 kdoEl.textContent = `Kđo: ${K_do.toFixed(2)}`;
                 

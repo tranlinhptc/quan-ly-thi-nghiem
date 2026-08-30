@@ -6,8 +6,7 @@
     <title>BIẾN DÒNG ĐIỆN</title>
 
 
-    <link rel="stylesheet" href="fun/common.css">
-
+<link rel="stylesheet" href="fun/common.css">
 
     <!-- Cụm thư viện xuất Word chuẩn gốc -->
     <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
@@ -141,7 +140,7 @@
         <div id="unlock_message">⚠️ Vui lòng chọn Trạm và gõ Ngăn lộ để mở khóa Form nhập liệu!</div>
     </div>
    <!-- KHU VỰC BỊ KHÓA (SẼ MỞ KHI ĐỦ ĐIỀU KIỆN) -->
-    <!--div id="locked_zone" class="form-locked">
+    div id="locked_zone" class="form-locked"
   <!-- 0. CẤU HÌNH ĐỘNG -->
     <div class="card">
         <div class="card-title"><span> CẤU HÌNH THIẾT BỊ</span>
@@ -360,6 +359,9 @@
 </div> <!-- HẾT KHU VỰC KHÓA -->
 </div>
 
+<script src="fun/config.js"></script>
+<script src="fun/common.js"></script>
+
 <!-- Thêm fallback -->
 <script>
     if (typeof loadCommonJS === 'undefined') {
@@ -373,7 +375,18 @@
     const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
     const MODULE_PREFIX = "ti_";
 	const prefix = MODULE_PREFIX; 
-
+	
+	
+	function toggleSection(sectionId, chk) { 
+    const section = document.getElementById(sectionId);
+    if (section) {
+        if (chk && chk.checked) {
+            section.classList.remove('hidden-section');
+        } else {
+            section.classList.add('hidden-section');
+        }
+    }
+}
 
   
 
@@ -397,7 +410,6 @@
     };
 
 	function refreshTables() {renderRatioTable(); renderTgTable(); calculateAll();}
-	function toggleSection(sectionId, chk) { document.getElementById(sectionId).classList.toggle('hidden-section', !chk.checked); }
 
     
     // ============================================================

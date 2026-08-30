@@ -66,23 +66,7 @@
         .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
         #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
 
-        /* ========== CSS MÀU SẮC ========== */
-        .phase-a { background-color: #fff9c4 !important; }
-        .phase-b { background-color: #ffebee !important; }
-        .phase-c { background-color: #e3f2fd !important; }
-
-        .old-data-latest { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
-        .old-data-latest::placeholder { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; }
-        .old-data-history { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
-        .old-data-history::placeholder { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; }
-
-        .new-data { color: #000000; font-weight: bold !important; }
-        .pass-color { color: #1565c0 !important; font-weight: bold !important; }
-        .fail-color { color: #c62828 !important; font-weight: bold !important; }
-
-        .warning-degradation { background-color: #fff9c4 !important; border: 2px solid #f57f17 !important; color: #e65100 !important; font-weight: bold !important; }
-        .warning-increase { border: 2px solid #ff6f00 !important; background-color: #fff3e0 !important; color: #e65100 !important; font-weight: bold !important; }
-
+        /* ========== 
         /* ========== CSS BẢNG TỈ SỐ BIẾN ========== */
         .ratio-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 90px; padding: 2px; }
         .ratio-cell .input-group { display: flex; flex-direction: column; gap: 2px; width: 100%; }
@@ -297,256 +281,72 @@
     </div>
 </div>
 
+
+<!-- Load common -->
+<script src="fun/config.js"></script>
+<script src="fun/common.js"></script>
+
+<!-- Code riêng của TI -->
 <script>
     // ============================================================
-    // CẤU HÌNH
+    // CẤU HÌNH MODULE TI
     // ============================================================
-    const TEMPLATE_DRIVE_ID = "1xRfbHxuOo4xPeV-Yn4aeMfjiXCHmD_C-";
-    const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxr-8Y25S607UYytRjKutvw4Zhx69W05XOc3Qs5gsSBQNxAZ8S16mmt7Nj8xUV1nNIn/exec";
-    const MODULE_PREFIX = "tu_";
-    let globalHistoryData = [];
+    const CURRENT_MODULE = 'TI';
+    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
+    const MODULE_PREFIX = "ti_";
+    window.prefix = MODULE_PREFIX;
 
     // ============================================================
-    // HÀM KHỞI TẠO
+    // HÀM toggleSection - FALLBACK
     // ============================================================
-    function setTodayDate() {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        let mm = today.getMonth() + 1;
-        let dd = today.getDate();
-        if (dd < 10) dd = '0' + dd;
-        if (mm < 10) mm = '0' + mm;
-        document.getElementById('info_ngay').value = yyyy + '-' + mm + '-' + dd;
-    }
-
-    function fetchSubstations() {
-        const cachedTrams = localStorage.getItem('CACHE_TRAMS');
-        const select = document.getElementById('info_tram');
-        if (cachedTrams) {
-            populateSelect(JSON.parse(cachedTrams));
-        } else {
-            select.innerHTML = '<option value="" disabled selected>Đang tải danh sách trạm...</option>';
-        }
-        fetch(GOOGLE_WEB_APP_URL + "?action=getSubstations")
-            .then(res => res.json())
-            .then(data => {
-                if(data.error) {
-                    if (!cachedTrams) select.innerHTML = `<option value="">⚠️ Lỗi: ${data.error}</option>`;
-                    console.error("Lỗi từ GAS:", data.error);
-                    return;
-                }
-                localStorage.setItem('CACHE_TRAMS', JSON.stringify(data));
-                if (!cachedTrams) populateSelect(data);
-            })
-            .catch(err => {
-                if (!cachedTrams) select.innerHTML = '<option value="">❌ Lỗi kết nối!</option>';
-                console.error("Lỗi Fetch:", err);
-            });
-    }
-
-    function populateSelect(data) {
-        const select = document.getElementById('info_tram');
-        select.innerHTML = '<option value="" disabled selected>-- Chọn Trạm --</option>';
-        data.forEach(tram => {
-            let option = document.createElement("option");
-            option.value = tram;
-            option.text = tram;
-            select.appendChild(option);
-        });
-        if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
-            loadDraftData();
-            checkUnlockForm();
+    function toggleSection(sectionId, chk) { 
+        const section = document.getElementById(sectionId);
+        if (section) {
+            if (chk && chk.checked) {
+                section.classList.remove('hidden-section');
+            } else {
+                section.classList.add('hidden-section');
+            }
         }
     }
 
-    function checkUnlockForm() {
-        const tram = document.getElementById('info_tram').value;
-        const nganLo = document.getElementById('info_nganlo').value.trim();
-        const zone = document.getElementById('locked_zone');
-        const msg = document.getElementById('unlock_message');
-        if (tram && tram !== "" && nganLo && nganLo !== "") {
-            zone.classList.remove('form-locked');
-            if (msg) msg.style.display = 'none';
-        } else {
-            zone.classList.add('form-locked');
-            if (msg) msg.style.display = 'block';
-        }
-    }
-
+    // ============================================================
+    // CODE RIÊNG CỦA TI
+    // ============================================================
     window.onload = function() {
+        initPrefix();
         setTodayDate();
         fetchSubstations();
+        refreshTables();
         renderAllTables();
         
-        ['chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'].forEach(id => {
-            const chk = document.getElementById(id);
-            if(chk) {
-                chk.checked = true;
-                const sectionId = id.replace('chk', 'body');
-                const section = document.getElementById(sectionId);
-                if(section) section.classList.remove('hidden-section');
-            }
-        });
-        
         if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
-            loadDraftData();
             checkUnlockForm();
         }
     };
+        function refreshTables() {
+        renderRatioTable(); 
+        renderTgTable(); 
+        calculateAll();
+    }
 
-    function showLoading(text) { document.getElementById('loadingText').innerText = text; document.getElementById('loadingOverlay').style.display = 'flex'; }
-    function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
-    function toggleSection(sectionId, chk) { document.getElementById(sectionId).classList.toggle('hidden-section', !chk.checked); }
+    function restoreInputValues(savedValues) {
+        for (let id in savedValues) {
+            const el = document.getElementById(id);
+            if (el && savedValues[id] !== "") el.value = savedValues[id];
+        }
+        calculateAll();
+    }
+
+
 
     // ============================================================
     // XỬ LÝ DỮ LIỆU CŨ
     // ============================================================
-    function loadOldDataSection() {
-        const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
-        const tram = encodeURIComponent(document.getElementById('info_tram').value);
-        if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Ngăn Lộ!"); return; }
-        showLoading("Đang tải dữ liệu ...");
-        const modName = MODULE_PREFIX.replace('_', '').toUpperCase();
-        const fetchUrl = `${GOOGLE_WEB_APP_URL}?nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
-        fetch(fetchUrl).then(res => res.json()).then(data => {
-            hideLoading();
-            if (!data || data.length === 0 || data.error) { alert("ℹ️ Không tìm thấy dữ liệu cũ!"); return; }
-            globalHistoryData = data;
-            showHistoryModal(data);
-        }).catch(err => { hideLoading(); alert("❌ Lỗi tải data: " + err); });
-    }
+    
+    
 
-    function loadLatestData() {
-        const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
-        const tram = encodeURIComponent(document.getElementById('info_tram').value);
-        if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Ngăn Lộ!"); return; }
-        showLoading("Đang tải thông số gần nhất...");
-        const modName = MODULE_PREFIX.replace('_', '').toUpperCase();
-        const fetchUrl = `${GOOGLE_WEB_APP_URL}?action=getLatest&nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
-        fetch(fetchUrl).then(res => res.json()).then(data => {
-            hideLoading();
-            if (!data || Object.keys(data).length === 0 || data.error) {
-                alert("ℹ️ Không tìm thấy dữ liệu cũ của thiết bị này trên hệ thống!");
-                return;
-            }
-            applyLatestData(data);
-        }).catch(err => { hideLoading(); alert("❌ Lỗi mạng: " + err); });
-    }
-
-    function applyLatestData(data) {
-        const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'tu_';
-        const numWindingsId = prefix + 'num_windings';
-
-        if (data[numWindingsId] !== undefined) {
-            const el = document.getElementById(numWindingsId);
-            if(el) {
-                const oldVal = el.value;
-                el.value = data[numWindingsId];
-                if (oldVal !== data[numWindingsId]) {
-                    changeWindingCount();
-                }
-            }
-        }
-
-        for (let key in data) {
-            const el = document.getElementById(key);
-            if (el && data[key] !== undefined && data[key] !== '') {
-                if (el.tagName === 'INPUT') {
-                    if (isConfigField(key)) {
-                        el.value = data[key];
-                    } else {
-                        el.value = "";
-                        el.placeholder = data[key];
-                        el.classList.remove('old-data-history', 'old-data', 'new-data', 'pass-color', 'fail-color');
-                        el.classList.add('old-data-latest');
-                        el.dataset.oldval = data[key];
-                        el.dataset.dataType = 'latest';
-                        el.style.color = '';
-                        el.style.fontWeight = '';
-                    }
-                } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
-                    el.value = data[key];
-                }
-            }
-        }
-
-        ['chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'].forEach(id => {
-            const chk = document.getElementById(id);
-            if(chk) {
-                chk.checked = true;
-                if (typeof toggleSection === 'function') {
-                    toggleSection(id.replace('chk', 'body'), chk);
-                }
-            }
-        });
-
-        if (typeof calculateAll === 'function') calculateAll();
-        alert(`⚡ Đã nhập các số liệu mới nhất!`);
-    }
-
-    function showHistoryModal(dataArray) {
-        const listDiv = document.getElementById('historyList');
-        listDiv.innerHTML = '';
-        dataArray.forEach((row, index) => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            const modeMap = { "new": "Mới", "1yr": "Sau 1 năm", "3yr": "Sau 3 năm", "6yr": "Sau 6 năm", "boost": "Tăng cường" };
-            const modeText = modeMap[row.tu_mode] || row.tu_mode || 'Không ghi nhận';
-            div.innerHTML = `<div class="history-date">📅 Ngày: ${row.ngayTN || '?'}</div><div class="history-person" style="color: #0288d1; font-weight: bold;">⚙️ Chế độ: ${modeText}</div>`;
-            div.onclick = () => applyHistoryData(index);
-            listDiv.appendChild(div);
-        });
-        document.getElementById('historyModal').style.display = 'flex';
-    }
-
-    function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
-
-    function applyHistoryData(index) {
-        if (typeof closeHistoryModal === 'function') closeHistoryModal();
-        const data = globalHistoryData[index];
-        let warnCount = 0;
-
-        const numWindingsId = MODULE_PREFIX + 'num_windings';
-        if (data[numWindingsId] !== undefined) {
-            const el = document.getElementById(numWindingsId);
-            if(el) {
-                const oldVal = el.value;
-                el.value = data[numWindingsId];
-                if (oldVal !== data[numWindingsId]) {
-                    renderAllTables();
-                }
-            }
-        }
-
-        for (let key in data) {
-            const el = document.getElementById(key);
-            if (el && data[key] !== undefined && data[key] !== '') {
-                if (el.tagName === 'INPUT') {
-                    if (isConfigField(key)) {
-                        el.value = data[key];
-                    } else {
-                        el.classList.remove('old-data-latest', 'old-data', 'new-data', 'pass-color', 'fail-color');
-                        el.classList.add('old-data-history');
-                        el.placeholder = data[key];
-                        el.dataset.oldval = data[key];
-                        el.dataset.dataType = 'history';
-                        el.style.color = '';
-                        el.style.fontWeight = '';
-                    }
-                } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
-                    el.value = data[key];
-                }
-            }
-        }
-
-        if (typeof calculateAll === 'function') calculateAll();
-        let msg = `⚡ Đã tải xong kết quả ngày ${data.ngayTN || ''} để đối chiếu!`;
-        if (warnCount > 0) msg += `\n⚠️ CẢNH BÁO: Phát hiện ${warnCount} vị trí có sự thay đổi bất thường!`;
-        alert(msg);
-    }
-
-
-
+    
     // ============================================================
     // RENDER BẢNG
     // ============================================================

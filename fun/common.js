@@ -12,12 +12,9 @@ let prefix = 'ti_'; // Mặc định
 // [SỬA] HÀM LẤY PREFIX TỪ MODULE HIỆN TẠI
 // ============================================================
 function initPrefix() {
-    // Nếu đã có prefix từ biến toàn cục
     if (typeof prefix !== 'undefined' && prefix) {
         return prefix;
     }
-    
-    // Thử lấy từ config
     if (typeof getCurrentModule === 'function') {
         const config = getCurrentModule();
         if (config && config.MODULE_PREFIX) {
@@ -25,8 +22,6 @@ function initPrefix() {
             return prefix;
         }
     }
-    
-    // Mặc định
     prefix = 'ti_';
     return prefix;
 }
@@ -176,7 +171,6 @@ function applyLatestData(data) {
         }
     }
 
-    // Mở các section
     ['chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'].forEach(id => {
         const chk = document.getElementById(id);
         if(chk) {
@@ -325,7 +319,6 @@ function showLoading(text) {
     if (overlay) overlay.style.display = 'flex';
 }
 
-
 function hideLoading() { 
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) overlay.style.display = 'none';
@@ -359,21 +352,13 @@ function syncOneDrive() {
 
     document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
         let value = "";
-if (el.tagName === "INPUT") 
-	{value = el.value.trim() || el.value.trim();}
-else if 
-	(el.tagName === "SELECT") {value = el.value;} else {value = el.value;}
-
-        // DÒNG 2 POST LUÔN SỐ CŨ
-		// DÒNG 3 CHỈ POST SỐ MỚI
-			// let value = (el.tagName === "INPUT" || el.tagName === "SELECT") ? el.value : el.innerText;
-			//let value = ""; if (el.tagName === "INPUT") {value = el.value.trim() || el.placeholder.trim();} else if (el.tagName === "SELECT") {value = el.value;} else {value = el.innerText; }
-			//let value = ""; if (el.tagName === "INPUT") {value = el.value.trim() || el.value.trim();} else if (el.tagName === "SELECT") {value = el.value;} else {value = el.value; }
-
-
-
-
-
+        if (el.tagName === "INPUT") {
+            value = el.value.trim() || el.value.trim();
+        } else if (el.tagName === "SELECT") {
+            value = el.value;
+        } else {
+            value = el.value;
+        }
         value = value ? value.replace("75°C:", "").replace("ms", "").trim() : "";
         if (value && value !== '-' && value !== 'NaN' && value !== '0') payload[el.id] = value;
     });
@@ -393,14 +378,13 @@ else if
 // ============================================================
 
 async function exportWordFromDrive() {
-    const config = getCurrentModule();
-    if (!config || !config.TEMPLATE_DRIVE_ID) {
+    if (!TEMPLATE_DRIVE_ID) {
         alert("⚠️ Chưa cấu hình TEMPLATE_DRIVE_ID!");
         return;
     }
     showLoading("Đang soạn file...");
     try {
-        const res = await fetch(`${GOOGLE_WEB_APP_URL}?action=getTemplate&fileId=${config.TEMPLATE_DRIVE_ID}`);
+        const res = await fetch(`${GOOGLE_WEB_APP_URL}?action=getTemplate&fileId=${TEMPLATE_DRIVE_ID}`);
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
@@ -409,19 +393,15 @@ async function exportWordFromDrive() {
         for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
 
         const payload = {};
-        payload[config.MODULE_PREFIX + 'tram'] = document.getElementById('info_tram').value || "";
-        payload[config.MODULE_PREFIX + 'nganlo'] = document.getElementById('info_nganlo').value || "";
+        payload[prefix + 'tram'] = document.getElementById('info_tram').value || "";
+        payload[prefix + 'nganlo'] = document.getElementById('info_nganlo').value || "";
         payload["ngayTN"] = document.getElementById('info_ngay').value || "";
         payload["nguoiTN"] = "";
 
-        document.querySelectorAll(`input[id^="${config.MODULE_PREFIX}"], select[id^="${config.MODULE_PREFIX}"]`).forEach(el => {
+        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
             let val = getVal(el.id);
             payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
         });
-
-
-
-
 
         const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'];
         checkboxes.forEach(id => {
@@ -429,20 +409,14 @@ async function exportWordFromDrive() {
             if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
         });
 
-        const num_windings = document.getElementById(config.MODULE_PREFIX + 'num_windings').value;
+        const num_windings = document.getElementById(prefix + 'num_windings').value;
         payload["is_2wind"] = (num_windings === "2");
         payload["is_3wind"] = (num_windings === "3");
         payload["is_4wind"] = (num_windings === "4");
-			payload["is_5wind"] = (num_windings === "5");
-			payload["is_6wind"] = (num_windings === "6");
-			payload["is_7wind"] = (num_windings === "7");
-			payload["is_8wind"] = (num_windings === "8");
-
-
-
-
-
-
+        payload["is_5wind"] = (num_windings === "5");
+        payload["is_6wind"] = (num_windings === "6");
+        payload["is_7wind"] = (num_windings === "7");
+        payload["is_8wind"] = (num_windings === "8");
 
         if (payload["ngayTN"]) {
             const m = payload["ngayTN"].match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -457,9 +431,10 @@ async function exportWordFromDrive() {
             compression: "DEFLATE" });
 
         const dateStr = payload["ngayTN"] ? payload["ngayTN"].replace(/\//g, '-') : "New";
-        const tramStr = payload[config.MODULE_PREFIX + 'tram'] ? payload[config.MODULE_PREFIX + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
-        const nganLoStr = payload[config.MODULE_PREFIX + 'nganlo'] ? payload[config.MODULE_PREFIX + 'nganlo'].replace(/[\/\\]/g, '-') : "NL";
-        saveAs(out, `Bien ban thi nghiem ${config.WORD_PREFIX}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
+        const tramStr = payload[prefix + 'tram'] ? payload[prefix + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
+        const nganLoStr = payload[prefix + 'nganlo'] ? payload[prefix + 'nganlo'].replace(/[\/\\]/g, '-') : "NL";
+        const wordPrefix = prefix.replace('_', '').toUpperCase();
+        saveAs(out, `Bien ban thi nghiem ${wordPrefix}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
 
         hideLoading();
     } catch (e) {
@@ -477,7 +452,7 @@ function handleRdcTab(event, currentWinding, colType) {
     if (event.key === 'Enter' || event.key === 'Tab') {
         event.preventDefault();
         const numWindings = parseInt(document.getElementById(prefix + 'num_windings')?.value) || 2;
-        const cols = ['ref', 'a', 'b', 'c'];
+        const cols = ['terminal', 'ref', 'a', 'b', 'c'];
         let colIndex = cols.indexOf(colType);
         let nextWinding = currentWinding;
         let nextCol = colType;
@@ -502,7 +477,14 @@ function handleRdcTab(event, currentWinding, colType) {
             }
         }
 
-        let nextId = `${prefix}rdc_${nextCol === 'ref' ? 'ref' : 'm'}_${nextWinding}${nextCol !== 'ref' ? '_' + nextCol : ''}`;
+        let nextId = '';
+        if (nextCol === 'terminal') {
+            nextId = `${prefix}rdc_terminal_${nextWinding}`;
+        } else if (nextCol === 'ref') {
+            nextId = `${prefix}rdc_ref_${nextWinding}`;
+        } else {
+            nextId = `${prefix}rdc_m_${nextWinding}_${nextCol}`;
+        }
         const nextEl = document.getElementById(nextId);
         if (nextEl) { nextEl.focus(); nextEl.select(); }
     }
@@ -572,7 +554,17 @@ function handleRcdTab(event, currentWinding, colType, isPri) {
     }
 }
 
-
+function handleEnterToNext(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
+        const currentIndex = Array.from(inputs).indexOf(event.target);
+        if (currentIndex < inputs.length - 1) {
+            inputs[currentIndex + 1].focus();
+            inputs[currentIndex + 1].select();
+        }
+    }
+}
 
 // ============================================================
 // 8. HÀM TIỆN ÍCH

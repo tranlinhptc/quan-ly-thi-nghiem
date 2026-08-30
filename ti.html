@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BIẾN DÒNG ĐIỆN</title>
+
+
+    <link rel="stylesheet" href="fun/common.css">
+
+
+    <!-- Cụm thư viện xuất Word chuẩn gốc -->
+    <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+
+    <style>
+        :root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+               background: url('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
+               background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
+        .container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .header-bar h2 { font-size: 15px; margin: 0; }
+        .btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
+        
+        .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
+        input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
+        th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
+        th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
+        
+        .sub-val { font-size: 10px; color: #1565c0; font-weight: 600; margin-top: 2px; display: block; }
+        .chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
+        .btn-view-old { background: #0288d1; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 15px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 4px 0; width: 100%; }
+        .btn-cloud { background: #2e7d32; }
+        .btn-draft { background: #0288d1; }
+        .btn-clear { background: #757575; font-size:11px; margin-top:4px; }
+        .pass { color: #2e7d32; font-weight: bold; }
+        .fail { color: #c62828; font-weight: bold; }
+        .note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
+        .hidden-section { display: none !important; }
+
+        /* Popups & Loading */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
+        .history-item { padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+        .history-item:hover { background: #fbe9e7; border-color: var(--primary); transform: scale(1.02); }
+        .history-date { font-weight: bold; color: #d84315; font-size: 14px; }
+        .history-person { font-size: 12px; color: #666; margin-top: 4px; }
+        .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
+        .err-box { background: #ffebee; border: 1px solid #ef5350; border-radius: 4px; padding: 2px; margin-top: 2px;}
+
+
+        /* CSS KHÓA FORM */
+        .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
+        #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
+
+
+
+        /* Style cho U₂ L1/L2 dọc */
+        .u2-input-group { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+        .u2-input-group input { font-size: 11px; background: #fff; width: 100%; padding: 2px 4px; border: 1px solid var(--border); border-radius: 3px; text-align: center; }
+        .u2-input-group input:focus { border-color: var(--primary); outline: none; }
+        .u2-avg-display { font-size: 9px; color: #1565c0; text-align: center; font-weight: bold; }
+
+	
+
+
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- Giao diện Popup (Được ẩn đi bằng display:none trong CSS) -->
+
+
+<div id="historyModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">⏱ LỊCH SỬ THÍ NGHIỆM</div>
+        <div style="font-size: 12px; color: #666; margin-bottom: 10px; text-align:center;">Chọn để điền mờ (Placeholder) số liệu cũ đối chiếu</div>
+        <div id="historyList"></div>
+        <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
+    </div>
+</div>
+
+
+
+<!-- them tu mc--!>
+
+<div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
+	<div class="loader"></div>
+    	<div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...	</div>
+</div>
+
+
+<div class="container">
+    <div class="header-bar">
+        <h2>⚡ THỬ NGHIỆM BIẾN DÒNG ĐIỆN(CT/TI)</h2>
+        <a href="../index.html" class="btn-back">← Trang Chủ</a>
+    </div>
+
+
+    <!-- 0. KHU VỰC BẮT BUỘC (ĐỊNH DANH) -->
+    <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
+        <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
+        <div class="grid">
+            <div class="form-group">
+                <label>Trạm (Lấy từ hệ thống): <span style="color:red">*</span></label>
+                <select id="info_tram" onchange="checkUnlockForm()">
+                    <option value="" disabled selected>Đang tải ...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ngăn Lộ / Chỉ danh: <span style="color:red">*</span></label>
+                <input type="text" id="info_nganlo" placeholder="Ví dụ: 271, 131..." oninput="checkUnlockForm()">
+            </div>
+            <div class="form-group">
+                <label>Ngày Thí Nghiệm:</label>
+                <input type="date" id="info_ngay" onchange="checkUnlockForm()">
+            </div>
+        </div>
+        <div id="unlock_message">⚠️ Vui lòng chọn Trạm và gõ Ngăn lộ để mở khóa Form nhập liệu!</div>
+    </div>
+   <!-- KHU VỰC BỊ KHÓA (SẼ MỞ KHI ĐỦ ĐIỀU KIỆN) -->
+    <!--div id="locked_zone" class="form-locked">
+  <!-- 0. CẤU HÌNH ĐỘNG -->
+    <div class="card">
+        <div class="card-title"><span> CẤU HÌNH THIẾT BỊ</span>
+		<button class="btn-view-old" style="background:#f57c00; margin-right: 5px;" 				onclick="loadLatestData()">⚡Tất cả kết quả mới nhất</button>
+                <button class="btn-view-old" onclick="loadOldDataSection()">👁️ Lịch sử</button>
+
+	</div>
+        <div class="grid">
+
+            <div class="form-group">
+                <label>Chế Độ Thí Nghiệm:</label>
+                <select id="ti_mode" onchange="calculateAll()">
+                    <option value="new" selected>Mới / Sau lắp đặt</option>
+                    <option value="1yr">Sau 1 năm vận hành</option>
+                    <option value="3yr">Sau 3 năm vận hành</option>
+                    <option value="6yr">Sau 6 năm vận hành</option>
+                    <option value="boost">Thí nghiệm tăng cường</option>
+                </select>
+            </div>
+
+
+
+
+            <div class="form-group">
+                <label>Hiệu:</label>
+                <select id="ti_mfg" onchange="calculateAll()">
+                    <option value="ABB">ABB (R_CĐ nhị thứ ≥ 5 MΩ)</option>
+                    <option value="Sieyun">Sieyun TYD (R_CĐ nhị thứ ≥ 1000 MΩ)</option>
+                    <option value="Areva">Areva (R_CĐ nhị thứ ≥ 50 MΩ)</option>
+                    <option value="Alstom">Alstom (R_CĐ nhị thứ ≥ 25 MΩ)</option>
+                    <option value="GE">GE (R_CĐ nhị thứ ≥ 50 MΩ)</option>
+                    <option value="Other" selected>Hãng khác (R_CĐ nhị thứ > 200 MΩ)</option>
+                </select>
+            </div>
+			<div class="form-group"><label>Kiểu (Type):</label><input type="text" 	id="ti_kieu" placeholder="LTB145"></div>
+
+			<div class="form-group"><label>Năm SX:</label><input type="number" 	id="ti_namsx" placeholder="2020"></div>
+
+            <div class="form-group"><label>Uđm (kV):</label><input type="number" 	id="ti_udm" placeholder="245"></div>
+			
+			<div class="form-group"><label>No:</label><input type="text" id="ti_no" 			placeholder="Serial:"></div>
+			
+			<div class="form-group"><label>Công suất:</label><input type="text" 	id="ti_csuat" 	placeholder="50/50"></div>
+			
+			<div class="form-group"><label>Điện dung (pF) (Type):</label><input 		type="number" id="ti_ddung" placeholder="4400"></div>
+			
+
+			
+			<div class="form-group">
+                <label>Vật Liệu Cách Điện:</label>
+                <select id="ti_insulation" onchange="calculateAll()">
+                    <option value="paper" selected>Loại Giấy (Mới ≤0.5%, Cũ ≤0.8%)</option>
+                    <option value="paper_film_paper">Giấy-Film-Giấy (Mới ≤0.2%, Cũ ≤0.3%)</option>
+                    <option value="film_paper_film">Film-Giấy-Film (Mới ≤0.2%, Cũ ≤0.3%)</option>
+                    <option value="film">Loại Film (Mới ≤0.1%, Cũ ≤0.15%)</option>
+                </select>
+            </div>
+			
+			<div class="form-group">
+                <label>Số Cuộn:</label>
+                <select id="ti_num_windings" onchange="changeWindingCount()">
+                    <option value="2">2 Cuộn</option>
+                    <option value="3">3 Cuộn</option>
+                    <option value="4" selected>4 Cuộn</option>
+                    <option value="5">5 Cuộn</option>
+                    <option value="6">6 Cuộn</option>
+                    <option value="7">7 Cuộn</option>
+                    <option value="8">8 Cuộn</option>
+                </select>
+            </div>
+			
+			<div class="form-group">
+                <label>Nhiệt độ MT (°C):</label>
+                <input type="number" id="ti_temp" value="" oninput="calculateAll()">
+            </div>
+			
+			<div class="form-group">
+                <label>Độ ẩm (%):</label>
+                <input type="number" id="ti_humidity" value="" oninput="calculateAll()">
+            </div>
+
+						<div class="form-group">
+                <label>Ghi chú:</label>
+                <input type="text" id="ti_ghichu" placeholder="Nhập ghi chú nếu cần"
+						</div>
+			
+			<!--div class="form-group">
+                <label>Uđm (kV):</label>
+                <select id="ti_udm" onchange="calculateAll()">
+                    <option value="550/1.73205">550</option>
+                    <option value="220/1.73205" selected>220</option>
+                    <option value="110/1.73205">110</option>
+                    <option value="35/1.73205">35</option>
+                    <option value="22/1.73205">22</option>
+                    <option value="15/1.73205">15</option>
+                    <option value="6.6/1.73205">6.6</option>
+                </select>
+            </div>-->
+        
+		</div>
+	
+	</div>
+
+
+		
+    <!-- 1. KIỂM TRA BÊN NGOÀI -->
+	<div class="card" style="display:none">
+     		<div class="card-title">
+            	<span>1. Kiểm Tra Bên Ngoài</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
+        	</div>
+            	<div id="body_sec1" class="table-responsive hidden-section">
+            <input type="text" id="ti_visual" value="Bình thường, sứ không nứt vỡ, không rò rỉ dầu.">
+       		</div> 
+	</div> 
+
+
+    <!-- 2. ĐIỆN TRỞ MỘT CHIỀU NHỊ THỨ -->
+    <div class="card">
+        <div class="card-title">
+            <span>1. R Một Chiều[Ω]</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
+        </div>
+            	<div id="body_sec2" class="table-responsive hidden-section">
+            <div class="note-text">* TI động quy đổi 75°C và đánh giá NGAY KHI NHẬ.</div>
+            <div class="table-responsive" id="table_rdc_container"></div>
+        </div>
+        </div>
+
+
+
+
+
+    <!-- 3. ĐO ĐIỆN TRỞ CÁCH ĐIỆN -->
+    <div class="card">
+        <div class="card-title">
+            <span>2. Cách Điện [MΩ]</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
+        </div>
+            	<div id="body_sec3" class="table-responsive hidden-section">
+		<div class="note-text" id="rcd_std_note">* R_CĐ NỘI SUY THEO NHIỆT ĐỘ.</div>
+		<div class="table-responsive" id="table_rcd_container"></div>
+	</div>
+	</div>
+
+
+
+
+
+<!-- 4. TỈ SỐ BIẾN -->
+    <div class="card">
+        <div class="card-title">
+            <span>3. Tỉ Số Biến</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec4" onchange="toggleSection('body_sec4', this)"> ✏️ Nhập</label>
+        </div>
+            	<div id="body_sec4" class="table-responsive hidden-section">
+<div class="grid" style="margin-bottom:8px;">
+                <div class="form-group">
+                    <label>I_Thử Nghiệm(A):</label>
+                    <input type="number" id="ti_i1_tn" value="10" oninput="calculateAll()">
+                </div>
+            </div>
+            <div class="table-responsive" id="table_ratio_container"></div>
+	</div>
+    	</div>
+
+	    <!-- 2. TỪ HÓA-->
+
+<div class="card">
+    <div class="card-title">
+        <span>4. Từ Hóa</span>
+        <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
+    </div>
+    <div id="body_sec5" class="table-responsive hidden-section">
+        <!-- Container cho 3 pha -->
+        <div id="table_tuhoa_container">
+            <div id="table_tuhoa_a_container"></div>
+            <div id="table_tuhoa_b_container"></div>
+            <div id="table_tuhoa_c_container"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 6. TAN DELTA & ĐIỆN DUNG -->
+<div class="card">
+    <div class="card-title">
+        <span>5. Tgδ(%) & Điện Dung (pF)</span>
+        <div>
+            <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
+        </div>
+    </div>
+    <div id="body_sec6" class="table-responsive hidden-section">
+        <div class="note-text">
+)))        </div>
+        <div class="table-responsive" id="table_tg_container"></div>
+    </div>
+</div>
+
+
+
+
+
+
+
+    <!-- ĐIỀU KHIỂN -->
+        <div class="card">
+            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
+            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản Word (Auto Template)</button>
+            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ Google Sheet</button>
+            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp làm lại</button>
+        </div>
+	    </div>
+</div>
+</div> <!-- HẾT KHU VỰC KHÓA -->
+</div>
+
+<!-- Thêm fallback -->
+<script>
+    if (typeof loadCommonJS === 'undefined') {
+        document.write('<div style="color:red;">⚠️ Lỗi tải common.js</div>');
+    }
+</script>
+
+<script>
+    // 🔴 BƯỚC QUAN TRỌNG ID CỦA FILE WORD 
+    const CURRENT_MODULE = 'TI';
+    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
+    const MODULE_PREFIX = "ti_";
+	const prefix = MODULE_PREFIX; 
+
+
+  
+
+// let globalHistoryData = [];
+
+</script>
+    // ============================================================
+    // CODE RIÊNG CỦA TI
+    // ============================================================
+    window.onload = function() {
+        setTodayDate();
+        fetchSubstations();
+        refreshTables();
+        renderAllTables();
+        
+        // Load nháp nếu có, nếu có nháp nghĩa là đã có Trạm/Ngăn lộ -> Thử mở khóa luôn
+       if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
+         // loadDraftData();
+            checkUnlockForm();
+        }
+    };
+
+	function refreshTables() {renderRatioTable(); renderTgTable(); calculateAll();}
+
+
+    
+    // ============================================================
+// PHẦN 3: HÀM applyHistoryData - Dữ liệu lịch sử (đen, mờ)
+// ============================================================
+
+
+
+
+
+
+
+
+
+    function restoreInputValues(savedValues) {
+        for (let id in savedValues) {
+            const el = document.getElementById(id);
+            if (el && savedValues[id] !== "") el.value = savedValues[id];
+        }
+        calculateAll();
+    }
+
+    function changeWindingCount() {
+    renderAllTables();
+}
+
+function renderAllTables() {
+        renderRcdTable();
+        renderRdcTable();
+        renderRatioTable();
+	    renderTuHoaTables(); 
+        renderTgTable();
+        calculateAll();
+    }
+
+function getInterpolatedPriRcd(temp, u1Str) {
+        let points = [];
+        // Ép giá trị anh gõ vào thành Số thực (Ví dụ gõ 245 -> 245)
+        const u = parseFloat(u1Str) || 0; 
+
+        // So sánh bằng Số học thay vì tìm chuỗi
+        if (u >= 110) { // Dành cho 110kV, 220kV (245), 500kV
+            points = [[20, 1200], [30, 600], [40, 300], [50, 150], [60, 75]];
+        } else if (u >= 22 && u < 110) { // Dành cho 22kV, 35kV
+            points = [[20, 1000], [30, 500], [40, 250], [50, 125], [60, 65]];
+        } else if (u === 15) { // Dành cho 15kV
+            points = [[20, 800], [30, 400], [40, 200], [50, 100], [60, 50]];
+        } else { // Nhỏ hơn 15kV
+            points = [[20, 400], [30, 200], [40, 100], [50, 50], [60, 25]];
+        }
+        
+        for (let p of points) { if (temp === p[0]) return p[1]; }
+        if (temp < points[0][0]) return points[0][1];
+        if (temp > points[points.length - 1][0]) return points[points.length - 1][1];
+        for (let i = 0; i < points.length - 1; i++) {
+            if (temp > points[i][0] && temp < points[i+1][0]) {
+                const t1 = points[i][0], r1 = points[i][1];
+                const t2 = points[i+1][0], r2 = points[i+1][1];
+                return r1 + (r2 - r1) * (temp - t1) / (t2 - t1);
+            }
+        }
+        return 300;
+    }
+
+
+// [ĐÃ SỬA] Bảng RDC - Bỏ cột Số cũ, thêm cột Đầu dây, bỏ đánh giá
+function renderRdcTable() {
+    const container = document.getElementById('table_rdc_container');
+    if (!container) return;
+
+    const num = parseInt(document.getElementById('ti_num_windings').value);
+    let html = `<table><thead><tr><th>Stt Cuộn</th><th>Đầu dây</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+    
+    for(let i=1; i<=num; i++) {
+        html += `<tr>
+            <td><b>Cuộn ${i}</b></td>
+            <td><input type="text" id="ti_rdc_terminal_${i}" value="${i}S1-${i}S" onkeydown="handleRdcTab(event, ${i}, 'terminal')" onkeypress="handleEnterToNext(event)"></td>
+            <td>
+                <input type="number" id="ti_rdc_m_${i}_a" oninput="handleNewInput(event); calculateAll()" placeholder="Đo A" onkeydown="handleRdcTab(event, ${i}, 'a')" onkeypress="handleEnterToNext(event)">
+                <span class="sub-val" id="ti_rdc_75_${i}_a">75°C: -</span>
+            </td>
+            <td>
+                <input type="number" id="ti_rdc_m_${i}_b" oninput="handleNewInput(event); calculateAll()" placeholder="Đo B" onkeydown="handleRdcTab(event, ${i}, 'b')" onkeypress="handleEnterToNext(event)">
+                <span class="sub-val" id="ti_rdc_75_${i}_b">75°C: -</span>
+            </td>
+            <td>
+                <input type="number" id="ti_rdc_m_${i}_c" oninput="handleNewInput(event); calculateAll()" placeholder="Đo C" onkeydown="handleRdcTab(event, ${i}, 'c')" onkeypress="handleEnterToNext(event)">
+                <span class="sub-val" id="ti_rdc_75_${i}_c">75°C: -</span>
+            </td>
+        </tr>`;
+    }
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+//THAY THÉ 
+function renderRcdTable() {
+    const container = document.getElementById('table_rcd_container');
+    if (!container) return;
+
+    const num = parseInt(document.getElementById('ti_num_windings').value) || 4;
+
+    let html = `
+    <table>
+        <thead>
+            <tr>
+                <th>Phép Đo</th>
+                <th>Tiêu Chuẩn</th>
+                <th>🟡Pha A</th>
+                <th>🔴Pha B</th>
+                <th>🔵Pha C</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    // =========================
+    // SƠ CẤP
+    // =========================
+    html += `
+    <tr>
+        <td><b>Sơ cấp - ∑</b></td>
+        <td id="ti_std_rcd_pri">-</td>
+
+        <td>
+            <input type="number" id="ti_rcd_pri_a" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'a', true)">
+            <span class="sub-val" id="ti_rcd_eval_pri_a"></span>
+        </td>
+        <td>
+            <input type="number" id="ti_rcd_pri_b" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'b', true)">
+            <span class="sub-val" id="ti_rcd_eval_pri_b"></span>
+        </td>
+        <td>
+            <input type="number" id="ti_rcd_pri_c" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'c', true)">
+            <span class="sub-val" id="ti_rcd_eval_pri_c"></span>
+        </td>
+    </tr>
+    `;
+
+    // =========================
+    // NHỊ THỨ
+    // =========================
+    for (let i = 1; i <= num; i++) {
+        html += `
+        <tr>
+            <td><b>Cuộn ${i} - ∑</b></td>
+            <td id="ti_std_rcd_sec${i}">-</td>
+
+            <td>
+                <input type="number" id="ti_rcd_sec${i}_a" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'a', false)">
+                <span class="sub-val" id="ti_rcd_eval_sec${i}_a"></span>
+            </td>
+
+            <td>
+                <input type="number" id="ti_rcd_sec${i}_b" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'b', false)">
+                <span class="sub-val" id="ti_rcd_eval_sec${i}_b"></span>
+            </td>
+
+            <td>
+                <input type="number" id="ti_rcd_sec${i}_c" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'c', false)">
+                <span class="sub-val" id="ti_rcd_eval_sec${i}_c"></span>
+            </td>
+        </tr>
+        `;
+    }
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// PHẦN 9A: renderRatioTable - MỖI CUỘN CÓ TỈ SỐ BIẾN RIÊNG
+// ============================================================
+function renderRatioTable() {
+    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="min-width:90px;vertical-align:middle;">Cuộn /<br>Thông số</th>
+                    <th colspan="3" style="min-width:180px;padding:6px 4px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+                            <span style="flex:1;text-align:center;font-size:12px;color:#f57f17;font-weight:700;">🟡 Pha A</span>
+                            <span style="flex:1;text-align:center;font-size:12px;color:#c62828;font-weight:700;">🔴 Pha B</span>
+                            <span style="flex:1;text-align:center;font-size:12px;color:#0d47a1;font-weight:700;">🔵 Pha C</span>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    for (let i = 1; i <= num; i++) {
+        html += `
+            <tr>
+                <td style="min-width:90px;vertical-align:middle;">
+                    <div style="display:flex;flex-direction:column;gap:3px;align-items:center;padding:4px 0;">
+                        <b style="font-size:13px;color:#d84315;">Cuộn ${i}</b>
+                        
+                        <!-- [SỬA] Tỉ số biến định mức cho từng cuộn -->
+                        <select id="ti_ratio_dm_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
+                            <option value="200">200</option>
+                            <option value="400" selected>400</option>
+                            <option value="600">600</option>
+                            <option value="800">800</option>
+                            <option value="1000">1.000</option>
+                            <option value="1200">1.200</option>
+                            <option value="1500">1.500</option>
+                            <option value="2000">2.000</option>
+                            <option value="3000">3.000</option>
+                        </select>
+
+                        <select id="ti_i2_dm_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
+                            <option value="1" selected>Thứ cấp 1A</option>
+                            <option value="5">Thứ cấp 5A</option>
+                        </select>
+
+                        <select id="ti_acc_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
+                            <option value="0.2">Cấp 0.2</option>
+                            <option value="0.5" selected>Cấp 0.5</option>
+                            <option value="5P">Cấp 5P</option>
+                            <option value="10P">Cấp 10P</option>
+                        </select>
+
+
+                    </div>
+                </td>
+        `;
+
+        ['A', 'B', 'C'].forEach(pha => {
+            let bgColor = '', borderLeft = '', borderRight = '';
+            let phaseClass = '';
+            
+            html += `
+                <td style="background:${bgColor};border-left:${borderLeft};border-right:${borderRight};padding:4px 2px;">
+                    <div class="ratio-cell">
+                        <div class="input-group">
+                            <!-- [SỬA] Ô Sai số - nhập % -->
+                            <div class="input-row">
+                                <input type="number" step="0.01" 
+                                    id="ti_err_w${i}_${pha}" 
+                                    class="${phaseClass}"
+                                    placeholder="± % sai số"
+                                    oninput="handleNewInput(event); calculateRatio(${i}, '${pha}', 'err')" 
+                                    onfocus="this.select()"
+                                    onkeydown="handleRatioTab(event, ${i}, '${pha}', 'err')"
+                                    style="font-size:12px;background:#fff;width:100%;"
+                                >
+                            </div>
+                        </div>
+                        <div class="ratio-info">
+                            <!-- [SỬA] Hiển thị TSB thực tế -->
+                            <span class="kdo" id="ti_kdo_w${i}_${pha}">TSB: </span>
+                        </div>
+                    </div>
+                </td>
+            `;
+        });
+
+        html += `</tr>`;
+    }
+
+    html += `</tbody></table>`;
+    document.getElementById('table_ratio_container').innerHTML = html;
+    
+    setTimeout(() => {
+        for (let i = 1; i <= num; i++) {
+            calculateRatio(i);
+        }
+    }, 100);
+}
+
+
+
+// ============================================================
+// PHẦN 9B: calculateRatio - TÍNH TỈ SỐ BIẾN + GIỮ MÀU ĐÁNH GIÁ
+// ============================================================
+function calculateRatio(winding, pha, source = null) {
+    const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}`)?.value || "400";
+    const ratio_dm = parseFloat(ratioDmStr) || 400;
+    const accStr = document.getElementById(`ti_acc_w${winding}`)?.value || "0.5";
+
+    let accLimit = parseFloat(accStr) || 0.5;
+    if (accStr === "5P") accLimit = 5;
+    else if (accStr === "10P") accLimit = 10;
+
+    // Kđm = tỉ số biến định mức
+    const K_dm = ratio_dm;
+    const kdmEl = document.getElementById(`ti_kdm_w${winding}`);
+    if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
+
+    // ============================================================
+    // TRƯỜNG HỢP 1: KHÔNG CÓ PHA → TÍNH TẤT CẢ PHA
+    // ============================================================
+    if (!pha) {
+        ['A', 'B', 'C'].forEach(p => {
+            const errEl = document.getElementById(`ti_err_w${winding}_${p}`);
+            const kdoEl = document.getElementById(`ti_kdo_w${winding}_${p}`);
+            
+            if (!errEl || !kdoEl) return;
+            
+            const error = parseFloat(errEl.value);
+            
+            if (!isNaN(error)) {
+                // Có giá trị sai số → tính TSB
+                const K_do = K_dm * (1 + error / 100);
+                kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
+                
+                // [SỬA QUAN TRỌNG] Đánh giá màu sắc
+                const isPass = Math.abs(error) <= accLimit;
+                
+                // [SỬA] CHỈ set màu khi ô đang có class new-data (dữ liệu mới nhập)
+                // KHÔNG set màu cho dữ liệu cũ (old-data)
+                if (errEl.classList.contains('new-data')) {
+                    errEl.style.color = isPass ? '#1565c0' : '#c62828';
+                    errEl.style.fontWeight = 'bold';
+                } else {
+                    // [SỬA] Nếu là dữ liệu cũ, KHÔNG reset màu
+                    // Chỉ reset nếu không có giá trị
+                    // KHÔNG set errEl.style.color = '' ở đây
+                }
+                errEl.dataset.source = 'err';
+            } else {
+                // Không có giá trị → reset TSB
+                kdoEl.textContent = 'TSB: -';
+                // [SỬA] Chỉ reset màu nếu không có class new-data
+                if (!errEl.classList.contains('new-data')) {
+                    errEl.style.color = '';
+                    errEl.style.fontWeight = '';
+                }
+                delete errEl.dataset.source;
+            }
+        });
+        return;
+    }
+
+    // ============================================================
+    // TRƯỜNG HỢP 2: CÓ PHA CỤ THỂ
+    // ============================================================
+    const errEl = document.getElementById(`ti_err_w${winding}_${pha}`);
+    const kdoEl = document.getElementById(`ti_kdo_w${winding}_${pha}`);
+
+    if (!errEl || !kdoEl) return;
+
+    const error = parseFloat(errEl.value);
+
+    if (!isNaN(error)) {
+        // Tính TSB
+        const K_do = K_dm * (1 + error / 100);
+        kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
+
+        // [SỬA] Đánh giá màu sắc
+        const isPass = Math.abs(error) <= accLimit;
+        
+        // [SỬA QUAN TRỌNG] CHỈ set màu khi ô đang có class new-data
+        if (errEl.classList.contains('new-data')) {
+            errEl.style.color = isPass ? '#1565c0' : '#c62828';
+            errEl.style.fontWeight = 'bold';
+        } else {
+            // [SỬA] Nếu là dữ liệu cũ, KHÔNG reset màu
+            // Chỉ reset nếu không có giá trị
+        }
+        errEl.dataset.source = 'err';
+
+    } else {
+        // Reset khi không có giá trị
+        kdoEl.textContent = 'TSB: -';
+        // [SỬA] Chỉ reset màu nếu không có class new-data
+        if (!errEl.classList.contains('new-data')) {
+            errEl.style.color = '';
+            errEl.style.fontWeight = '';
+        }
+        delete errEl.dataset.source;
+    }
+}
+
+	function renderTuHoaTables() {
+    const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
+    const numWindingsEl = document.getElementById(prefix + 'num_windings');
+    const num = numWindingsEl ? parseInt(numWindingsEl.value) || 4 : 4;
+
+    const phases = [
+        { id: 'a', name: 'Pha A', color: '#fff9c4' },
+        { id: 'b', name: 'Pha B', color: '#ffebee' },
+        { id: 'c', name: 'Pha C', color: '#e3f2fd' }
+    ];
+
+    phases.forEach(pha => {
+        const container = document.getElementById(`table_tuhoa_${pha.id}_container`);
+        if (!container) return;
+
+        let html = `<table>
+            <thead>
+                <tr>
+                    <th style="font-size:10px;">Cuộn / Đầu dây</th>
+                    <th style="font-size:10px;">Điện áp (3 giá trị)</th>
+                    <th style="font-size:10px;">Dòng điện (3 giá trị)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        for (let i = 1; i <= num; i++) {
+            html += `<tr>
+                <td style="background:${pha.color};">
+                    <b>C${i}</b><br>
+                    <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:10px; padding:2px; text-align:center;">
+                </td>
+                <td style="padding:2px;">
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <input type="number" step="0.001" id="${prefix}th_${pha.id}_u1_${i}" placeholder="U1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                        <input type="number" step="0.001" id="${prefix}th_${pha.id}_u2_${i}" placeholder="U2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                        <input type="number" step="0.001" id="${prefix}th_${pha.id}_u3_${i}" placeholder="U3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                    </div>
+                </td>
+                <td style="padding:2px;">
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i1_${i}" placeholder="I1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i2_${i}" placeholder="I2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i3_${i}" placeholder="I3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
+                    </div>
+                </td>
+            </tr>`;
+        }
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    });
+	}
+// 5. TANG=================================================
+function renderTgTable() {
+    const container = document.getElementById('table_tg_container');
+    if (!container) return;
+    
+    let html = `
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="2">Pha</th>
+                <th colspan="2">UST</th>
+                <th colspan="2">GST</th>
+            </tr>
+            <tr>
+                <th>Tgδ (%)</th>
+                <th>C (pF)</th>
+                <th>Tgδ (%)</th>
+                <th>C (pF)</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    
+        
+
+
+
+        // Chỉ 3 pha A, B, C
+      ['A', 'B', 'C'].forEach(pha => {
+        let phaseClass = '';
+        if (pha === 'A') phaseClass = 'phase-a';
+        else if (pha === 'B') phaseClass = 'phase-b';
+        else if (pha === 'C') phaseClass = 'phase-c';
+        
+        // [SỬA] Hiển thị emoji trong thẻ <td>, không dùng làm tên pha
+        let displayName = '';
+        if (pha === 'A') displayName = '🟡 Pha A';
+        else if (pha === 'B') displayName = '🔴 Pha B';
+        else if (pha === 'C') displayName = '🔵 Pha C';
+        
+        html += `
+       <tr>
+            <td><b>${displayName}</b></td>
+            <!-- UST -->
+            <td>
+                <input type="number" id="ti_tg_ust_${pha}" class="${phaseClass}" step="0.001" placeholder="Tgδ" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'ust_tg')" style="width:100%;">
+            </td>
+            <td>
+                <input type="number" id="ti_c_ust_${pha}" class="${phaseClass}" step="0.01" placeholder="C (pF)" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'ust_c')" style="width:100%;">
+            </td>
+            <!-- GST -->
+            <td>
+                <input type="number" id="ti_tg_gst_${pha}" class="${phaseClass}" step="0.001" placeholder="Tgδ" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'gst_tg')" style="width:100%;">
+            </td>
+            <td>
+                <input type="number" id="ti_c_gst_${pha}" class="${phaseClass}" step="0.01" placeholder="C (pF)" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'gst_c')" style="width:100%;">
+            </td>
+        </tr>
+        `;
+    });
+    
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+	
+	
+// ============================================================
+// PHẦN 8: calculateAll - Đánh giá qua màu sắc input
+// ============================================================
+function calculateAll() {
+    const temp = parseFloat(document.getElementById('ti_temp').value) || 23;
+    const i1_dm_str = document.getElementById('ti_udm').value;
+    const mfg = document.getElementById('ti_mfg').value;
+    const num = parseInt(document.getElementById('ti_num_windings').value);
+
+// ===== RCD SƠ CẤP =====
+    const stdPriRcd = getInterpolatedPriRcd(temp, i1_dm_str);
+    const stdPriEl = document.getElementById('ti_std_rcd_pri');
+    if(stdPriEl) stdPriEl.innerText = `≥ ${stdPriRcd.toFixed(0)} MΩ (${temp}°C)`;
+
+    ['a', 'b', 'c'].forEach(p => {
+        const el = document.getElementById(`ti_rcd_pri_${p}`);
+        if (el) {
+            const val = parseFloat(el.value) || 0;
+            // Chỉ đánh giá màu sắc nếu có giá trị mới nhập (new-data)
+            if (val > 0 && el.classList.contains('new-data')) {
+                const pass = val >= stdPriRcd;
+                el.style.color = pass ? '#1565c0' : '#c62828';
+                el.style.fontWeight = 'bold';
+            } else if (!el.classList.contains('new-data')) {
+                el.style.color = '';
+                el.style.fontWeight = '';
+            }
+        }
+    });
+
+    // ===== RCD NHỊ THỨ =====
+    let stdSecRcd = 200;
+    if (mfg === 'ABB') stdSecRcd = 5;
+    else if (mfg === 'Sieyun') stdSecRcd = 1000;
+    else if (mfg === 'Areva' || mfg === 'GE') stdSecRcd = 50;
+    else if (mfg === 'Alstom') stdSecRcd = 25;
+
+    for(let i=1; i<=num; i++) {
+        const stdEl = document.getElementById(`ti_std_rcd_sec${i}`);
+        if(stdEl) stdEl.innerText = `≥ ${stdSecRcd} MΩ`;
+        
+        ['a', 'b', 'c'].forEach(p => {
+            const el = document.getElementById(`ti_rcd_sec${i}_${p}`);
+            if (el) {
+                const val = parseFloat(el.value) || 0;
+                // Chỉ đánh giá màu sắc nếu có giá trị mới nhập (new-data)
+                if (val > 0 && el.classList.contains('new-data')) {
+                    const pass = val >= stdSecRcd;
+                    el.style.color = pass ? '#1565c0' : '#c62828';
+                    el.style.fontWeight = 'bold';
+                } else if (!el.classList.contains('new-data')) {
+                    el.style.color = '';
+                    el.style.fontWeight = '';
+                }
+            }
+        });
+    }
+    // ===== RDC =====
+    for(let i=1; i<=num; i++) {
+        ['a', 'b', 'c'].forEach(p => {
+            const mVal = parseFloat(document.getElementById(`ti_rdc_m_${i}_${p}`)?.value) || 0;
+            const el75 = document.getElementById(`ti_rdc_75_${i}_${p}`);
+            if(mVal > 0) {
+                const r75 = mVal * ((235 + 75) / (235 + temp));
+                if(el75) el75.innerText = `75°C: ${r75.toFixed(4)} Ω`;
+            } else {
+                if(el75) el75.innerText = `75°C: -`;
+            }
+        });
+    }
+
+    // ===== TỈ SỐ BIẾN =====
+    const numWindings = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+    for (let i = 1; i <= numWindings; i++) {
+        calculateRatio(i);
+    }
+
+    // ===== Tgδ =====
+    const insulation = document.getElementById('ti_insulation').value;
+    const mode = document.getElementById('ti_mode').value;
+    const isNew = (mode === 'new');
+
+    let tgLimit = 0.5;
+    switch(insulation) {
+        case 'paper': tgLimit = isNew ? 0.5 : 0.8; break;
+        case 'paper_film_paper':
+        case 'film_paper_film': tgLimit = isNew ? 0.2 : 0.3; break;
+        case 'film': tgLimit = isNew ? 0.1 : 0.15; break;
+        default: tgLimit = isNew ? 0.5 : 0.8;
+    }
+
+    const cStandard = parseFloat(document.getElementById('ti_ddung')?.value);
+
+    ['A', 'B', 'C'].forEach(pha => {
+        // UST Tgδ
+        const tgUstEl = document.getElementById(`ti_tg_ust_${pha}`);
+        if (tgUstEl) {
+            const val = parseFloat(tgUstEl.value) || 0;
+            if (val > 0) {
+                const pass = val <= tgLimit;
+                tgUstEl.style.color = pass ? '#1565c0' : '#c62828';
+                tgUstEl.style.fontWeight = 'bold';
+            } else {
+                tgUstEl.style.color = '';
+                tgUstEl.style.fontWeight = '';
+            }
+        }
+        
+        // UST C
+        const cUstEl = document.getElementById(`ti_c_ust_${pha}`);
+        if (cUstEl && cStandard > 0) {
+            const val = parseFloat(cUstEl.value) || 0;
+            if (val > 0) {
+                const err = ((val - cStandard) / cStandard) * 100;
+                const pass = (err >= -5 && err <= 10);
+                cUstEl.style.color = pass ? '#1565c0' : '#c62828';
+                cUstEl.style.fontWeight = 'bold';
+            } else {
+                cUstEl.style.color = '';
+                cUstEl.style.fontWeight = '';
+            }
+        }
+        
+        // GST Tgδ
+        const tgGstEl = document.getElementById(`ti_tg_gst_${pha}`);
+        if (tgGstEl) {
+            const val = parseFloat(tgGstEl.value) || 0;
+            if (val > 0) {
+                const pass = val <= tgLimit;
+                tgGstEl.style.color = pass ? '#1565c0' : '#c62828';
+                tgGstEl.style.fontWeight = 'bold';
+            } else {
+                tgGstEl.style.color = '';
+                tgGstEl.style.fontWeight = '';
+            }
+        }
+        
+        // GST C
+        const cGstEl = document.getElementById(`ti_c_gst_${pha}`);
+        if (cGstEl && cStandard > 0) {
+            const val = parseFloat(cGstEl.value) || 0;
+            if (val > 0) {
+                const err = ((val - cStandard) / cStandard) * 100;
+                const pass = (err >= -5 && err <= 10);
+                cGstEl.style.color = pass ? '#1565c0' : '#c62828';
+                cGstEl.style.fontWeight = 'bold';
+            } else {
+                cGstEl.style.color = '';
+                cGstEl.style.fontWeight = '';
+            }
+        }
+    });
+}	
+
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+// ============================================================
+// handleRatioTab - Điều hướng Tab cho bảng tỉ số biến
+// ============================================================
+function handleRatioTab(event, currentWinding, pha, fieldType) {
+    if (event.key !== 'Tab' && event.key !== 'Enter') return;
+    event.preventDefault();
+    
+    const numWindings = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+    const phases = ['A', 'B', 'C'];
+    const fields = ['err']; // [SỬA] Chỉ còn 1 ô nhập
+    
+    let phaIndex = phases.indexOf(pha);
+    let nextWinding = currentWinding;
+    let nextPha = pha;
+
+    if (!event.shiftKey) {
+        if (currentWinding < numWindings) {
+            nextWinding = currentWinding + 1;
+        } else {
+            if (phaIndex < phases.length - 1) {
+                nextPha = phases[phaIndex + 1];
+                nextWinding = 1;
+            } else {
+                event.target.blur();
+                return;
+            }
+        }
+    } else {
+        if (currentWinding > 1) {
+            nextWinding = currentWinding - 1;
+        } else {
+            if (phaIndex > 0) {
+                nextPha = phases[phaIndex - 1];
+                nextWinding = numWindings;
+            } else {
+                event.target.blur();
+                return;
+            }
+        }
+    }
+
+    const nextId = `ti_err_w${nextWinding}_${nextPha}`;
+    const nextEl = document.getElementById(nextId);
+    if (nextEl) {
+        nextEl.focus();
+        nextEl.select();
+    }
+
+
+// 2. ĐIỀU HƯỚNG PHÍM TAB CHO BẢNG RCD (Điện trở cách điện)
+
+
+
+//==================== HÀM XỬ LÝ TANG DELTA
+
+function handleTgTab(event, pha, fieldType) {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+        event.preventDefault();
+        
+        const phas = ['A', 'B', 'C'];
+        // Thứ tự các cột: ust_tg -> ust_c -> gst_tg -> gst_c
+        const fields = ['ust_tg', 'ust_c', 'gst_tg', 'gst_c'];
+        
+        let nextPha = pha;
+        let nextField = fieldType;
+        let currentFieldIndex = fields.indexOf(fieldType);
+        
+        if (event.key === 'Enter' || !event.shiftKey) {
+            // Đi tới
+            if (currentFieldIndex < 3) {
+                // Cùng pha, sang cột tiếp theo
+                nextField = fields[currentFieldIndex + 1];
+            } else {
+                // Hết cột của pha này -> sang pha tiếp theo
+                const phaIndex = phas.indexOf(pha);
+                if (phaIndex < 2) {
+                    nextPha = phas[phaIndex + 1];
+                    nextField = fields[0]; // Quay lại cột UST Tgδ
+                } else {
+                    // Hết pha C -> thoát
+                    event.target.blur();
+                    return;
+                }
+            }
+        } else {
+            // Shift + Tab: Đi lùi
+            if (currentFieldIndex > 0) {
+                // Cùng pha, sang cột trước
+                nextField = fields[currentFieldIndex - 1];
+            } else {
+                // Hết cột của pha này -> sang pha trước
+                const phaIndex = phas.indexOf(pha);
+                if (phaIndex > 0) {
+                    nextPha = phas[phaIndex - 1];
+                    nextField = fields[3]; // Quay lại cột GST C
+                } else {
+                    // Hết pha A -> thoát
+                    event.target.blur();
+                    return;
+                }
+            }
+        }
+        
+        // Tạo ID theo format: ti_tg_ust_A, ti_c_ust_A, ti_tg_gst_A, ti_c_gst_A
+        const nextId = `ti_${nextField === 'ust_tg' ? 'tg_ust' : nextField === 'ust_c' ? 'c_ust' : nextField === 'gst_tg' ? 'tg_gst' : 'c_gst'}_${nextPha}`;
+        
+        const nextEl = document.getElementById(nextId);
+        if (nextEl) {
+            nextEl.focus();
+            nextEl.select();
+        }
+    }
+}
+	
+
+
+
+
+</script>
+</body>
+</html>

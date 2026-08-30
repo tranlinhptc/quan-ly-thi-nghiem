@@ -285,14 +285,12 @@
 <!-- Load common -->
 <script src="fun/config.js"></script>
 <script src="fun/common.js"></script>
-
-<!-- Code riêng của TI -->
 <script>
     // ============================================================
     // CẤU HÌNH MODULE TU
     // ============================================================
     const CURRENT_MODULE = 'TU';
-    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
+    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjHTu";
     const MODULE_PREFIX = "tu_";
     window.prefix = MODULE_PREFIX;
 
@@ -311,7 +309,7 @@
     }
 
     // ============================================================
-    // CODE RIÊNG CỦA TI
+    // CODE RIÊNG CỦA TU
     // ============================================================
     window.onload = function() {
         initPrefix();
@@ -325,7 +323,9 @@
         }
     };
         function refreshTables() {
-        renderRatioTable(); 
+        renderRdcTable();
+            renderRcdTable();
+            renderRatioTable(); 
         renderTgTable(); 
         calculateAll();
     }
@@ -943,9 +943,108 @@
             nextEl.focus();
             nextEl.select();
         }
+    }
 
+    // ===== TAB CHO BẢNG RDC =====
+    function handleRdcTab(event, currentWinding, colType) {
+        if (event.key === 'Enter' || event.key === 'Tab') {
+            event.preventDefault();
+            const numWindings = parseInt(document.getElementById('tu_num_windings')?.value) || 2;
+            const cols = ['ref', 'a', 'b', 'c'];
+            let colIndex = cols.indexOf(colType);
+            let nextWinding = currentWinding;
+            let nextCol = colType;
+
+            if (event.key === 'Enter' || !event.shiftKey) {
+                if (currentWinding < numWindings) {
+                    nextWinding++;
+                } else {
+                    nextWinding = 1;
+                    colIndex = (colIndex + 1) % cols.length;
+                    nextCol = cols[colIndex];
+                    if (colIndex === 0) { event.target.blur(); return; }
+                }
+            } else {
+                if (currentWinding > 1) {
+                    nextWinding--;
+                } else {
+                    nextWinding = numWindings;
+                    colIndex = (colIndex - 1 + cols.length) % cols.length;
+                    nextCol = cols[colIndex];
+                    if (colIndex === cols.length - 1) { event.target.blur(); return; }
+                }
+            }
+
+            let nextId = `tu_rdc_${nextCol === 'ref' ? 'ref' : 'm'}_${nextWinding}${nextCol !== 'ref' ? '_' + nextCol : ''}`;
+            const nextEl = document.getElementById(nextId);
+            if (nextEl) { nextEl.focus(); nextEl.select(); }
+        }
+    }
+
+    // ===== TAB CHO BẢNG RCD (Cuộn 1→n cùng pha, hết cuộn → pha tiếp theo) =====
+    function handleRcdTab(event, currentWinding, colType, isPri) {
+        if (event.key !== 'Tab' && event.key !== 'Enter') return;
+        event.preventDefault();
+
+        const numWindings = parseInt(document.getElementById('tu_num_windings')?.value) || 2;
+        const cols = ['a', 'b', 'c'];
+        let colIndex = cols.indexOf(colType);
+        let nextWinding = currentWinding;
+        let nextIsPri = isPri;
+        let nextCol = colType;
+
+        if (event.key === 'Enter' || !event.shiftKey) {
+            if (isPri) {
+                nextWinding = 1;
+                nextIsPri = false;
+            } else if (currentWinding < numWindings) {
+                nextWinding++;
+            } else {
+                colIndex = (colIndex + 1) % cols.length;
+                if (colIndex === 0) {
+                    event.target.blur();
+                    return;
+                }
+                nextCol = cols[colIndex];
+                nextWinding = 0;
+                nextIsPri = true;
+            }
+        } else {
+            if (isPri) {
+                if (colIndex <= 0) {
+                    event.target.blur();
+                    return;
+                }
+                colIndex--;
+                nextCol = cols[colIndex];
+                nextWinding = numWindings;
+                nextIsPri = false;
+            } else if (currentWinding > 1) {
+                nextWinding--;
+            } else {
+                if (colIndex > 0) {
+                    colIndex--;
+                    nextCol = cols[colIndex];
+                    nextWinding = 0;
+                    nextIsPri = true;
+                } else {
+                    event.target.blur();
+                    return;
+                }
+            }
+        }
+
+        const nextId = nextIsPri
+            ? `tu_rcd_pri_${nextCol}`
+            : `tu_rcd_sec${nextWinding}_${nextCol}`;
+
+        const nextEl = document.getElementById(nextId);
+        if (nextEl) {
+            nextEl.focus();
+            nextEl.select();
+        }
+    }
 
 
 </script>
-</body>
-                                                                            </html>
+    </body>

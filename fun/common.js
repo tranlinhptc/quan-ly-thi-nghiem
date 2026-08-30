@@ -84,8 +84,7 @@ function populateSelect(data) {
         checkUnlockForm();
     }
 }
-
-function checkUnlockForm() {
+/* function checkUnlockForm() {
     const tram = document.getElementById('info_tram').value;
     const nganLo = document.getElementById('info_nganlo').value.trim();
     const zone = document.getElementById('locked_zone');

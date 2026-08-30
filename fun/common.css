@@ -1,0 +1,140 @@
+/* ============================================================
+   fun/common.css - STYLE DÙNG CHUNG CHO TẤT CẢ MODULE
+   ============================================================ */
+
+/* ---------- MÀU SẮC PHÂN BIỆT PHA ---------- */
+.phase-a { background-color: #fff9c4 !important; } /* Vàng */
+.phase-b { background-color: #ffebee !important; } /* Đỏ nhạt */
+.phase-c { background-color: #e3f2fd !important; } /* Xanh dương */
+
+/* ---------- DỮ LIỆU CŨ ---------- */
+.old-data-latest {
+    color: #2e7d32 !important;
+    opacity: 0.6 !important;
+    font-weight: bold !important;
+    font-style: italic !important;
+}
+.old-data-latest::placeholder {
+    color: #2e7d32 !important;
+    opacity: 0.6 !important;
+    font-weight: bold !important;
+}
+
+.old-data-history {
+    color: #333333 !important;
+    opacity: 0.6 !important;
+    font-weight: bold !important;
+    font-style: italic !important;
+}
+.old-data-history::placeholder {
+    color: #333333 !important;
+    opacity: 0.6 !important;
+    font-weight: bold !important;
+}
+.old-data {
+    color: #d32f2f !important;
+    opacity: 1 !important;
+    font-weight: bold !important;
+    font-style: normal !important;
+}
+
+.old-data::placeholder {
+    color: #2e7d32 !important;
+    opacity: 1 !important;
+    font-weight: bold !important;
+}
+
+
+/* ---------- DỮ LIỆU MỚI ---------- */
+.new-data {
+    color: #000000;
+    font-weight: bold !important;
+}
+
+/* ---------- ĐÁNH GIÁ ---------- */
+.pass-color {
+    color: #1565c0 !important;
+    font-weight: bold !important;
+}
+.fail-color {
+    color: #c62828 !important;
+    font-weight: bold !important;
+}
+
+/* ---------- CẢNH BÁO ---------- */
+.warning-degradation {
+    background-color: #fff9c4 !important;
+    border: 2px solid #f57f17 !important;
+    color: #e65100 !important;
+    font-weight: bold !important;
+}
+.warning-increase {
+    border: 2px solid #ff6f00 !important;
+    background-color: #fff3e0 !important;
+    color: #e65100 !important;
+    font-weight: bold !important;
+}
+
+/* ---------- BẢNG TỈ SỐ BIẾN ---------- */
+.ratio-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 90px;
+    padding: 2px;
+}
+.ratio-cell .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+.ratio-cell .input-row {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+}
+.ratio-cell .input-row input {
+    flex: 1;
+    padding: 4px 4px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    text-align: center;
+    min-width: 50px;
+    width: 100%;
+}
+.ratio-cell .input-row input:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(216, 67, 21, 0.1);
+}
+.ratio-cell .input-row .unit {
+    font-size: 9px;
+    color: #666;
+    min-width: 14px;
+    font-weight: 600;
+}
+.ratio-info {
+    font-size: 9px;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    margin-top: 2px;
+    width: 100%;
+}
+.ratio-info .kdo {
+    color: #1565c0;
+    font-weight: 600;
+    font-size: 10px;
+}
+
+
+
+
+
+

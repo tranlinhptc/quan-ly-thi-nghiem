@@ -673,8 +673,9 @@ function getInterpolatedPriRcd(temp, u1Str) {
             }
 
             if (!isNaN(u2_do) && u2_do > 0) {
-                const K_do = u1_tn_val / u2_do;
-                kdoEl.textContent = `Kđo: ${K_do.toFixed(2)}`;
+               // const K_do = u1_tn_val / u2_do;
+                const K_do = K_dm * (1 + error / 100);
+                kdoEl.textContent = `Kđo: ${K_do.toFixed(3)}`;
                 
                 const error = ((K_do - K_dm) / K_dm) * 100;
                 errEl.value = error.toFixed(3);

@@ -29,7 +29,7 @@ function initPrefix() {
 // ============================================================
 // [SỬA] LẤY GOOGLE_WEB_APP_URL
 // ============================================================
-const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxr-8Y25S607UYytRjKutvw4Zhx69W05XOc3Qs5gsSBQNxAZ8S16mmt7Nj8xUV1nNIn/exec";
+// const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxr-8Y25S607UYytRjKutvw4Zhx69W05XOc3Qs5gsSBQNxAZ8S16mmt7Nj8xUV1nNIn/exec";
 
 // ============================================================
 // 1. HÀM KHỞI TẠO

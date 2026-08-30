@@ -418,17 +418,6 @@ async function exportWordFromDrive() {
 
         document.querySelectorAll(`input[id^="${config.MODULE_PREFIX}"], select[id^="${config.MODULE_PREFIX}"]`).forEach(el => {
             let val = getVal(el.id);
-
-        // DÒNG 1 LẤY LUÔN SỐ CŨ
-		// val = el.value.trim() || el.placeholder.trim();}else if (el.tagName === "SELECT") {val = el.value;}else {val=el.innerText;}
-		// DÒNG 2 CHỈ LẤY SỐ MỚI
-       	// val = el.value.trim() || el.value.trim();}else if (el.tagName === "SELECT") {val = el.value;}else {val=el.value;}
-// MỚI 927-929
-		//document.querySelectorAll(`input[id^="${MODULE_PREFIX}"], select[id^="${MODULE_PREFIX}"]`).forEach(el => {
-		let val = getVal(el.id);	
-
-
-
             payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
         });
 

@@ -402,11 +402,37 @@ async function exportWordFromDrive() {
             payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
         });
 
-        const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'];
-        checkboxes.forEach(id => {
-            const checked = document.getElementById(id)?.checked;
-            if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
-        });
+        //const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'];
+        //checkboxes.forEach(id => {
+            //const checked = document.getElementById(id)?.checked;
+            //if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
+       // });
+
+
+
+                    // --- BỘ CÔNG TẮC ĐIỀU KIỆN ẨN/HIỆN FORM WORD ---
+			const sec1 = document.getElementById('chk_sec1').checked; if (sec1) {payload["is_sec1"] = true;} else {    delete payload["is_sec1"];}
+			const sec2 = document.getElementById('chk_sec2').checked; if (sec2) {payload["is_sec2"] = true;} else {    delete payload["is_sec2"];}
+			const sec3 = document.getElementById('chk_sec3').checked; if (sec3) {payload["is_sec3"] = true;} else {    delete payload["is_sec3"];}
+			const sec4 = document.getElementById('chk_sec4').checked; if (sec4) {payload["is_sec4"] = true;} else {    delete payload["is_sec4"];}
+			const sec5 = document.getElementById('chk_sec5').checked; if (sec5) {payload["is_sec5"] = true;} else {    delete payload["is_sec5"];}
+			const sec6 = document.getElementById('chk_sec6').checked; if (sec6) {payload["is_sec6"] = true;} else {    delete payload["is_sec6"];}
+
+			const tuDK = document.getElementById('mc_tudk').value;
+            payload["is_1tu"] = (tuDK === "1"); // Bằng true nếu là 1 tủ
+            payload["is_3tu"] = (tuDK === "3"); // Bằng true nếu là 3 tủ
+            
+            const cuonDay = document.getElementById('mc_cuonday').value;
+            payload["is_1C2O"] = (cuonDay === "1C2O");
+            payload["is_2C1O"] = (cuonDay === "2C1O");
+            payload["is_2C2O"] = (cuonDay === "2C2O");
+
+            const tiepDiem = document.getElementById('mc_tiepdiem').value;
+            payload["is_1TD"] = (tiepDiem === "1");
+            payload["is_2TD"] = (tiepDiem === "2");
+            payload["is_3TD"] = (tiepDiem === "3");
+            payload["is_4TD"] = (tiepDiem === "4");
+            // ------------------------------------------------
 
         const num_windings = document.getElementById(prefix + 'num_windings').value;
         payload["is_2wind"] = (num_windings === "2");

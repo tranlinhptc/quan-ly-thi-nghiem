@@ -110,6 +110,76 @@
         .import-section .btn-import { background: #0288d1; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; margin: 5px; }
         .import-section .btn-import:hover { opacity: 0.8; }
         .file-input-hidden { display: none; }
+
+/* ========== CT TABS ========== */
+.ct-phase-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+.ct-phase-tabs button { 
+    padding: 6px 14px; 
+    border: 1px solid var(--border); 
+    border-radius: 4px; 
+    background: #f5f5f5; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 12px; 
+    flex: 1;
+    min-width: 60px;
+}
+.ct-phase-tabs button.active { 
+    background: var(--primary); 
+    color: white; 
+    border-color: var(--primary); 
+}
+.ct-phase-tabs button:hover:not(.active) { background: #e0e0e0; }
+
+.ct-winding-select { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ct-winding-select .btn-add-remove { 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    padding: 2px 12px; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: 700; 
+    line-height: 1.4;
+}
+.ct-winding-select .btn-add-remove.red { background: #c62828; }
+.ct-winding-select .btn-add-remove.green { background: #2e7d32; }
+
+.ct-table-wrap { overflow-x: auto; margin-top: 5px; }
+.ct-table-wrap table { font-size: 10px; width: 100%; min-width: 600px; }
+.ct-table-wrap table th { 
+    background: #f1f3f4; 
+    font-size: 9px; 
+    padding: 4px 3px; 
+    text-align: center; 
+    white-space: nowrap;
+}
+.ct-table-wrap table td { padding: 2px 3px; text-align: center; vertical-align: middle; }
+.ct-table-wrap table input { 
+    font-size: 10px; 
+    padding: 3px 2px; 
+    border: 1px solid #ddd; 
+    border-radius: 2px; 
+    text-align: center; 
+    width: 100%;
+    min-width: 50px;
+}
+.ct-table-wrap table input:focus { border-color: var(--primary); outline: none; }
+.ct-phase-label { font-weight: 700; font-size: 11px; }
+.ct-location-label { font-weight: 600; font-size: 10px; }
+.ct-winding-label { font-weight: 600; font-size: 10px; }
+
+.ct-excitation-group { display: flex; flex-direction: column; gap: 1px; align-items: center; }
+.ct-excitation-row { display: flex; gap: 2px; align-items: center; }
+.ct-excitation-row input { width: 28px; font-size: 9px; padding: 2px 2px; }
+.ct-excitation-row span { font-size: 8px; color: #666; }
+
+@media (max-width: 480px) {
+    .ct-table-wrap table input { min-width: 35px; font-size: 9px; padding: 2px 1px; }
+    .ct-excitation-row input { width: 22px; font-size: 8px; }
+    .ct-phase-tabs button { font-size: 10px; padding: 4px 8px; }
+}
     </style>
 </head>
 <body>
@@ -222,7 +292,7 @@
         </div>
 
         <!-- 1. KIỂM TRA BÊN NGOÀI -->
-        <div class="card" style="display:none">
+        <div class="card">
             <div class="card-title">
                 <span>1. Kiểm Tra Bên Ngoài</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
@@ -245,7 +315,7 @@
         </div>
 
         <!-- 3. TỔ ĐẤU DÂY -->
-        <div class="card" style="display:none">
+        <div class="card">
             <div class="card-title">
                 <span>3. Tổ Đấu Dây (Vector Group)</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
@@ -301,36 +371,43 @@
             </div>
         </div>
 
-        <!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
-        <div class="card">
-            <div class="card-title">
-                <span>8. Biến Dòng Chân Sứ (Bushing CT)</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec8" onchange="toggleSection('body_sec8', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec8" class="table-responsive hidden-section">
-                <div class="note-text">* Đo ở nhiệt độ: <span id="mba_ct_temp_display">-</span> °C</div>
-                <div id="ct_selector" class="ct-section">
-                    <div class="ct-title">📌 Chọn vị trí CT</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-                        <select id="mba_ct_location" onchange="renderCtTables()" style="padding:4px 8px;font-size:12px;">
-                            <option value="HV">Phía Cao áp (220kV)</option>
-                            <option value="MV">Phía Trung áp (110kV)</option>
-                            <option value="LV">Phía Hạ áp (22kV)</option>
-                            <option value="NEUTRAL">Phía Trung tính</option>
-                        </select>
-                    </div>
-                    <div class="ct-phase-tabs">
-                        <button class="active" data-phase="A" onclick="switchCtPhase('A')">Pha A</button>
-                        <button data-phase="B" onclick="switchCtPhase('B')">Pha B</button>
-                        <button data-phase="C" onclick="switchCtPhase('C')">Pha C</button>
-                    </div>
-                    <div id="ct_container"></div>
-                </div>
-            </div>
+<!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG -->
+<div class="card">
+    <div class="card-title">
+        <span>8. Biến Dòng Chân Sứ (Bushing CT)</span>
+        <label class="chk-disable"><input type="checkbox" id="chk_sec8" onchange="toggleSection('body_sec8', this)"> ✏️ Nhập</label>
+    </div>
+    <div id="body_sec8" class="table-responsive hidden-section">
+        <div class="note-text">* Đo ở nhiệt độ: <span id="mba_ct_temp_display">-</span> °C</div>
+        
+        <!-- Chọn số cuộn dây chung -->
+        <div class="ct-winding-select" style="margin:10px 0;padding:8px;background:#f5f5f5;border-radius:4px;">
+            <label style="font-weight:600;font-size:13px;">Số cuộn dây chung: </label>
+            <strong style="font-size:16px;color:var(--primary);" id="ct_windings_display">5</strong>
+            <button class="btn-add-remove red" onclick="changeCtWindings(-1)">−</button>
+            <button class="btn-add-remove green" onclick="changeCtWindings(1)">+</button>
+            <input type="hidden" id="mba_ct_windings" value="5">
+            <span style="font-size:10px;color:#666;margin-left:10px;">(Áp dụng cho tất cả)</span>
         </div>
 
+        <!-- Tab chọn phép đo -->
+        <div class="ct-phase-tabs" style="margin-bottom:10px;">
+            <button class="active" data-cttab="rcd" onclick="switchCtTab('rcd')">📊 RCD</button>
+            <button data-cttab="rdc" onclick="switchCtTab('rdc')">⚡ RDC</button>
+            <button data-cttab="ratio" onclick="switchCtTab('ratio')">📐 Tỉ số</button>
+            <button data-cttab="excitation" onclick="switchCtTab('excitation')">🌀 Từ hóa</button>
+        </div>
+
+        <!-- Container cho từng bảng -->
+        <div id="ct_rcd_container" class="ct-table-wrap"></div>
+        <div id="ct_rdc_container" class="ct-table-wrap" style="display:none;"></div>
+        <div id="ct_ratio_container" class="ct-table-wrap" style="display:none;"></div>
+        <div id="ct_excitation_container" class="ct-table-wrap" style="display:none;"></div>
+    </div>
+</div>
+
         <!-- KẾT LUẬN -->
-        <div class="card"style="display:none">
+        <div class="card">
             <div class="card-title">
                 <span>9. Kết Luận</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec9" onchange="toggleSection('body_sec9', this)"> ✏️ Nhập</label>
@@ -679,7 +756,7 @@
         renderRdcWindingTable();
         renderRatioTable();
         renderOltcTable();
-        renderCtTables();
+       // renderCtTables();
     }
 
     function isConfigField(id) {
@@ -1156,94 +1233,307 @@
         `;
     }
 
-    // ============================================================
-    // 8. BIẾN DÒNG CHÂN SỨ (Bushing CT)
-    // ============================================================
-    function switchCtPhase(phase) {
-        ctCurrentPhase = phase;
-        document.querySelectorAll('.ct-phase-tabs button').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.phase === phase);
-        });
-        renderCtTables();
-    }
 
-    function renderCtTables() {
-        const container = document.getElementById('ct_container');
-        if (!container) return;
-        const temp = document.getElementById('mba_temp').value || '--';
-        document.getElementById('mba_ct_temp_display').textContent = temp;
-        const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 5;
-        const location = document.getElementById('mba_ct_location').value;
-        const phase = ctCurrentPhase;
+// ============================================================
+// 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG
+// ============================================================
 
-        let html = `
-            <div class="ct-winding-select">
-                <label>Số cuộn dây: <strong style="color:var(--primary);">${numWindings}</strong></label>
-                <button class="btn-add-remove red" onclick="changeCtWindings(-1)">−</button>
-                <button class="btn-add-remove green" onclick="changeCtWindings(1)">+</button>
-                <span style="font-size:10px;color:#666;margin-left:10px;">(Vị trí: ${location}, Pha: ${phase})</span>
-            </div>
-            <div class="ct-table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Cuộn</th>
-                            <th>Đầu dây</th>
-                            <th>R<sub>CD</sub> (MΩ)</th>
-                            <th>R<sub>DC</sub> (Ω)</th>
-                            <th>Tỉ số biến</th>
-                            <th>Từ hóa U(V)/I(mA)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
+let ctCurrentTab = 'rcd';
 
-        for (let i = 1; i <= numWindings; i++) {
-            const prefixId = `mba_ct_${location}_${phase}_w${i}`;
+function switchCtTab(tab) {
+    ctCurrentTab = tab;
+    document.querySelectorAll('.ct-phase-tabs button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cttab === tab);
+    });
+    document.querySelectorAll('.ct-table-wrap').forEach(el => el.style.display = 'none');
+    document.getElementById(`ct_${tab}_container`).style.display = 'block';
+    renderCtTables();
+}
+
+function changeCtWindings(delta) {
+    const input = document.getElementById('mba_ct_windings');
+    let val = parseInt(input.value) || 5;
+    val = Math.max(1, Math.min(10, val + delta));
+    input.value = val;
+    document.getElementById('ct_windings_display').textContent = val;
+    renderCtTables();
+}
+
+function renderCtTables() {
+    const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 5;
+    const temp = document.getElementById('mba_temp').value || '--';
+    document.getElementById('mba_ct_temp_display').textContent = temp;
+
+    // Các vị trí CT
+    const locations = [
+        { id: 'HV', label: 'Cao áp' },
+        { id: 'MV', label: 'Trung áp' },
+        { id: 'LV', label: 'Hạ áp' },
+        { id: 'NEUTRAL', label: 'Trung tính' }
+    ];
+    const phases = ['A', 'B', 'C'];
+    const phaseColors = {
+        'A': '#fff9c4',
+        'B': '#ffebee',
+        'C': '#e3f2fd'
+    };
+    const phaseLabels = {
+        'A': '🟡 A',
+        'B': '🔴 B',
+        'C': '🔵 C'
+    };
+
+    // Render từng bảng
+    renderCtRcd(numWindings, locations, phases, phaseColors, phaseLabels);
+    renderCtRdc(numWindings, locations, phases, phaseColors, phaseLabels);
+    renderCtRatio(numWindings, locations, phases, phaseColors, phaseLabels);
+    renderCtExcitation(numWindings, locations, phases, phaseColors, phaseLabels);
+}
+
+// ============================================================
+// 8.1 CT - RCD
+// ============================================================
+function renderCtRcd(numWindings, locations, phases, phaseColors, phaseLabels) {
+    const container = document.getElementById('ct_rcd_container');
+    if (!container) return;
+
+    let html = `
+        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">📊 RCD (MΩ) - Đo giữa cuộn dây và vỏ</div>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="min-width:50px;">Pha</th>
+                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
+                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
+                    <th colspan="4" style="min-width:200px;">Vị trí</th>
+                </tr>
+                <tr>
+                    <th style="min-width:55px;">Cao áp</th>
+                    <th style="min-width:55px;">Trung áp</th>
+                    <th style="min-width:55px;">Hạ áp</th>
+                    <th style="min-width:55px;">Trung tính</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    phases.forEach(pha => {
+        const bgColor = phaseColors[pha];
+        const phaLabel = phaseLabels[pha];
+        
+        for (let w = 1; w <= numWindings; w++) {
+            const isFirstRow = (w === 1);
             html += `
                 <tr>
-                    <td><b>${i}</b></td>
-                    <td><input type="text" id="${prefixId}_terminal" value="${i}S1-${i}S" style="width:70px;"></td>
-                    <td><input type="number" id="${prefixId}_rcd" step="0.1" placeholder="RCD" style="width:70px;"></td>
-                    <td><input type="number" id="${prefixId}_rdc" step="0.001" placeholder="RDC" style="width:70px;"></td>
-                    <td>
-                        <input type="number" id="${prefixId}_ratio" step="0.001" placeholder="Tỉ số" style="width:70px;">
-                        <span style="font-size:8px;color:#666;">(K<sub>đo</sub>)</span>
-                    </td>
-                    <td>
-                        <div style="display:flex;flex-direction:column;gap:1px;">
-                            <div style="display:flex;gap:2px;">
-                                <input type="number" id="${prefixId}_u1" placeholder="U1" style="width:45px;font-size:9px;">
-                                <span style="font-size:8px;">/</span>
-                                <input type="number" id="${prefixId}_i1" placeholder="I1" style="width:45px;font-size:9px;">
-                            </div>
-                            <div style="display:flex;gap:2px;">
-                                <input type="number" id="${prefixId}_u2" placeholder="U2" style="width:45px;font-size:9px;">
-                                <span style="font-size:8px;">/</span>
-                                <input type="number" id="${prefixId}_i2" placeholder="I2" style="width:45px;font-size:9px;">
-                            </div>
-                            <div style="display:flex;gap:2px;">
-                                <input type="number" id="${prefixId}_u3" placeholder="U3" style="width:45px;font-size:9px;">
-                                <span style="font-size:8px;">/</span>
-                                <input type="number" id="${prefixId}_i3" placeholder="I3" style="width:45px;font-size:9px;">
-                            </div>
-                        </div>
-                    </td>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
+                    <td style="font-weight:600;">${w}</td>
+                    <td><input type="text" id="mba_ct_rcd_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
+                    ${locations.map(loc => `
+                        <td><input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w${w}" step="0.1" placeholder="RCD" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
+                    `).join('')}
                 </tr>
             `;
         }
+        // Dòng cách giữa các pha
+        if (phases.indexOf(pha) < phases.length - 1) {
+            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
+        }
+    });
 
-        html += `</tbody></table></div>`;
-        container.innerHTML = html;
-    }
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
 
-    function changeCtWindings(delta) {
-        const input = document.getElementById('mba_ct_windings');
-        let val = parseInt(input.value) || 5;
-        val = Math.max(1, Math.min(10, val + delta));
-        input.value = val;
-        renderCtTables();
-    }
+// ============================================================
+// 8.2 CT - RDC
+// ============================================================
+function renderCtRdc(numWindings, locations, phases, phaseColors, phaseLabels) {
+    const container = document.getElementById('ct_rdc_container');
+    if (!container) return;
+
+    let html = `
+        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">⚡ RDC (Ω) - Điện trở một chiều các cuộn dây</div>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="min-width:50px;">Pha</th>
+                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
+                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
+                    <th colspan="4" style="min-width:200px;">Vị trí</th>
+                </tr>
+                <tr>
+                    <th style="min-width:55px;">Cao áp</th>
+                    <th style="min-width:55px;">Trung áp</th>
+                    <th style="min-width:55px;">Hạ áp</th>
+                    <th style="min-width:55px;">Trung tính</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    phases.forEach(pha => {
+        const bgColor = phaseColors[pha];
+        const phaLabel = phaseLabels[pha];
+        
+        for (let w = 1; w <= numWindings; w++) {
+            const isFirstRow = (w === 1);
+            html += `
+                <tr>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
+                    <td style="font-weight:600;">${w}</td>
+                    <td><input type="text" id="mba_ct_rdc_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
+                    ${locations.map(loc => `
+                        <td><input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w}" step="0.001" placeholder="RDC" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
+                    `).join('')}
+                </tr>
+            `;
+        }
+        if (phases.indexOf(pha) < phases.length - 1) {
+            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
+        }
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// 8.3 CT - Tỉ số biến
+// ============================================================
+function renderCtRatio(numWindings, locations, phases, phaseColors, phaseLabels) {
+    const container = document.getElementById('ct_ratio_container');
+    if (!container) return;
+
+    let html = `
+        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">📐 Tỉ số biến (Kđo)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" style="min-width:50px;">Pha</th>
+                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
+                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
+                    <th colspan="4" style="min-width:200px;">Vị trí</th>
+                </tr>
+                <tr>
+                    <th style="min-width:55px;">Cao áp</th>
+                    <th style="min-width:55px;">Trung áp</th>
+                    <th style="min-width:55px;">Hạ áp</th>
+                    <th style="min-width:55px;">Trung tính</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    phases.forEach(pha => {
+        const bgColor = phaseColors[pha];
+        const phaLabel = phaseLabels[pha];
+        
+        for (let w = 1; w <= numWindings; w++) {
+            const isFirstRow = (w === 1);
+            html += `
+                <tr>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
+                    <td style="font-weight:600;">${w}</td>
+                    <td><input type="text" id="mba_ct_ratio_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
+                    ${locations.map(loc => `
+                        <td><input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w${w}" step="0.001" placeholder="Kđo" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
+                    `).join('')}
+                </tr>
+            `;
+        }
+        if (phases.indexOf(pha) < phases.length - 1) {
+            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
+        }
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// ============================================================
+// 8.4 CT - Từ hóa U(V)/I(mA)
+// ============================================================
+function renderCtExcitation(numWindings, locations, phases, phaseColors, phaseLabels) {
+    const container = document.getElementById('ct_excitation_container');
+    if (!container) return;
+
+    let html = `
+        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">🌀 Từ hóa U(V) / I(mA) - 3 điểm đo</div>
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="3" style="min-width:50px;">Pha</th>
+                    <th rowspan="3" style="min-width:50px;">Cuộn</th>
+                    <th rowspan="3" style="min-width:60px;">Đầu dây</th>
+                    <th colspan="12" style="min-width:360px;">Vị trí</th>
+                </tr>
+                <tr>
+                    <th colspan="3" style="min-width:90px;">Cao áp</th>
+                    <th colspan="3" style="min-width:90px;">Trung áp</th>
+                    <th colspan="3" style="min-width:90px;">Hạ áp</th>
+                    <th colspan="3" style="min-width:90px;">Trung tính</th>
+                </tr>
+                <tr>
+                    ${locations.map(() => `
+                        <th style="min-width:28px;">U</th>
+                        <th style="min-width:28px;">I</th>
+                        <th style="min-width:8px;font-size:7px;">#</th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    phases.forEach(pha => {
+        const bgColor = phaseColors[pha];
+        const phaLabel = phaseLabels[pha];
+        
+        for (let w = 1; w <= numWindings; w++) {
+            const isFirstRow = (w === 1);
+            html += `
+                <tr>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
+                    <td style="font-weight:600;">${w}</td>
+                    <td><input type="text" id="mba_ct_exc_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
+                    ${locations.map((loc, locIdx) => `
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u1" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i1" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};padding:0;"></td>` : ''}
+                    <td colspan="2" style="font-size:8px;color:#666;text-align:right;padding:0 4px;">Điểm 2</td>
+                    ${locations.map((loc, locIdx) => `
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u2" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i2" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};padding:0;"></td>` : ''}
+                    <td colspan="2" style="font-size:8px;color:#666;text-align:right;padding:0 4px;">Điểm 3</td>
+                    ${locations.map((loc, locIdx) => `
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u3" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i3" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
+                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
+                    `).join('')}
+                </tr>
+            `;
+        }
+        if (phases.indexOf(pha) < phases.length - 1) {
+            html += `<tr style="height:3px;"><td colspan="${4 + locations.length * 3}" style="background:#f0f0f0;padding:0;"></td></tr>`;
+        }
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+// Gọi render CT khi khởi tạo
+function initCtTables() {
+    renderCtTables();
+}
 
     // ============================================================
     // TÍNH TOÁN (Đánh giá qua màu sắc)

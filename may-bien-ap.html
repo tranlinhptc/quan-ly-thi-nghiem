@@ -62,6 +62,7 @@
         .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
         #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
 
+        /* ========== MÀU SẮC ========== */
         .phase-a { background-color: #fff9c4 !important; }
         .phase-b { background-color: #ffebee !important; }
         .phase-c { background-color: #e3f2fd !important; }
@@ -83,9 +84,32 @@
         .ratio-info { font-size: 9px; color: #666; display: flex; flex-direction: column; align-items: center; gap: 1px; margin-top: 2px; width: 100%; }
         .ratio-info .kdo { color: #1565c0; font-weight: 600; font-size: 10px; }
 
+        /* ========== MBA TAB TABLE ========== */
         .mba-tap-table { font-size: 10px; }
         .mba-tap-table input { font-size: 10px; padding: 2px 4px; width: 60px; }
         .mba-tap-table th { font-size: 9px; padding: 2px 4px; }
+        .btn-add-remove { background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; margin: 0 2px; }
+        .btn-add-remove:hover { opacity: 0.8; }
+        .btn-add-remove.green { background: #2e7d32; }
+        .btn-add-remove.red { background: #c62828; }
+
+        /* ========== BUSBING CT ========== */
+        .ct-section { border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-top: 10px; background: #fafafa; }
+        .ct-section .ct-title { font-weight: 700; color: var(--primary); font-size: 13px; margin-bottom: 8px; }
+        .ct-phase-tabs { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+        .ct-phase-tabs button { padding: 4px 15px; border: 1px solid var(--border); border-radius: 4px; background: #f5f5f5; cursor: pointer; font-weight: 600; font-size: 12px; }
+        .ct-phase-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .ct-phase-tabs button:hover:not(.active) { background: #e0e0e0; }
+        .ct-winding-select { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .ct-winding-select select { width: 80px; padding: 4px 8px; }
+        .ct-table-wrap { overflow-x: auto; }
+        .ct-table-wrap table { font-size: 10px; }
+        .ct-table-wrap table input { font-size: 10px; padding: 3px 4px; width: 70px; }
+
+        .import-section { border: 1px dashed #0288d1; border-radius: 6px; padding: 15px; margin: 10px 0; background: #e3f2fd; text-align: center; }
+        .import-section .btn-import { background: #0288d1; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; margin: 5px; }
+        .import-section .btn-import:hover { opacity: 0.8; }
+        .file-input-hidden { display: none; }
     </style>
 </head>
 <body>
@@ -142,6 +166,7 @@
             <div class="card-title"><span>THÔNG SỐ THIẾT BỊ</span>
                 <button class="btn-view-old" style="background:#f57c00; margin-right: 5px;" onclick="loadLatestData()">⚡Kết quả mới nhất</button>
                 <button class="btn-view-old" onclick="loadOldDataSection()">👁️ Lịch sử</button>
+                <button class="btn-view-old" style="background:#0288d1;" onclick="showImportSection()">📤 Nhập từ file</button>
             </div>
             <div class="grid">
                 <div class="form-group">
@@ -170,10 +195,30 @@
                         <option value="Kiem tra dac biet">Kiểm tra đặc biệt</option>
                     </select>
                 </div>
+                <div class="form-group"><label>Số nấc điều áp:</label>
+                    <input type="number" id="mba_tap_count" value="17" onchange="renderTapTables()" style="width:70px;">
+                    <span style="font-size:9px;color:#666;">(Nấc trung gian: 9)</span>
+                </div>
+                <div class="form-group"><label>Số cuộn CT:</label>
+                    <input type="number" id="mba_ct_windings" value="5" onchange="renderCtTables()" style="width:70px;">
+                </div>
                 <div class="form-group"><label>Nhiệt độ (°C):</label><input type="number" id="mba_temp" value="" oninput="calculateAll()"></div>
                 <div class="form-group"><label>Độ ẩm (%):</label><input type="number" id="mba_humidity" value="" oninput="calculateAll()"></div>
                 <div class="form-group"><label>Ghi chú:</label><input type="text" id="mba_ghichu" placeholder="Nhập ghi chú nếu cần"></div>
             </div>
+        </div>
+
+        <!-- IMPORT SECTION -->
+        <div id="importSection" class="import-section" style="display:none;">
+            <div style="font-weight:700;color:#0288d1;font-size:14px;margin-bottom:8px;">📤 NHẬP DỮ LIỆU TỪ FILE</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+                <button class="btn-import" onclick="document.getElementById('fileInputXml').click()">📄 Chọn file XML</button>
+                <button class="btn-import" onclick="document.getElementById('fileInputImage').click()">🖼️ Chọn file ảnh</button>
+                <button class="btn-import" style="background:#757575;" onclick="document.getElementById('importSection').style.display='none'">✖ Đóng</button>
+            </div>
+            <input type="file" id="fileInputXml" class="file-input-hidden" accept=".xml" onchange="importFromXml(event)">
+            <input type="file" id="fileInputImage" class="file-input-hidden" accept="image/*" onchange="importFromImage(event)">
+            <div id="importStatus" style="margin-top:8px;font-size:12px;color:#666;"></div>
         </div>
 
         <!-- 1. KIỂM TRA BÊN NGOÀI -->
@@ -187,7 +232,7 @@
             </div>
         </div>
 
-        <!-- 2. ĐIỆN TRỞ CÁCH ĐIỆN -->
+        <!-- 2. ĐIỆN TRỞ CÁCH ĐIỆN MBA -->
         <div class="card">
             <div class="card-title">
                 <span>2. Điện Trở Cách Điện [MΩ]</span>
@@ -222,19 +267,19 @@
             </div>
         </div>
 
-        <!-- 5. ĐIỆN TRỞ MỘT CHIỀU -->
+        <!-- 5. ĐIỆN TRỞ MỘT CHIỀU MBA -->
         <div class="card">
             <div class="card-title">
                 <span>5. Điện Trở Một Chiều [mΩ]</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec5" class="table-responsive hidden-section">
-                <div class="note-text">* Quy đổi về 75°C, hệ số hiệu chỉnh K = (235+75)/(235+t)</div>
+                <div class="note-text">* Quy đổi về 75°C</div>
                 <div class="table-responsive" id="table_rdc_container"></div>
             </div>
         </div>
 
-        <!-- 6. TỶ SỐ BIẾN -->
+        <!-- 6. TỶ SỐ BIẾN MBA -->
         <div class="card">
             <div class="card-title">
                 <span>6. Tỷ Số Biến</span>
@@ -245,7 +290,57 @@
             </div>
         </div>
 
-        <!-- 7. ĐIỀU KHIỂN -->
+        <!-- 7. BỘ ĐIỀU ÁP DƯỚI TẢI -->
+        <div class="card">
+            <div class="card-title">
+                <span>7. Bộ Điều Áp Dưới Tải (OLTC)</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec7" onchange="toggleSection('body_sec7', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec7" class="table-responsive hidden-section">
+                <div class="table-responsive" id="table_oltc_container"></div>
+            </div>
+        </div>
+
+        <!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
+        <div class="card">
+            <div class="card-title">
+                <span>8. Biến Dòng Chân Sứ (Bushing CT)</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec8" onchange="toggleSection('body_sec8', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec8" class="table-responsive hidden-section">
+                <div class="note-text">* Đo ở nhiệt độ: <span id="mba_ct_temp_display">-</span> °C</div>
+                <div id="ct_selector" class="ct-section">
+                    <div class="ct-title">📌 Chọn vị trí CT</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+                        <select id="mba_ct_location" onchange="renderCtTables()" style="padding:4px 8px;font-size:12px;">
+                            <option value="HV">Phía Cao áp (220kV)</option>
+                            <option value="MV">Phía Trung áp (110kV)</option>
+                            <option value="LV">Phía Hạ áp (22kV)</option>
+                            <option value="NEUTRAL">Phía Trung tính</option>
+                        </select>
+                    </div>
+                    <div class="ct-phase-tabs">
+                        <button class="active" data-phase="A" onclick="switchCtPhase('A')">Pha A</button>
+                        <button data-phase="B" onclick="switchCtPhase('B')">Pha B</button>
+                        <button data-phase="C" onclick="switchCtPhase('C')">Pha C</button>
+                    </div>
+                    <div id="ct_container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KẾT LUẬN -->
+        <div class="card">
+            <div class="card-title">
+                <span>9. Kết Luận</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec9" onchange="toggleSection('body_sec9', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec9" class="table-responsive hidden-section">
+                <textarea id="mba_conclusion" rows="3" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;font-size:12px;">Các hạng mục đã kiểm định, thí nghiệm đạt yêu cầu kỹ thuật.</textarea>
+            </div>
+        </div>
+
+        <!-- ĐIỀU KHIỂN -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
             <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản Word</button>
@@ -264,6 +359,7 @@
     const MODULE_PREFIX = "mba_";
     const prefix = MODULE_PREFIX;
     let globalHistoryData = [];
+    let ctCurrentPhase = 'A';
 
     // ============================================================
     // HÀM KHỞI TẠO
@@ -287,6 +383,11 @@
                 section.classList.add('hidden-section');
             }
         }
+    }
+
+    function showImportSection() {
+        const el = document.getElementById('importSection');
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
     }
 
     function fetchSubstations() {
@@ -377,6 +478,44 @@
     }
 
     // ============================================================
+    // IMPORT XML / IMAGE
+    // ============================================================
+    function importFromXml(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parser = new DOMParser();
+                const xml = parser.parseFromString(e.target.result, 'text/xml');
+                // Parse XML và đổ dữ liệu vào form
+                // Đây là phần mẫu, bạn sẽ custom theo format XML thực tế
+                document.getElementById('importStatus').textContent = '✅ Đã đọc file XML: ' + file.name;
+                // Gọi hàm parseXmlData(xml) để xử lý
+                parseXmlData(xml);
+            } catch(err) {
+                document.getElementById('importStatus').textContent = '❌ Lỗi đọc XML: ' + err.message;
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    function importFromImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        document.getElementById('importStatus').textContent = '📷 Đã chọn ảnh: ' + file.name + ' (Xử lý OCR sẽ được tích hợp sau)';
+        // TODO: Tích hợp OCR sau
+        event.target.value = '';
+    }
+
+    function parseXmlData(xml) {
+        // TODO: Parse XML theo format thực tế
+        console.log('XML Data:', xml);
+        document.getElementById('importStatus').textContent += ' - Đã parse dữ liệu thành công!';
+    }
+
+    // ============================================================
     // XỬ LÝ DỮ LIỆU CŨ
     // ============================================================
     function loadOldDataSection() {
@@ -433,7 +572,7 @@
                 }
             }
         }
-        ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6'].forEach(id => {
+        ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6', 'chk_sec7', 'chk_sec8', 'chk_sec9'].forEach(id => {
             const chk = document.getElementById(id);
             if (chk) {
                 chk.checked = true;
@@ -496,7 +635,9 @@
     // ============================================================
     function captureInputs() {
         const data = {};
-        document.querySelectorAll('input, select').forEach(el => { if (el.id && el.value) data[el.id] = el.value; });
+        document.querySelectorAll('input, select, textarea').forEach(el => { 
+            if (el.id && el.value) data[el.id] = el.value; 
+        });
         return data;
     }
 
@@ -537,13 +678,16 @@
         renderTgTable();
         renderRdcWindingTable();
         renderRatioTable();
+        renderOltcTable();
+        renderCtTables();
     }
 
     function isConfigField(id) {
         const commonSuffixes = [
             '_nsx', '_no', '_namsx', '_udm', '_idm', '_inm', '_kieu', '_ghichu',
             '_temp', '_humidity', '_csuat', '_ddung', '_kieu', '_mfg', '_type',
-            '_sn', '_year', '_power', '_voltage', '_vector', '_current', '_reason'
+            '_sn', '_year', '_power', '_voltage', '_vector', '_current', '_reason',
+            '_tap_count', '_ct_windings'
         ];
         const systemIds = ['info_ngay', 'info_tram', 'info_nganlo'];
         if (systemIds.includes(id)) return true;
@@ -554,6 +698,7 @@
         const el = document.getElementById(id);
         if (!el) return "";
         if (el.tagName === "SPAN" || el.tagName === "DIV") return el.innerText.trim();
+        if (el.tagName === "TEXTAREA") return el.value || "";
         if (isConfigField(id)) {
             return (el.value && el.value.trim() !== "") ? el.value : (el.placeholder || "");
         }
@@ -561,7 +706,7 @@
     }
 
     // ============================================================
-    // 2. BẢNG RCD
+    // 2. BẢNG RCD MBA
     // ============================================================
     function renderRcdTable() {
         const container = document.getElementById('table_rcd_container');
@@ -640,7 +785,7 @@
     }
 
     // ============================================================
-    // 4. Tgδ
+    // 4. Tgδ MBA
     // ============================================================
     function renderTgTable() {
         const container = document.getElementById('table_tg_container');
@@ -694,25 +839,26 @@
     }
 
     // ============================================================
-    // 5. ĐIỆN TRỞ MỘT CHIỀU
+    // 5. ĐIỆN TRỞ MỘT CHIỀU MBA (CÓ NÚC ĐIỀU ÁP)
     // ============================================================
     function renderRdcWindingTable() {
         const container = document.getElementById('table_rdc_container');
         if (!container) return;
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
         
         let html = `
             <div style="margin-bottom:8px;">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                     <div class="form-group">
-                        <label>Cuộn cao thế (220kV) - Nhiệt độ đo:</label>
+                        <label>Cuộn cao thế - Nhiệt độ đo (°C):</label>
                         <input type="number" id="mba_rdc_hv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
                     </div>
                     <div class="form-group">
-                        <label>Cuộn trung thế (110kV) - Nhiệt độ đo:</label>
+                        <label>Cuộn trung thế - Nhiệt độ đo (°C):</label>
                         <input type="number" id="mba_rdc_mv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
                     </div>
                     <div class="form-group">
-                        <label>Cuộn hạ thế (22kV) - Nhiệt độ đo:</label>
+                        <label>Cuộn hạ thế - Nhiệt độ đo (°C):</label>
                         <input type="number" id="mba_rdc_lv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
                     </div>
                 </div>
@@ -739,7 +885,7 @@
                         </thead>
                         <tbody>
         `;
-        for (let tap = 1; tap <= 17; tap++) {
+        for (let tap = 1; tap <= tapCount; tap++) {
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
@@ -825,11 +971,12 @@
     }
 
     // ============================================================
-    // 6. TỶ SỐ BIẾN
+    // 6. TỶ SỐ BIẾN MBA (CÓ NÚC ĐIỀU ÁP)
     // ============================================================
     function renderRatioTable() {
         const container = document.getElementById('table_ratio_container');
         if (!container) return;
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
         
         let html = `
             <div style="margin-bottom:10px;">
@@ -874,7 +1021,7 @@
                         </thead>
                         <tbody>
         `;
-        for (let tap = 1; tap <= 17; tap++) {
+        for (let tap = 1; tap <= tapCount; tap++) {
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
@@ -910,7 +1057,7 @@
                         </thead>
                         <tbody>
         `;
-        for (let tap = 1; tap <= 17; tap++) {
+        for (let tap = 1; tap <= tapCount; tap++) {
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
@@ -963,7 +1110,143 @@
     }
 
     // ============================================================
-    // TÍNH TOÁN (Đơn giản - hiển thị màu sắc đánh giá)
+    // 7. BỘ ĐIỀU ÁP DƯỚI TẢI (OLTC)
+    // ============================================================
+    function renderOltcTable() {
+        const container = document.getElementById('table_oltc_container');
+        if (!container) return;
+        container.innerHTML = `
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div class="form-group">
+                    <label>Kiểu (Type):</label>
+                    <input type="text" id="mba_oltc_type" placeholder="CMI-1200/170D-10193W" oninput="handleNewInput(event)">
+                </div>
+                <div class="form-group">
+                    <label>Số chế tạo (S/N):</label>
+                    <input type="text" id="mba_oltc_sn" placeholder="M110076" oninput="handleNewInput(event)">
+                </div>
+                <div class="form-group">
+                    <label>Hãng SX:</label>
+                    <input type="text" id="mba_oltc_mfg" placeholder="SHANGHAI" oninput="handleNewInput(event)">
+                </div>
+                <div class="form-group">
+                    <label>Năm SX:</label>
+                    <input type="number" id="mba_oltc_year" placeholder="2011" oninput="handleNewInput(event)">
+                </div>
+            </div>
+            <div style="margin-top:10px;">
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="form-group">
+                        <label>Chiều quay:</label>
+                        <select id="mba_oltc_direction" onchange="handleNewInput(event)">
+                            <option value="Tang">Tăng</option>
+                            <option value="Giam">Giảm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Số vòng khi K tác động:</label>
+                        <input type="number" id="mba_oltc_rounds_action" placeholder="29" oninput="handleNewInput(event)">
+                    </div>
+                    <div class="form-group">
+                        <label>Số vòng kết thúc 1 chu trình:</label>
+                        <input type="number" id="mba_oltc_rounds_cycle" placeholder="33" oninput="handleNewInput(event)">
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ============================================================
+    // 8. BIẾN DÒNG CHÂN SỨ (Bushing CT)
+    // ============================================================
+    function switchCtPhase(phase) {
+        ctCurrentPhase = phase;
+        document.querySelectorAll('.ct-phase-tabs button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.phase === phase);
+        });
+        renderCtTables();
+    }
+
+    function renderCtTables() {
+        const container = document.getElementById('ct_container');
+        if (!container) return;
+        const temp = document.getElementById('mba_temp').value || '--';
+        document.getElementById('mba_ct_temp_display').textContent = temp;
+        const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 5;
+        const location = document.getElementById('mba_ct_location').value;
+        const phase = ctCurrentPhase;
+
+        let html = `
+            <div class="ct-winding-select">
+                <label>Số cuộn dây: <strong style="color:var(--primary);">${numWindings}</strong></label>
+                <button class="btn-add-remove red" onclick="changeCtWindings(-1)">−</button>
+                <button class="btn-add-remove green" onclick="changeCtWindings(1)">+</button>
+                <span style="font-size:10px;color:#666;margin-left:10px;">(Vị trí: ${location}, Pha: ${phase})</span>
+            </div>
+            <div class="ct-table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cuộn</th>
+                            <th>Đầu dây</th>
+                            <th>R<sub>CD</sub> (MΩ)</th>
+                            <th>R<sub>DC</sub> (Ω)</th>
+                            <th>Tỉ số biến</th>
+                            <th>Từ hóa U(V)/I(mA)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        for (let i = 1; i <= numWindings; i++) {
+            const prefixId = `mba_ct_${location}_${phase}_w${i}`;
+            html += `
+                <tr>
+                    <td><b>${i}</b></td>
+                    <td><input type="text" id="${prefixId}_terminal" value="${i}S1-${i}S" style="width:70px;"></td>
+                    <td><input type="number" id="${prefixId}_rcd" step="0.1" placeholder="RCD" style="width:70px;"></td>
+                    <td><input type="number" id="${prefixId}_rdc" step="0.001" placeholder="RDC" style="width:70px;"></td>
+                    <td>
+                        <input type="number" id="${prefixId}_ratio" step="0.001" placeholder="Tỉ số" style="width:70px;">
+                        <span style="font-size:8px;color:#666;">(K<sub>đo</sub>)</span>
+                    </td>
+                    <td>
+                        <div style="display:flex;flex-direction:column;gap:1px;">
+                            <div style="display:flex;gap:2px;">
+                                <input type="number" id="${prefixId}_u1" placeholder="U1" style="width:45px;font-size:9px;">
+                                <span style="font-size:8px;">/</span>
+                                <input type="number" id="${prefixId}_i1" placeholder="I1" style="width:45px;font-size:9px;">
+                            </div>
+                            <div style="display:flex;gap:2px;">
+                                <input type="number" id="${prefixId}_u2" placeholder="U2" style="width:45px;font-size:9px;">
+                                <span style="font-size:8px;">/</span>
+                                <input type="number" id="${prefixId}_i2" placeholder="I2" style="width:45px;font-size:9px;">
+                            </div>
+                            <div style="display:flex;gap:2px;">
+                                <input type="number" id="${prefixId}_u3" placeholder="U3" style="width:45px;font-size:9px;">
+                                <span style="font-size:8px;">/</span>
+                                <input type="number" id="${prefixId}_i3" placeholder="I3" style="width:45px;font-size:9px;">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        html += `</tbody></table></div>`;
+        container.innerHTML = html;
+    }
+
+    function changeCtWindings(delta) {
+        const input = document.getElementById('mba_ct_windings');
+        let val = parseInt(input.value) || 5;
+        val = Math.max(1, Math.min(10, val + delta));
+        input.value = val;
+        renderCtTables();
+    }
+
+    // ============================================================
+    // TÍNH TOÁN (Đánh giá qua màu sắc)
     // ============================================================
     function calculateAll() {
         const temp = parseFloat(document.getElementById('mba_temp').value) || 30;
@@ -1021,8 +1304,8 @@
         });
         
         // Tỷ số biến - Kiểm tra sai số
-        // HV:MV
-        for (let tap = 1; tap <= 17; tap++) {
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
+        for (let tap = 1; tap <= tapCount; tap++) {
             const el = document.getElementById(`mba_ratio_hv_mv_dabc_${tap}`);
             if (el) {
                 const val = parseFloat(el.value) || 0;
@@ -1035,7 +1318,6 @@
                     el.style.fontWeight = '';
                 }
             }
-            // HV:LV
             const el2 = document.getElementById(`mba_ratio_hv_lv_dabc_${tap}`);
             if (el2) {
                 const val = parseFloat(el2.value) || 0;
@@ -1057,7 +1339,7 @@
     function handleEnterToNext(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
-            const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
+            const inputs = document.querySelectorAll('input[type="number"], input[type="text"], select, textarea');
             const currentIndex = Array.from(inputs).indexOf(event.target);
             if (currentIndex < inputs.length - 1) {
                 inputs[currentIndex + 1].focus();
@@ -1086,9 +1368,9 @@
             nguoiTN: nguoiDo || ""
         };
 
-        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
+        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"]`).forEach(el => {
             let value = "";
-            if (el.tagName === "INPUT") {
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
                 value = el.value.trim() || el.value.trim();
             } else if (el.tagName === "SELECT") {
                 value = el.value;
@@ -1134,12 +1416,12 @@
             payload["ngayTN"] = document.getElementById('info_ngay').value || "";
             payload["nguoiTN"] = "";
 
-            document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
+            document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"]`).forEach(el => {
                 let val = getVal(el.id);
                 payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
             });
 
-            const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6'];
+            const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6', 'chk_sec7', 'chk_sec8', 'chk_sec9'];
             checkboxes.forEach(id => {
                 const checked = document.getElementById(id)?.checked;
                 if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
@@ -1178,7 +1460,7 @@
         fetchSubstations();
         renderAllTables();
         
-        ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6'].forEach(id => {
+        ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6', 'chk_sec7', 'chk_sec8', 'chk_sec9'].forEach(id => {
             const chk = document.getElementById(id);
             if (chk) {
                 chk.checked = true;
@@ -1193,6 +1475,21 @@
             checkUnlockForm();
         }
     };
+
+    // ============================================================
+    // HÀM HỖ TRỢ RENDER TAP TABLES KHI THAY ĐỔI SỐ NẤC
+    // ============================================================
+    function renderTapTables() {
+        renderRdcWindingTable();
+        renderRatioTable();
+    }
+
+    // ============================================================
+    // HÀM HỖ TRỢ CHO CT
+    // ============================================================
+    function renderCtLocation() {
+        renderCtTables();
+    }
 </script>
 </body>
-                  </html>
+</html>

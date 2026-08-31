@@ -1,0 +1,667 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MÁY CẮT (MC)</title>
+    <!-- Cụm thư viện xuất Word chuẩn gốc -->
+    <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+               background: url('images/giai-phap-mba.jpg') no-repeat center center fixed;
+               background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
+        .container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .header-bar h2 { font-size: 15px; margin: 0; }
+        .btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
+        
+        .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
+        input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
+        th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
+        th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
+        
+        .sub-val { font-size: 10px; color: #1565c0; font-weight: 600; margin-top: 2px; display: block; }
+        .chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
+        .btn-view-old { background: #0288d1; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 15px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 4px 0; width: 100%; }
+        .btn-cloud { background: #2e7d32; }
+        .btn-draft { background: #0288d1; }
+        .btn-clear { background: #757575; font-size:11px; margin-top:4px; }
+        .pass { color: #2e7d32; font-weight: bold; }
+        .fail { color: #c62828; font-weight: bold; }
+        .note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
+        .hidden-section { display: none !important; }
+
+        /* Popups & Loading */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
+        .history-item { padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+        .history-item:hover { background: #fbe9e7; border-color: var(--primary); transform: scale(1.02); }
+        .history-date { font-weight: bold; color: #d84315; font-size: 14px; }
+        .history-person { font-size: 12px; color: #666; margin-top: 4px; }
+        .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
+        .err-box { background: #ffebee; border: 1px solid #ef5350; border-radius: 4px; padding: 2px; margin-top: 2px;}
+
+
+
+
+
+
+        /* CSS KHÓA FORM */
+        .form-locked {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(0.8);
+            transition: all 0.3s ease;
+        }
+        
+        #unlock_message {
+            color: #d32f2f;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<!-- MÀN HÌNH LOADING -->
+<div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
+    <div class="loader"></div>
+    <div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...</div>
+</div>
+
+<div class="container">
+    <div class="header-bar">
+        <h2>⚡ THỬ NGHIỆM MÁY CẮT (MC)</h2>
+        <a href="../index.html" class="btn-back">← Trang Chủ</a>
+    </div>
+
+    <!-- 0. KHU VỰC BẮT BUỘC (ĐỊNH DANH) -->
+    <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
+        <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
+        <div class="grid">
+            <div class="form-group">
+                <label>Trạm (Lấy từ hệ thống): <span style="color:red">*</span></label>
+                <select id="info_tram" onchange="checkUnlockForm()">
+                    <option value="" disabled selected>Đang tải ...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ngăn Lộ / Chỉ danh: <span style="color:red">*</span></label>
+                <input type="text" id="info_nganlo" placeholder="Ví dụ: 271, 131..." oninput="checkUnlockForm()">
+            </div>
+            <div class="form-group">
+                <label>Ngày Thí Nghiệm:</label>
+                <input type="date" id="info_ngay" onchange="checkUnlockForm()">
+            </div>
+        </div>
+        <div id="unlock_message">⚠️ Vui lòng chọn Trạm và gõ Ngăn lộ để mở khóa Form nhập liệu!</div>
+    </div>
+
+    <!-- ========================================== -->
+
+
+        <!-- 0. CẤU HÌNH ĐỘNG -->
+        <div class="card">
+            <div class="card-title">
+                <span>CẤU HÌNH THIẾT BỊ</span>	
+		<button class="btn-view-old" style="background:#f57c00; margin-right: 5px;" onclick="loadLatestData()">⚡Tất cả kết quả mới nhất</button>
+                <button class="btn-view-old" onclick="loadOldDataSection()">👁️ Lịch sử</button>
+            </div>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Chế Độ Thí Nghiệm:</label>
+                    <select id="mc_mode">
+                        <option value="new" selected>Mới / Sau lắp đặt</option>
+                        <option value="1yr">Sau 1 năm vận hành</option>
+                        <option value="3yr">Sau 3 năm vận hành</option>
+                        <option value="6yr">Sau 6 năm vận hành</option>
+                        <option value="boost">Thí nghiệm tăng cường</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Hiệu:</label><input type="text" id="mc_nsx" placeholder="ABB, Siemens..."></div>
+                <div class="form-group"><label>No:</label><input type="text" id="mc_no" placeholder="Serial:"></div>
+                <div class="form-group"><label>Năm SX:</label><input type="number" id="mc_namsx" placeholder="2020"></div>
+                <div class="form-group"><label>U định mức (kV):</label><input type="number" id="mc_udm" placeholder="245"></div>
+                <div class="form-group"><label>I định mức (A):</label><input type="number" id="mc_idm" placeholder="1250"></div>
+                <div class="form-group"><label>I ngắn mạch (A):</label><input type="number" id="mc_inm" placeholder="5000"></div>
+                <div class="form-group"><label>Truyền động:</label><input type="text" id="mc_truyendong" placeholder="3APG1"></div>
+                <div class="form-group"><label>Kiểu (Type):</label><input type="text" id="mc_kieu" placeholder="LTB145"></div>
+                <div class="form-group"><label>Nhiệt độ MT (°C):</label><input type="number" id="mc_temp" value="28" oninput="calculateAll()"></div>
+                <div class="form-group"><label>Độ ẩm(%):</label><input type="number" id="mc_doam" value="75" oninput="calculateAll()"></div>
+                
+                <div class="form-group">
+                    <label>Số Tủ Điều Khiển:</label>
+                    <select id="mc_tudk" onchange="refreshTables()">
+                        <option value="1" selected>1 Tủ (Chung 3 Pha)</option>
+                        <option value="3">3 hoặc 6 Tủ (Độc lập từng Pha)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cấu hình Cuộn dây:</label>
+                    <select id="mc_cuonday" onchange="refreshTables()">
+                        <option value="1C2O" selected>1 Đóng (C) - 2 Cắt (O1, O2)</option>
+                        <option value="2C1O">2 Đóng (C1, C2) - 1 Cắt (O)</option>
+                        <option value="2C2O">2 Đóng (C1, C2) - 2 Cắt (O1, O2)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Số Tiếp điểm / 1 Pha:</label>
+                    <select id="mc_tiepdiem" onchange="refreshTables()">
+                        <option value="1" selected>1 Tiếp điểm</option>
+                        <option value="2">2 Tiếp điểm</option>
+                        <option value="3">3 Tiếp điểm</option>
+                        <option value="4">4 Tiếp điểm</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;"><label>Ghi Chú:</label><input type="text" id="mc_ghichu" placeholder="Nhập thông tin ghi chú bổ sung..."></div>
+            </div>
+        </div>
+
+    <!-- KHU VỰC BỊ KHÓA (SẼ MỞ KHI ĐỦ ĐIỀU KIỆN) -->
+    <div id="locked_zone" class="form-locked">
+
+        <!-- CÁC HẠNG MỤC -->
+        <div class="card">
+            <div class="card-title">
+                <span>1. R Cách Điện Mạch Điều Khiển [MΩ]</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec1" class="table-responsive hidden-section">
+            <div class="grid">
+                <div class="form-group">
+                    <label>R_CĐ Mạch ĐK (TC: ≥ 2 MΩ):</label>
+                    <input type="number" id="mc_rcd_mdk" oninput="calculateAll()" placeholder="">
+                    <span class="sub-val" id="mc_eval_mdk"></span>
+                </div>
+            </div>
+</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>2. Cuộn Dây & Động Cơ Tích Năng</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec2" class="table-responsive hidden-section">
+                <div class="note-text">* Cuộn dây: Tính R_75°C. Động cơ: Đo R_1C, R_CĐ, Dòng k.động, T.gian.</div>
+                <div id="table_coils_container"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>3. Tiếp Điểm Chính (Rtx & R_CĐ)</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec3" class="table-responsive hidden-section">
+                <div class="grid" style="margin-bottom:6px;"><div class="form-group"><label>Rtx_NSX Yêu cầu (µΩ):</label><input type="number" id="mc_rtx_nsx" value="50" oninput="calculateAll()"></div></div>
+                <div class="note-text">* Rtx Đạt nếu ≤ 120% Rtx_NSX. R_CĐ Đất ≥ 1000 MΩ.</div>
+                <div id="table_contacts_container"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">
+                <span>4. Thời Gian Hành Trình (Timing) [ms]</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec4" onchange="toggleSection('body_sec4', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec4" class="table-responsive hidden-section">
+                <div class="note-text">* Tự tính Max/Min/Lệch (Δ). Tự báo Đỏ vi phạm (Đóng: 3.3/5ms | Cắt: 2.5/3.3ms).</div>
+                <div id="table_timing_container"></div>
+            </div>
+        </div>
+
+<!-- TRƯỜNG HỢP 1: TỪNG PHA -->
+        <div class="card">
+            <div class="card-title">
+                <span>5. Kiểm tra khí SF6</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec5" class="table-responsive hidden-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pha</th>
+  				<th>A</th>
+                            	<th>B</th>
+                            	<th>C</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Áp suất (bar)</b></td>
+                            <td><input type="number" id="mc_as_a"></td>
+                            <td><input type="number" id="mc_as_b"></td>
+                            <td><input type="number" id="mc_as_c"></td>
+
+                        </tr>
+                        <tr>
+                            <td><b>Độ ẩm</b></td>
+                            <td><input type="number" id="mc_da_a"></td>
+                            <td><input type="number" id="mc_da_b"></td>
+                            <td><input type="number" id="mc_da_c"></td>
+
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+
+
+<!--TIẾP ĐIỂM PHỤ-->
+      <div class="card">
+            <div class="card-title">
+                <span>6. Đo điện trở tiếp xúc tiếp điểm phụ </span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec6" class="table-responsive hidden-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No tiếp điểm</th>
+  								<th>Hàng kẹp</th>
+                            	<th>Tiếp điểm</th>
+                            	<th>Điện trở (Ω)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>1</b></td>
+                            <td><input type="text" id="mc_hkep_1a"></td>
+                            <td><input type="text" id="mc_hkep_1b"></td>
+                            <td><input type="text" id="mc_hkep_1c"></td>
+
+                        </tr>
+                        <tr>
+                            <td><b>2</b></td>
+                            <td><input type="text" id="mc_hkep_2a"></td>
+                            <td><input type="text" id="mc_hkep_2b"></td>
+                            <td><input type="text" id="mc_hkep_2c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>3</b></td>
+                            <td><input type="text" id="mc_hkep_3a"></td>
+                            <td><input type="text" id="mc_hkep_3b"></td>
+                            <td><input type="text" id="mc_hkep_3c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>4</b></td>
+                            <td><input type="text" id="mc_hkep_4a"></td>
+                            <td><input type="text" id="mc_hkep_4b"></td>
+                            <td><input type="text" id="mc_hkep_4c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>5</b></td>
+                            <td><input type="text" id="mc_hkep_5a"></td>
+                            <td><input type="text" id="mc_hkep_5b"></td>
+                            <td><input type="text" id="mc_hkep_5c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>6</b></td>
+                            <td><input type="text" id="mc_hkep_6a"></td>
+                            <td><input type="text" id="mc_hkep_6b"></td>
+                            <td><input type="text" id="mc_hkep_6c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>7</b></td>
+                            <td><input type="text" id="mc_hkep_7a"></td>
+                            <td><input type="text" id="mc_hkep_7b"></td>
+                            <td><input type="text" id="mc_hkep_7c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>8</b></td>
+                            <td><input type="text" id="mc_hkep_8a"></td>
+                            <td><input type="text" id="mc_hkep_8b"></td>
+                            <td><input type="text" id="mc_hkep_8c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>9</b></td>
+                            <td><input type="text" id="mc_hkep_9a"></td>
+                            <td><input type="text" id="mc_hkep_9b"></td>
+                            <td><input type="text" id="mc_hkep_9c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>10</b></td>
+                            <td><input type="text" id="mc_hkep_10a"></td>
+                            <td><input type="text" id="mc_hkep_10b"></td>
+                            <td><input type="text" id="mc_hkep_10c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>11</b></td>
+                            <td><input type="text" id="mc_hkep_11a"></td>
+                            <td><input type="text" id="mc_hkep_11b"></td>
+                            <td><input type="text" id="mc_hkep_11c"></td>
+                        </tr>
+                        <tr>
+                            <td><b>12</b></td>
+                            <td><input type="text" id="mc_hkep_12a"></td>
+                            <td><input type="text" id="mc_hkep_12b"></td>
+                            <td><input type="text" id="mc_hkep_12c"></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+
+            </div>
+        </div>    
+
+        <!-- NÚT CHỨC NĂNG TÍCH HỢP -->
+        <div class="card">
+            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
+            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
+            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
+            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp</button>
+        </div>
+
+    </div> <!-- HẾT KHU VỰC KHÓA -->
+</div>
+
+<div id="historyModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-title">⏱ LỊCH SỬ THÍ NGHIỆM</div>
+        <div style="font-size: 12px; color: #666; margin-bottom: 10px; text-align:center;">Chọn để điền mờ (Placeholder) số liệu cũ đối chiếu</div>
+        <div id="historyList"></div>
+        <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
+    </div>
+</div>
+
+<!-- Load common -->
+<script src="fun/config.js"></script>
+<script src="fun/common.js"></script>
+
+<!-- Code riêng của TI -->
+<script>
+    // ============================================================
+    // CẤU HÌNH MODULE TI
+    // ============================================================
+    const CURRENT_MODULE = 'TI';
+    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
+    const MODULE_PREFIX = "ti_";
+    window.prefix = MODULE_PREFIX;
+
+    // ============================================================
+    // HÀM toggleSection - FALLBACK
+    // ============================================================
+    function toggleSection(sectionId, chk) { 
+        const section = document.getElementById(sectionId);
+        if (section) {
+            if (chk && chk.checked) {
+                section.classList.remove('hidden-section');
+            } else {
+                section.classList.add('hidden-section');
+            }
+        }
+    }
+
+    // ============================================================
+    // CODE RIÊNG CỦA TI
+    // ============================================================
+    window.onload = function() {
+        initPrefix();
+        setTodayDate();
+        fetchSubstations();
+        refreshTables();
+        renderAllTables();
+        
+        if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
+            checkUnlockForm();
+        }
+    };
+    function <!-- Load common -->
+<script src="fun/config.js"></script>
+<script src="fun/common.js"></script>
+
+<!-- Code riêng của TI -->
+<script>
+    // ============================================================
+    // CẤU HÌNH MODULE TI
+    // ============================================================
+    const CURRENT_MODULE = 'MC';
+    const TEMPLATE_DRIVE_ID = "1-VQ8Femmz7jaOoys3UvTeJyV1kAYRFjH";
+    const MODULE_PREFIX = "mc_";
+    prefix = MODULE_PREFIX;
+
+    // ============================================================
+    // HÀM toggleSection - FALLBACK
+    // ============================================================
+    function toggleSection(sectionId, chk) { 
+        const section = document.getElementById(sectionId);
+        if (section) {
+            if (chk && chk.checked) {
+                section.classList.remove('hidden-section');
+            } else {
+                section.classList.add('hidden-section');
+            }
+        }
+    }
+
+    // ============================================================
+    // CODE RIÊNG CỦA TI
+    // ============================================================
+    window.onload = function() {
+        initPrefix();
+        setTodayDate();
+        fetchSubstations();
+        refreshTables();
+        renderAllTables();
+        
+        if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
+            checkUnlockForm();
+        }
+    };
+
+
+
+
+ 
+  //=======≈===========================================
+    function refreshTables() {
+        renderCoilTable(); renderContactTable(); renderTimingTable(); calculateAll();
+       }
+  
+  function renderCoilTable() {
+        const tuDK = parseInt(document.getElementById('mc_tudk').value);
+        const cdType = document.getElementById('mc_cuonday').value;
+        const phases = tuDK === 1 ? ['Chung'] : ['A', 'B', 'C'];
+        
+        let coils = [];
+        if(cdType === '1C2O') coils = [{id:'C', name:'Đóng (YC)'}, {id:'O1', name:'Cắt 1 (YT1)'}, {id:'O2', name:'Cắt 2 (YT2)'}];
+        else if(cdType === '2C1O') coils = [{id:'C1', name:'Đóng 1 (YC1)'}, {id:'C2', name:'Đóng 2 (YC2)'}, {id:'O', name:'Cắt (YT)'}];
+        else if(cdType === '2C2O') coils = [{id:'C1', name:'Đóng 1 (YC1)'}, {id:'C2', name:'Đóng 2 (YC2)'}, {id:'O1', name:'Cắt 1 (YT1)'}, {id:'O2', name:'Cắt 2 (YT2)'}];
+
+        let html = `<table><thead><tr><th>Hạng mục</th>`;
+        phases.forEach(p => html += `<th>${tuDK===1 ? 'Tủ Điều Khiển' : 'Tủ Pha '+p}</th>`);
+        html += `</tr></thead><tbody>`;
+
+        coils.forEach(c => {
+            html += `<tr><td style="background:#f1f3f4;"><b>Cuộn ${c.name}</b><br><span class="note-text">R1C / R_CĐ</span></td>`;
+            phases.forEach(p => {
+                let px = tuDK === 1 ? 'Chung' : p;
+                html += `<td>
+                    <input type="number" id="mc_coil_${c.id}_r1c_${px}" placeholder="" oninput="calculateAll()" style="margin-bottom:2px;">
+                    <span class="sub-val" id="mc_coil_${c.id}_r75_${px}">R75: -</span>
+                    <input type="number" id="mc_coil_${c.id}_rcd_${px}" placeholder="">
+                </td>`;
+            });
+            html += `</tr>`;
+        });
+
+        html += `<tr><td style="background:#f1f3f4;"><b>Động Cơ</b><br><span class="note-text">R1C / R_CĐ<br>I_kđ / T_tích</span></td>`;
+        phases.forEach(p => {
+            let px = tuDK === 1 ? 'Chung' : p;
+            html += `<td>
+                <input type="number" id="mc_mot_r1c_${px}" placeholder="" style="margin-bottom:2px;">
+                <input type="number" id="mc_mot_rcd_${px}" placeholder="" style="margin-bottom:2px;">
+                <input type="number" id="mc_mot_ikd_${px}" placeholder="" style="margin-bottom:2px;">
+                <input type="number" id="mc_mot_time_${px}" placeholder="">
+            </td>`;
+        });
+        html += `</tr></tbody></table>`;
+        document.getElementById('table_coils_container').innerHTML = html;
+    }
+
+    function renderContactTable() {
+        const numTd = parseInt(document.getElementById('mc_tiepdiem').value);
+        let html = `<table><thead><tr><th>Pha</th><th>Tiếp điểm</th><th>R Tiếp Xúc (µΩ)</th><th>R_CĐ Giữa TĐ (MΩ)</th><th>R_CĐ Đất (MΩ)</th></tr></thead><tbody>`;
+        ['A', 'B', 'C'].forEach(p => {
+            for(let i=1; i<=numTd; i++) {
+                html += `<tr>
+                    ${i===1 ? `<td rowspan="${numTd}"><b>${p}</b></td>` : ''}
+                    <td><b>TĐ ${i}</b></td>
+                    <td><input type="number" id="mc_rtx_${p}_${i}" oninput="calculateAll()"><span class="sub-val" id="mc_eval_rtx_${p}_${i}"></span></td>
+                    <td><input type="number" id="mc_rcd_giua_${p}_${i}"></td>
+                    ${i===1 ? `<td rowspan="${numTd}"><input type="number" id="mc_rcd_dat_${p}" oninput="calculateAll()"><span class="sub-val" id="mc_eval_rcddat_${p}"></span></td>` : ''}
+                </tr>`;
+            }
+        });
+        html += `</tbody></table>`;
+        document.getElementById('table_contacts_container').innerHTML = html;
+    }
+
+    function renderTimingTable() {
+        const numTd = parseInt(document.getElementById('mc_tiepdiem').value);
+        const cdType = document.getElementById('mc_cuonday').value;
+        let actions = [];
+        
+        if(cdType === '1C2O') actions = [{id:'C', name:'ĐÓNG (C)'}, {id:'O1', name:'CẮT 1 (O1)'}, {id:'O2', name:'CẮT 2 (O2)'}];
+        else if(cdType === '2C1O') actions = [{id:'C1', name:'ĐÓNG 1 (C1)'}, {id:'C2', name:'ĐÓNG 2 (C2)'}, {id:'O', name:'CẮT (O)'}];
+        else if(cdType === '2C2O') actions = [{id:'C1', name:'ĐÓNG 1 (C1)'}, {id:'C2', name:'ĐÓNG 2 (C2)'}, {id:'O1', name:'CẮT 1 (O1)'}, {id:'O2', name:'CẮT 2 (O2)'}];
+
+        // 🔥 THÊM 2 THÔNG SỐ CO VÀ DEAD TIME CHO TẤT CẢ CÁC LOẠI MÁY CẮT
+        actions.push({id:'CO', name:'TIẾP XÚC TRONG CHU TRÌNH CO (CO time)'});
+        actions.push({id:'DEAD', name:'NGỪNG TIẾP XÚC TRONG CHU TRÌNH O-0,3s-CO (Dead time)'});
+
+        let html = ``;
+        actions.forEach(act => {
+            html += `<h4 style="margin-top:10px; color:#1565c0;">🔹 Chu trình: ${act.name}</h4>`;
+            html += `<table><thead><tr><th>Pha</th>`;
+            for(let i=1; i<=numTd; i++) html += `<th>TĐ ${i}</th>`;
+            html += `<th>Δ TĐ / Pha</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(p => {
+                html += `<tr><td><b>${p}</b></td>`;
+                for(let i=1; i<=numTd; i++) { html += `<td><input type="text" step="0.1" id="mc_t_${act.id}_${p}_${i}" oninput="calculateAll()"></td>`; }
+                html += `<td><div class="err-box" id="mc_err_td_${act.id}_${p}">-</div></td></tr>`;
+            });
+            html += `<tr><td colspan="${numTd + 1}" style="text-align:right;"><b>Độ lệch giữa 3 Pha (Δ Pha MAX):</b></td>`;
+            html += `<td><div class="err-box" style="font-weight:bold;" id="mc_err_pha_${act.id}">-</div></td></tr>`;
+            html += `</tbody></table>`;
+        });
+        document.getElementById('table_timing_container').innerHTML = html;
+    }
+
+    function calculateAll() {
+        const temp = parseFloat(document.getElementById('mc_temp').value) || 25;
+        
+        const mdk = parseFloat(document.getElementById('mc_rcd_mdk').value);
+        const elMdk = document.getElementById('mc_eval_mdk');
+        if(mdk) { elMdk.innerText = mdk >= 2 ? "✔ ĐẠT" : "✘ LỖI"; elMdk.className = mdk >= 2 ? "sub-val pass" : "sub-val fail"; }
+
+        document.querySelectorAll('input').forEach(el => {
+            if(el.id.includes('_r1c_') && !el.id.includes("mot")) {
+                const v = parseFloat(el.value);
+                const elR75 = document.getElementById(el.id.replace('_r1c_', '_r75_'));
+                if(elR75 && !isNaN(v)) elR75.innerText = `75°C: ${(v * ((235 + 75) / (235 + temp))).toFixed(2)}`;
+                else if (elR75) elR75.innerText = `75°C: -`;
+            }
+
+            if(el.value !== "" && el.dataset.oldval && (el.id.includes("rcd") || el.id.includes("mdk"))) {
+                const oldV = parseFloat(el.dataset.oldval.replace(',', '.'));
+                const newV = parseFloat(el.value);
+                if (!isNaN(oldV) && !isNaN(newV) && oldV > 0) {
+                    const suyGiam = (oldV - newV) / oldV;
+                    if (suyGiam >= 0.30) {
+                        el.classList.add("bg-warning");
+                        el.title = `Cũ: ${oldV} MΩ. Đã giảm ${(suyGiam*100).toFixed(1)}%!`;
+                    } else {
+                        el.classList.remove("bg-warning"); el.title = "";
+                    }
+                }
+            } else if (el.value === "") { el.classList.remove("bg-warning"); el.title = ""; }
+        });
+
+        const rtxNsx = parseFloat(document.getElementById('mc_rtx_nsx').value) || 50;
+        const rtxMax = rtxNsx * 1.2;
+        ['A', 'B', 'C'].forEach(p => {
+            const rdat = parseFloat(document.getElementById(`mc_rcd_dat_${p}`)?.value);
+            const elDat = document.getElementById(`mc_eval_rcddat_${p}`);
+            if(elDat && !isNaN(rdat)) { elDat.innerText = rdat >= 1000 ? "✔ ĐẠT" : "✘ LỖI"; elDat.className = rdat >= 1000 ? "sub-val pass" : "sub-val fail"; }
+            
+            for(let i=1; i<=4; i++) {
+                const rtx = parseFloat(document.getElementById(`mc_rtx_${p}_${i}`)?.value);
+                const elRtx = document.getElementById(`mc_eval_rtx_${p}_${i}`);
+                if(elRtx && !isNaN(rtx)) { elRtx.innerText = rtx <= rtxMax ? "✔ ĐẠT" : "✘ LỖI"; elRtx.className = rtx <= rtxMax ? "sub-val pass" : "sub-val fail"; }
+            }
+        });
+
+        const numTd = parseInt(document.getElementById('mc_tiepdiem').value);
+        const cdType = document.getElementById('mc_cuonday').value;
+        let actions = [];
+        if(cdType === '1C2O') actions = ['C', 'O1', 'O2'];
+        else if(cdType === '2C1O') actions = ['C1', 'C2', 'O'];
+        else if(cdType === '2C2O') actions = ['C1', 'C2', 'O1', 'O2'];
+
+        // 🔥 THÊM VÀO MẢNG TÍNH TOÁN
+        actions.push('CO', 'DEAD');
+
+        actions.forEach(act => {
+            // Loại trừ 'CO' khỏi việc áp dụng tiêu chuẩn Cắt (Vì chữ 'CO' có chứa chữ 'C')
+            let limitTd = (act.startsWith('C') && act !== 'CO') ? 3.3 : 2.5; 
+            let limitPha = (act.startsWith('C') && act !== 'CO') ? 5.0 : 3.3; 
+            let allPhaseTimes = [];
+
+            ['A', 'B', 'C'].forEach(p => {
+                let phaseTimes = [];
+                for(let i=1; i<=numTd; i++) {
+                    // const t = parseFloat(document.getElementById(`mc_t_${act}_${p}_${i}`)?.value); sua loi phay (,)va cham(.)
+					const raw = document.getElementById(`mc_t_${act}_${p}_${i}`)?.value || "";
+					const t = parseFloat(raw.replace(',', '.'));
+					
+                    if(!isNaN(t)) { phaseTimes.push(t); allPhaseTimes.push(t); }
+                }
+                const errBox = document.getElementById(`mc_err_td_${act}_${p}`);
+                if(errBox && phaseTimes.length > 1) {
+                    const diff = Math.max(...phaseTimes) - Math.min(...phaseTimes);
+                    errBox.innerText = diff.toFixed(1);
+                    errBox.style.color = diff <= limitTd ? "#2e7d32" : "#c62828";
+                    errBox.style.background = diff <= limitTd ? "transparent" : "#ffebee";
+                }
+            });
+
+            const errPhaBox = document.getElementById(`mc_err_pha_${act}`);
+            if(errPhaBox && allPhaseTimes.length > 0) {
+                const diffGlobal = Math.max(...allPhaseTimes) - Math.min(...allPhaseTimes);
+                errPhaBox.innerText = diffGlobal.toFixed(1) + " ms";
+                errPhaBox.style.color = diffGlobal <= limitPha ? "#2e7d32" : "#c62828";
+                errPhaBox.style.background = diffGlobal <= limitPha ? "transparent" : "#ffebee";
+            
+    }
+        });
+  }
+	
+</script>
+</body>
+  </html>

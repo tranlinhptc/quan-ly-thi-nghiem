@@ -54,7 +54,7 @@
         .history-person { font-size: 12px; color: #666; margin-top: 4px; }
         .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
@@ -86,7 +86,7 @@
 
         /* ========== MBA TAB TABLE ========== */
         .mba-tap-table { font-size: 10px; }
-        .mba-tap-table input { font-size: 10px; padding: 2px 4px; width: 60px; }
+        .mba-tap-table input { font-size: 10px; padding: 2px 4px; }
         .mba-tap-table th { font-size: 9px; padding: 2px 4px; }
         .btn-add-remove { background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; margin: 0 2px; }
         .btn-add-remove:hover { opacity: 0.8; }
@@ -111,26 +111,12 @@
         .import-section .btn-import:hover { opacity: 0.8; }
         .file-input-hidden { display: none; }
 
-/* ========== CT TABS ========== */
-.ct-phase-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
-.ct-phase-tabs button { 
-    padding: 6px 14px; 
-    border: 1px solid var(--border); 
-    border-radius: 4px; 
-    background: #f5f5f5; 
-    cursor: pointer; 
-    font-weight: 600; 
-    font-size: 12px; 
-    flex: 1;
-    min-width: 60px;
-}
-.ct-phase-tabs button.active { 
-    background: var(--primary); 
-    color: white; 
-    border-color: var(--primary); 
-}
-.ct-phase-tabs button:hover:not(.active) { background: #e0e0e0; }
 
+
+
+
+
+/* ========== CT ========== */
 .ct-winding-select { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .ct-winding-select .btn-add-remove { 
     background: var(--primary); 
@@ -147,15 +133,21 @@
 .ct-winding-select .btn-add-remove.green { background: #2e7d32; }
 
 .ct-table-wrap { overflow-x: auto; margin-top: 5px; }
-.ct-table-wrap table { font-size: 10px; width: 100%; min-width: 600px; }
+.ct-table-wrap table { font-size: 10px; width: 100%; min-width: 300px; border-collapse: collapse; }
 .ct-table-wrap table th { 
     background: #f1f3f4; 
     font-size: 9px; 
     padding: 4px 3px; 
     text-align: center; 
     white-space: nowrap;
+    border: 1px solid #ddd;
 }
-.ct-table-wrap table td { padding: 2px 3px; text-align: center; vertical-align: middle; }
+.ct-table-wrap table td { 
+    padding: 2px 3px; 
+    text-align: center; 
+    vertical-align: middle; 
+    border: 1px solid #ddd;
+}
 .ct-table-wrap table input { 
     font-size: 10px; 
     padding: 3px 2px; 
@@ -166,19 +158,22 @@
     min-width: 50px;
 }
 .ct-table-wrap table input:focus { border-color: var(--primary); outline: none; }
-.ct-phase-label { font-weight: 700; font-size: 11px; }
-.ct-location-label { font-weight: 600; font-size: 10px; }
-.ct-winding-label { font-weight: 600; font-size: 10px; }
+.ct-table-wrap table input[readonly] { background: #f5f5f5; cursor: default; }
 
 .ct-excitation-group { display: flex; flex-direction: column; gap: 1px; align-items: center; }
-.ct-excitation-row { display: flex; gap: 2px; align-items: center; }
-.ct-excitation-row input { width: 28px; font-size: 9px; padding: 2px 2px; }
+.ct-excitation-row { display: flex; gap: 2px; align-items: center; justify-content: center; }
+.ct-excitation-row input { }
 .ct-excitation-row span { font-size: 8px; color: #666; }
 
 @media (max-width: 480px) {
     .ct-table-wrap table input { min-width: 35px; font-size: 9px; padding: 2px 1px; }
-    .ct-excitation-row input { width: 22px; font-size: 8px; }
-    .ct-phase-tabs button { font-size: 10px; padding: 4px 8px; }
+    .ct-excitation-row input { font-size: 8px; }
+    .ct-table-wrap table { font-size: 9px; }
+    .ct-table-wrap table th { font-size: 8px; padding: 2px 2px; }
+}
+
+.hidden-col {
+    display: none !important;
 }
     </style>
 </head>
@@ -230,7 +225,7 @@
     </div>
 
     <!-- KHU VỰC BỊ KHÓA -->
-    <div id="locked_zone" class="form-locked">
+    <!--div id="locked_zone" class="form-locked"-->
         <!-- CẤU HÌNH THIẾT BỊ -->
         <div class="card">
             <div class="card-title"><span>THÔNG SỐ THIẾT BỊ</span>
@@ -266,11 +261,11 @@
                     </select>
                 </div>
                 <div class="form-group"><label>Số nấc điều áp:</label>
-                    <input type="number" id="mba_tap_count" value="17" onchange="renderTapTables()" style="width:70px;">
+                    <input type="number" id="mba_tap_count" value="19" onchange="renderTapTables()" >
                     <span style="font-size:9px;color:#666;">(Nấc trung gian: 9)</span>
                 </div>
                 <div class="form-group"><label>Số cuộn CT:</label>
-                    <input type="number" id="mba_ct_windings" value="5" onchange="renderCtTables()" style="width:70px;">
+                    <input type="number" id="mba_ct_windings" value="2" onchange="renderCtTables()" >
                 </div>
                 <div class="form-group"><label>Nhiệt độ (°C):</label><input type="number" id="mba_temp" value="" oninput="calculateAll()"></div>
                 <div class="form-group"><label>Độ ẩm (%):</label><input type="number" id="mba_humidity" value="" oninput="calculateAll()"></div>
@@ -372,6 +367,7 @@
         </div>
 
 <!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG -->
+<!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
 <div class="card">
     <div class="card-title">
         <span>8. Biến Dòng Chân Sứ (Bushing CT)</span>
@@ -381,28 +377,41 @@
         <div class="note-text">* Đo ở nhiệt độ: <span id="mba_ct_temp_display">-</span> °C</div>
         
         <!-- Chọn số cuộn dây chung -->
-        <div class="ct-winding-select" style="margin:10px 0;padding:8px;background:#f5f5f5;border-radius:4px;">
-            <label style="font-weight:600;font-size:13px;">Số cuộn dây chung: </label>
-            <strong style="font-size:16px;color:var(--primary);" id="ct_windings_display">5</strong>
+        <div class="ct-winding-select" style="margin:10px 0;padding:8px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <label style="font-weight:600;font-size:13px;">Số cuộn dây:</label>
+            <strong style="font-size:16px;color:var(--primary);" id="ct_windings_display">2</strong>
             <button class="btn-add-remove red" onclick="changeCtWindings(-1)">−</button>
             <button class="btn-add-remove green" onclick="changeCtWindings(1)">+</button>
-            <input type="hidden" id="mba_ct_windings" value="5">
-            <span style="font-size:10px;color:#666;margin-left:10px;">(Áp dụng cho tất cả)</span>
+            <input type="hidden" id="mba_ct_windings" value="2">
+            <span style="font-size:10px;color:#666;">(Áp dụng cho tất cả)</span>
         </div>
 
-        <!-- Tab chọn phép đo -->
-        <div class="ct-phase-tabs" style="margin-bottom:10px;">
-            <button class="active" data-cttab="rcd" onclick="switchCtTab('rcd')">📊 RCD</button>
-            <button data-cttab="rdc" onclick="switchCtTab('rdc')">⚡ RDC</button>
-            <button data-cttab="ratio" onclick="switchCtTab('ratio')">📐 Tỉ số</button>
-            <button data-cttab="excitation" onclick="switchCtTab('excitation')">🌀 Từ hóa</button>
-        </div>
+        <!-- 4 bảng riêng biệt -->
+        <div style="margin-top:10px;">
+            <!-- 8.1 RCD -->
+            <div style="margin-bottom:20px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
+                <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">📊 8.1 RCD (MΩ) - Điện trở cách điện</div>
+                <div id="ct_rcd_container"></div>
+            </div>
 
-        <!-- Container cho từng bảng -->
-        <div id="ct_rcd_container" class="ct-table-wrap"></div>
-        <div id="ct_rdc_container" class="ct-table-wrap" style="display:none;"></div>
-        <div id="ct_ratio_container" class="ct-table-wrap" style="display:none;"></div>
-        <div id="ct_excitation_container" class="ct-table-wrap" style="display:none;"></div>
+            <!-- 8.2 RDC -->
+            <div style="margin-bottom:20px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
+                <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">⚡ 8.2 RDC (Ω) - Điện trở một chiều</div>
+                <div id="ct_rdc_container"></div>
+            </div>
+
+            <!-- 8.3 Tỉ số biến -->
+            <div style="margin-bottom:20px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
+                <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">📐 8.3 Tỉ số biến (Kđo)</div>
+                <div id="ct_ratio_container"></div>
+            </div>
+
+            <!-- 8.4 Từ hóa -->
+            <div style="margin-bottom:10px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
+                <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">🌀 8.4 Từ hóa U(V)/I(mA) - 3 điểm đo</div>
+                <div id="ct_excitation_container"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -750,13 +759,12 @@
     // RENDER BẢNG
     // ============================================================
     function renderAllTables() {
-        renderRcdTable();
-        renderVectorTable();
-        renderTgTable();
-        renderRdcWindingTable();
-        renderRatioTable();
-        renderOltcTable();
-       // renderCtTables();
+    renderRcdTable();
+    renderVectorTable();
+    renderTgTable();
+    renderRdcWindingTable();
+    renderRatioTable();
+    renderOltcTable();
     }
 
     function isConfigField(id) {
@@ -825,11 +833,11 @@
             html += `
                 <tr>
                     <td style="text-align:left;font-size:10px;">${item.label}</td>
-                    <td><input type="number" id="mba_rcd_15_${item.id}" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                    <td><input type="number" id="mba_rcd_60_${item.id}" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                    <td><input type="number" id="mba_rcd_kht_${item.id}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_rcd_pi_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_rcd_volt_${item.id}" value="2500" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                    <td><input type="number" id="mba_rcd_15_${item.id}" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_rcd_60_${item.id}" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_rcd_kht_${item.id}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_rcd_pi_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_rcd_volt_${item.id}" value="2500" oninput="handleNewInput(event); calculateAll()" ></td>
                 </tr>
             `;
         });
@@ -897,11 +905,11 @@
             html += `
                 <tr>
                     <td style="text-align:left;font-size:10px;">${item.label}</td>
-                    <td><input type="number" id="mba_tg_${item.id}" step="0.001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                    <td><input type="number" id="mba_c_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:80px;"></td>
-                    <td><input type="number" id="mba_tg_volt_${item.id}" value="10" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                    <td><input type="number" id="mba_tg_${item.id}" step="0.001" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_c_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td><input type="number" id="mba_tg_volt_${item.id}" value="10" oninput="handleNewInput(event); calculateAll()" ></td>
                     <td>
-                        <select id="mba_tg_diagram_${item.id}" onchange="handleNewInput(event)" style="width:80px;">
+                        <select id="mba_tg_diagram_${item.id}" onchange="handleNewInput(event)" >
                             <option value="GND">GND</option>
                             <option value="UST-R">UST-R</option>
                             <option value="GAR-R">GAR-R</option>
@@ -921,22 +929,22 @@
     function renderRdcWindingTable() {
         const container = document.getElementById('table_rdc_container');
         if (!container) return;
-        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
         
         let html = `
             <div style="margin-bottom:8px;">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                     <div class="form-group">
                         <label>Cuộn cao thế - Nhiệt độ đo (°C):</label>
-                        <input type="number" id="mba_rdc_hv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_rdc_hv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" >
                     </div>
                     <div class="form-group">
                         <label>Cuộn trung thế - Nhiệt độ đo (°C):</label>
-                        <input type="number" id="mba_rdc_mv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_rdc_mv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" >
                     </div>
                     <div class="form-group">
                         <label>Cuộn hạ thế - Nhiệt độ đo (°C):</label>
-                        <input type="number" id="mba_rdc_lv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_rdc_lv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" >
                     </div>
                 </div>
             </div>
@@ -966,13 +974,13 @@
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
-                    <td><input type="number" id="mba_rdc_hv_an_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_dan_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_bn_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_dbn_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_cn_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_dcn_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_rdc_hv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                    <td><input type="number" id="mba_rdc_hv_an_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_dan_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_bn_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_dbn_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_cn_${tap}" step="0.01" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_dcn_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()"></td>
+                    <td><input type="number" id="mba_rdc_hv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()"></td>
                 </tr>
             `;
         }
@@ -997,13 +1005,13 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="number" id="mba_rdc_mv_amn" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_damn" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_bmn" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_dbmn" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_cmn" step="0.01" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_dcmn" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_mv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                                <td><input type="number" id="mba_rdc_mv_amn" step="0.01" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_damn" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_bmn" step="0.01" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_dbmn" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_cmn" step="0.01" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_dcmn" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_rdc_mv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1030,13 +1038,13 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="number" id="mba_rdc_lv_ab" step="0.001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_dab" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_bc" step="0.001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_dbc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_ca" step="0.001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_dca" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_rdc_lv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                                <td><input type="number" id="mba_rdc_lv_ab" step="0.001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_dab" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_bc" step="0.001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_dbc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_ca" step="0.001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_dca" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
+                                <td><input type="number" id="mba_rdc_lv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1053,26 +1061,26 @@
     function renderRatioTable() {
         const container = document.getElementById('table_ratio_container');
         if (!container) return;
-        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
         
         let html = `
             <div style="margin-bottom:10px;">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
                     <div class="form-group">
                         <label>U_Thử (kV):</label>
-                        <input type="number" id="mba_u1_tn" value="10" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_u1_tn" value="10" oninput="handleNewInput(event); calculateAll()" ;">
                     </div>
                     <div class="form-group">
                         <label>U<sub>HV</sub> (kV):</label>
-                        <input type="number" id="mba_uhv" value="225" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_uhv" value="225" oninput="handleNewInput(event); calculateAll()" ;">
                     </div>
                     <div class="form-group">
                         <label>U<sub>MV</sub> (kV):</label>
-                        <input type="number" id="mba_umv" value="115" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_umv" value="115" oninput="handleNewInput(event); calculateAll()";">
                     </div>
                     <div class="form-group">
                         <label>U<sub>LV</sub> (kV):</label>
-                        <input type="number" id="mba_ulv" value="23" oninput="handleNewInput(event); calculateAll()" style="width:80px;">
+                        <input type="number" id="mba_ulv" value="23" oninput="handleNewInput(event); calculateAll()";">
                     </div>
                 </div>
             </div>
@@ -1081,19 +1089,23 @@
         // HV:MV Ratio
         html += `
             <div style="margin-top:10px;">
-                <h4 style="color:var(--primary);">Tỷ số HV:MV (220kV/110kV)</h4>
+                <h4 style="color:var(--primary);">Tỷ số HV:MV</h4>
                 <div class="table-responsive">
                     <table class="mba-tap-table">
                         <thead>
                             <tr>
                                 <th>Nấc</th>
                                 <th>U<sub>AB</sub>/U<sub>AmBm</sub></th>
-                                <th>ΔK<sub>AB/AmBm</sub> (%)</th>
-                                <th>U<sub>BC</sub>/U<sub>BmCm</sub></th>
-                                <th>ΔK<sub>BC/BmCm</sub> (%)</th>
+                                <th class="hidden-col">ΔK<sub>AB/AmBm</sub> (%)</th>
+
+                               <th>U<sub>BC</sub>/U<sub>BmCm</sub></th>
+                                <th class="hidden-col">ΔK<sub>BC/BmCm</sub> (%)</th>
+
                                 <th>U<sub>CA</sub>/U<sub>CmAm</sub></th>
-                                <th>ΔK<sub>CA/CmAm</sub> (%)</th>
-                                <th>ΔK(A,B,C) (%)</th>
+                                <th class="hidden-col">ΔK<sub>CA/CmAm</sub> (%)</th>
+
+                                <th>ΔK(A,B,C) (%)</th>            
+
                             </tr>
                         </thead>
                         <tbody>
@@ -1102,13 +1114,13 @@
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_ab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_dab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_bc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_dbc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_ca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_dca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_mv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                    <td><input type="number" id="mba_ratio_hv_mv_ab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_mv_dab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()";"></td>
+                    <td><input type="number" id="mba_ratio_hv_mv_bc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_mv_dbc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td><input type="number" id="mba_ratio_hv_mv_ca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_mv_dca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td><input type="number" id="mba_ratio_hv_mv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()";"></td>
                 </tr>
             `;
         }
@@ -1117,18 +1129,18 @@
         // HV:LV Ratio
         html += `
             <div style="margin-top:15px;">
-                <h4 style="color:var(--primary);">Tỷ số HV:LV (220kV/22kV)</h4>
+                <h4 style="color:var(--primary);">Tỷ số HV:LV</h4>
                 <div class="table-responsive">
                     <table class="mba-tap-table">
                         <thead>
                             <tr>
                                 <th>Nấc</th>
                                 <th>U<sub>AB</sub>/U<sub>ab</sub></th>
-                                <th>ΔK<sub>AB/ab</sub> (%)</th>
+                                   <th class="hidden-col">ΔK<sub>AB/ab</sub> (%)</th>
                                 <th>U<sub>BC</sub>/U<sub>bc</sub></th>
-                                <th>ΔK<sub>BC/bc</sub> (%)</th>
+                                  <th class="hidden-col">ΔK<sub>BC/bc</sub> (%)</th>
                                 <th>U<sub>CA</sub>/U<sub>ca</sub></th>
-                                <th>ΔK<sub>CA/ca</sub> (%)</th>
+                                 <th class="hidden-col">ΔK<sub>CA/ca</sub> (%)</th>
                                 <th>ΔK(A,B,C) (%)</th>
                             </tr>
                         </thead>
@@ -1138,13 +1150,13 @@
             html += `
                 <tr>
                     <td><b>${tap}</b></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_ab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_dab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_bc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_dbc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_ca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_dca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:55px;"></td>
-                    <td><input type="number" id="mba_ratio_hv_lv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                    <td><input type="number" id="mba_ratio_hv_lv_ab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_lv_dab_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td><input type="number" id="mba_ratio_hv_lv_bc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()";"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_lv_dbc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td><input type="number" id="mba_ratio_hv_lv_ca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td class="hidden-col"><input type="number" id="mba_ratio_hv_lv_dca_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                    <td><input type="number" id="mba_ratio_hv_lv_dabc_${tap}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
                 </tr>
             `;
         }
@@ -1153,29 +1165,29 @@
         // MV:LV Ratio
         html += `
             <div style="margin-top:15px;">
-                <h4 style="color:var(--primary);">Tỷ số MV:LV (110kV/22kV)</h4>
+                <h4 style="color:var(--primary);">Tỷ số MV:LV</h4>
                 <div class="table-responsive">
                     <table>
                         <thead>
                             <tr>
                                 <th>U<sub>AmBm</sub>/U<sub>ab</sub></th>
-                                <th>ΔK<sub>AmBm/ab</sub> (%)</th>
+                                <th class="hidden-col">ΔK<sub>AmBm/ab</sub> (%)</th>
                                 <th>U<sub>BmCm</sub>/U<sub>bc</sub></th>
-                                <th>ΔK<sub>BmCm/bc</sub> (%)</th>
+                                <th class="hidden-col">ΔK<sub>BmCm/bc</sub> (%)</th>
                                 <th>U<sub>CmAm</sub>/U<sub>ca</sub></th>
-                                <th>ΔK<sub>CmAm/ca</sub> (%)</th>
+                                <th class="hidden-col">ΔK<sub>CmAm/ca</sub> (%)</th>
                                 <th>ΔK(A,B,C) (%)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type="number" id="mba_ratio_mv_lv_ab" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_dab" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_bc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_dbc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_ca" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:70px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_dca" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
-                                <td><input type="number" id="mba_ratio_mv_lv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" style="width:60px;"></td>
+                                <td><input type="number" id="mba_ratio_mv_lv_ab" step="0.0001" oninput="handleNewInput(event); calculateAll()";"></td>
+                                <td class="hidden-col"><input type="number" id="mba_ratio_mv_lv_dab" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_ratio_mv_lv_bc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td class="hidden-col"><input type="number" id="mba_ratio_mv_lv_dbc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_ratio_mv_lv_ca" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td  class="hidden-col"><input type="number" id="mba_ratio_mv_lv_dca" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
+                                <td><input type="number" id="mba_ratio_mv_lv_dabc" step="0.0001" oninput="handleNewInput(event); calculateAll()" ;"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1238,21 +1250,9 @@
 // 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG
 // ============================================================
 
-let ctCurrentTab = 'rcd';
-
-function switchCtTab(tab) {
-    ctCurrentTab = tab;
-    document.querySelectorAll('.ct-phase-tabs button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.cttab === tab);
-    });
-    document.querySelectorAll('.ct-table-wrap').forEach(el => el.style.display = 'none');
-    document.getElementById(`ct_${tab}_container`).style.display = 'block';
-    renderCtTables();
-}
-
 function changeCtWindings(delta) {
     const input = document.getElementById('mba_ct_windings');
-    let val = parseInt(input.value) || 5;
+    let val = parseInt(input.value) || 2;
     val = Math.max(1, Math.min(10, val + delta));
     input.value = val;
     document.getElementById('ct_windings_display').textContent = val;
@@ -1260,281 +1260,313 @@ function changeCtWindings(delta) {
 }
 
 function renderCtTables() {
-    const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 5;
+    const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 2;
     const temp = document.getElementById('mba_temp').value || '--';
     document.getElementById('mba_ct_temp_display').textContent = temp;
 
-    // Các vị trí CT
+    // Các vị trí CT (hàng dọc)
     const locations = [
         { id: 'HV', label: 'Cao áp' },
         { id: 'MV', label: 'Trung áp' },
         { id: 'LV', label: 'Hạ áp' },
         { id: 'NEUTRAL', label: 'Trung tính' }
     ];
+    // Các pha (cột ngang)
     const phases = ['A', 'B', 'C'];
-    const phaseColors = {
-        'A': '#fff9c4',
-        'B': '#ffebee',
-        'C': '#e3f2fd'
-    };
-    const phaseLabels = {
-        'A': '🟡 A',
-        'B': '🔴 B',
-        'C': '🔵 C'
-    };
+    const phaseColors = { 'A': '#fff9c4', 'B': '#ffebee', 'C': '#e3f2fd' };
 
-    // Render từng bảng
-    renderCtRcd(numWindings, locations, phases, phaseColors, phaseLabels);
-    renderCtRdc(numWindings, locations, phases, phaseColors, phaseLabels);
-    renderCtRatio(numWindings, locations, phases, phaseColors, phaseLabels);
-    renderCtExcitation(numWindings, locations, phases, phaseColors, phaseLabels);
+    renderCtRcd(numWindings, locations, phases, phaseColors);
+    renderCtRdc(numWindings, locations, phases, phaseColors);
+    renderCtRatio(numWindings, locations, phases, phaseColors);
+    renderCtExcitation(numWindings, locations, phases, phaseColors);
 }
 
 // ============================================================
-// 8.1 CT - RCD
+// 8.1 CT - RCD (MΩ)
 // ============================================================
-function renderCtRcd(numWindings, locations, phases, phaseColors, phaseLabels) {
+function renderCtRcd(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_rcd_container');
     if (!container) return;
 
     let html = `
-        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">📊 RCD (MΩ) - Đo giữa cuộn dây và vỏ</div>
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2" style="min-width:50px;">Pha</th>
-                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
-                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
-                    <th colspan="4" style="min-width:200px;">Vị trí</th>
-                </tr>
-                <tr>
-                    <th style="min-width:55px;">Cao áp</th>
-                    <th style="min-width:55px;">Trung áp</th>
-                    <th style="min-width:55px;">Hạ áp</th>
-                    <th style="min-width:55px;">Trung tính</th>
-                </tr>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
+                    ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
+                
             </thead>
             <tbody>
     `;
 
-    phases.forEach(pha => {
-        const bgColor = phaseColors[pha];
-        const phaLabel = phaseLabels[pha];
-        
-        for (let w = 1; w <= numWindings; w++) {
-            const isFirstRow = (w === 1);
-            html += `
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
-                    <td style="font-weight:600;">${w}</td>
-                    <td><input type="text" id="mba_ct_rcd_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
-                    ${locations.map(loc => `
-                        <td><input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w${w}" step="0.1" placeholder="RCD" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
-                    `).join('')}
-                </tr>
-            `;
-        }
-        // Dòng cách giữa các pha
-        if (phases.indexOf(pha) < phases.length - 1) {
-            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
-        }
+    locations.forEach(loc => {
+        html += `
+            <tr>
+                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
+                ${phases.map(pha => `
+                    <td>
+                        ${numWindings > 1 ? `
+                            <div style="display:flex;flex-direction:column;gap:1px;">
+                                ${Array.from({length: numWindings}, (_, w) => `
+                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
+                                        <span style="font-size:8px;color:#666;">C${w+1}</span>
+                                        <input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w${w+1}" step="0.1" placeholder="Rcd" ;" oninput="handleNewInput(event); calculateAll()">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w1" step="0.1" placeholder="Rcd";" oninput="handleNewInput(event); calculateAll()">
+                        `}
+                    </td>
+                `).join('')}
+            </tr>
+        `;
     });
 
-    html += `</tbody></table>`;
+    html += `
+            </tbody>
+        </table>
+        <div style="font-size:9px;color:#666;margin-top:3px;">* RCD đo giữa cuộn dây và vỏ (MΩ)</div>
+    `;
     container.innerHTML = html;
 }
 
 // ============================================================
-// 8.2 CT - RDC
+// 8.2 CT - RDC (Ω)
 // ============================================================
-function renderCtRdc(numWindings, locations, phases, phaseColors, phaseLabels) {
+function renderCtRdc(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_rdc_container');
     if (!container) return;
 
     let html = `
-        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">⚡ RDC (Ω) - Điện trở một chiều các cuộn dây</div>
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2" style="min-width:50px;">Pha</th>
-                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
-                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
-                    <th colspan="4" style="min-width:200px;">Vị trí</th>
-                </tr>
-                <tr>
-                    <th style="min-width:55px;">Cao áp</th>
-                    <th style="min-width:55px;">Trung áp</th>
-                    <th style="min-width:55px;">Hạ áp</th>
-                    <th style="min-width:55px;">Trung tính</th>
-                </tr>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
+
+
+                    <!-- [SỬA] Thêm cột Đầu dây============================================= -->
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
+
+                    ${phases.map(p => `<th background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
+
             </thead>
             <tbody>
     `;
 
-    phases.forEach(pha => {
-        const bgColor = phaseColors[pha];
-        const phaLabel = phaseLabels[pha];
+    locations.forEach(loc => {
+
+ // Tạo mảng các đầu dây cho từng cuộn====================================================
+        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
         
-        for (let w = 1; w <= numWindings; w++) {
-            const isFirstRow = (w === 1);
-            html += `
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
-                    <td style="font-weight:600;">${w}</td>
-                    <td><input type="text" id="mba_ct_rdc_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
-                    ${locations.map(loc => `
-                        <td><input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w}" step="0.001" placeholder="RDC" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
-                    `).join('')}
-                </tr>
-            `;
-        }
-        if (phases.indexOf(pha) < phases.length - 1) {
-            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
-        }
+        html += `
+            <tr>
+                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
+               
+
+ <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn ==================================-->
+                <td style="vertical-align:middle;">
+                    ${numWindings > 1 ? `
+                        <div style="display:flex;flex-direction:column;gap:1px;align-items:center;">
+                            ${terminalValues.map((val, idx) => `
+                                <div style="display:flex;align-items:center;justify-content:center;height:24px;">
+                                    <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${idx+1}" 
+                                           value="${val}" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w1" 
+                               value="1S1-1S" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
+                    `}
+                </td>
+                ${phases.map(pha => `
+                    <td style="vertical-align:middle;">
+                        ${numWindings > 1 ? `
+                            <div style="display:flex;flex-direction:column;gap:1px;">
+                                ${Array.from({length: numWindings}, (_, w) => `
+                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
+
+
+
+                                        <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w+1}" step="0.001" placeholder="Rdc" ;" oninput="handleNewInput(event); calculateAll()">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w1" step="0.001" placeholder="Rdc" ;" oninput="handleNewInput(event); calculateAll()">
+                        `}
+                    </td>
+                `).join('')}
+            </tr>
+        `;
     });
 
-    html += `</tbody></table>`;
+    html += `
+            </tbody>
+        </table>
+        <div style="font-size:9px;color:#666;margin-top:3px;">* RDC - Điện trở một chiều các cuộn dây (Ω)</div>
+    `;
     container.innerHTML = html;
 }
 
 // ============================================================
-// 8.3 CT - Tỉ số biến
+// 8.3 CT - Tỉ số biến (Kđo)
 // ============================================================
-function renderCtRatio(numWindings, locations, phases, phaseColors, phaseLabels) {
+function renderCtRatio(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_ratio_container');
     if (!container) return;
 
     let html = `
-        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">📐 Tỉ số biến (Kđo)</div>
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2" style="min-width:50px;">Pha</th>
-                    <th rowspan="2" style="min-width:50px;">Cuộn</th>
-                    <th rowspan="2" style="min-width:60px;">Đầu dây</th>
-                    <th colspan="4" style="min-width:200px;">Vị trí</th>
-                </tr>
-                <tr>
-                    <th style="min-width:55px;">Cao áp</th>
-                    <th style="min-width:55px;">Trung áp</th>
-                    <th style="min-width:55px;">Hạ áp</th>
-                    <th style="min-width:55px;">Trung tính</th>
-                </tr>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="font-size:10px; padding:2px ">Vị trí</th>
+                   <!-- [SỬA] Thêm cột Đầu dây -->
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
+
+                    ${phases.map(p => `<th style="min-width:55px;background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
+             
             </thead>
             <tbody>
     `;
 
-    phases.forEach(pha => {
-        const bgColor = phaseColors[pha];
-        const phaLabel = phaseLabels[pha];
+   locations.forEach(loc => {
+
+ // Tạo mảng các đầu dây cho từng cuộn
+        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
+
+        html += `
+            <tr>
+                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
         
-        for (let w = 1; w <= numWindings; w++) {
-            const isFirstRow = (w === 1);
-            html += `
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
-                    <td style="font-weight:600;">${w}</td>
-                    <td><input type="text" id="mba_ct_ratio_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
-                    ${locations.map(loc => `
-                        <td><input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w${w}" step="0.001" placeholder="Kđo" style="width:50px;" oninput="handleNewInput(event); calculateAll()"></td>
-                    `).join('')}
-                </tr>
-            `;
-        }
-        if (phases.indexOf(pha) < phases.length - 1) {
-            html += `<tr style="height:3px;"><td colspan="7" style="background:#f0f0f0;padding:0;"></td></tr>`;
-        }
+
+
+ <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn ==================================-->
+                <td style="vertical-align:middle;">
+                    ${numWindings > 1 ? `
+                        <div style="display:flex;flex-direction:column;gap:1px;align-items:center;">
+                            ${terminalValues.map((val, idx) => `
+                                <div style="display:flex;align-items:center;justify-content:center;height:24px;">
+                                    <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${idx+1}" 
+                                           value="${val}" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w1" 
+                               value="1S1-1S" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
+                    `}
+                </td>
+                ${phases.map(pha => `
+                    <td style="vertical-align:middle;">
+
+
+                        ${numWindings > 1 ? `
+                            <div style="display:flex;flex-direction:column;gap:1px;">
+                                ${Array.from({length: numWindings}, (_, w) => `
+                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
+                                        <input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w${w+1}" step="0.001" placeholder="Kđo" ;" oninput="handleNewInput(event); calculateAll()">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w1" step="0.001" placeholder="Kđo"  oninput="handleNewInput(event); calculateAll()">
+                        `}
+                    </td>
+                `).join('')}
+            </tr>
+        `;
     });
 
-    html += `</tbody></table>`;
+    html += `
+            </tbody>
+        </table>
+        <div style="font-size:9px;color:#666;margin-top:3px;">* Tỉ số biến đo được (Kđo)</div>
+    `;
     container.innerHTML = html;
 }
 
 // ============================================================
-// 8.4 CT - Từ hóa U(V)/I(mA)
+// 8.4 CT - Từ hóa U(V)/I(mA) - 3 điểm đo
 // ============================================================
-function renderCtExcitation(numWindings, locations, phases, phaseColors, phaseLabels) {
+function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_excitation_container');
     if (!container) return;
 
+    // Hàm tạo 3 điểm đo cho 1 ô
+    function excitationInputs(locId, pha, w) {
+        return `
+            <div class="ct-excitation-group">
+                <div class="ct-excitation-row">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u1" step="0.01" placeholder="U" oninput="handleNewInput(event)">
+                    <span>/</span>
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i1" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+                </div>
+                <div class="ct-excitation-row">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u2" step="0.01" placeholder="U" oninput="handleNewInput(event)">
+                    <span>/</span>
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i2" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+                </div>
+                <div class="ct-excitation-row">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u3" step="0.01" placeholder="U" oninput="handleNewInput(event)">
+                    <span>/</span>
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i3" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+                </div>
+            </div>
+        `;
+    }
+
     let html = `
-        <div style="font-size:11px;font-weight:600;color:var(--primary);margin-bottom:5px;">🌀 Từ hóa U(V) / I(mA) - 3 điểm đo</div>
         <table>
             <thead>
                 <tr>
-                    <th rowspan="3" style="min-width:50px;">Pha</th>
-                    <th rowspan="3" style="min-width:50px;">Cuộn</th>
-                    <th rowspan="3" style="min-width:60px;">Đầu dây</th>
-                    <th colspan="12" style="min-width:360px;">Vị trí</th>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:90px;">Vị trí</th>
+                    ${phases.map(p => `<th style="min-width:90px;background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
                 </tr>
-                <tr>
-                    <th colspan="3" style="min-width:90px;">Cao áp</th>
-                    <th colspan="3" style="min-width:90px;">Trung áp</th>
-                    <th colspan="3" style="min-width:90px;">Hạ áp</th>
-                    <th colspan="3" style="min-width:90px;">Trung tính</th>
-                </tr>
-                <tr>
-                    ${locations.map(() => `
-                        <th style="min-width:28px;">U</th>
-                        <th style="min-width:28px;">I</th>
-                        <th style="min-width:8px;font-size:7px;">#</th>
-                    `).join('')}
-                </tr>
+               <!-- ${numWindings > 1 ? `<tr>${phases.map(() => `<th style="font-size:8px;font-weight:400;">(${numWindings} cuộn)</th>`).join('')}</tr>` : ''}-->
             </thead>
             <tbody>
     `;
 
-    phases.forEach(pha => {
-        const bgColor = phaseColors[pha];
-        const phaLabel = phaseLabels[pha];
-        
-        for (let w = 1; w <= numWindings; w++) {
-            const isFirstRow = (w === 1);
-            html += `
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};font-weight:bold;vertical-align:middle;">${phaLabel}</td>` : ''}
-                    <td style="font-weight:600;">${w}</td>
-                    <td><input type="text" id="mba_ct_exc_terminal_${pha}_w${w}" value="${w}S1-${w}S" style="width:55px;font-size:9px;"></td>
-                    ${locations.map((loc, locIdx) => `
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u1" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i1" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
-                    `).join('')}
-                </tr>
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};padding:0;"></td>` : ''}
-                    <td colspan="2" style="font-size:8px;color:#666;text-align:right;padding:0 4px;">Điểm 2</td>
-                    ${locations.map((loc, locIdx) => `
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u2" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i2" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
-                    `).join('')}
-                </tr>
-                <tr>
-                    ${isFirstRow ? `<td rowspan="${numWindings}" style="background:${bgColor};padding:0;"></td>` : ''}
-                    <td colspan="2" style="font-size:8px;color:#666;text-align:right;padding:0 4px;">Điểm 3</td>
-                    ${locations.map((loc, locIdx) => `
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_u3" step="0.01" placeholder="U" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td><input type="number" id="mba_ct_exc_${loc.id}_${pha}_w${w}_i3" step="0.0001" placeholder="I" style="width:28px;font-size:9px;" oninput="handleNewInput(event)"></td>
-                        <td style="font-size:7px;color:#999;width:8px;">${locIdx < locations.length - 1 ? '|' : ''}</td>
-                    `).join('')}
-                </tr>
-            `;
-        }
-        if (phases.indexOf(pha) < phases.length - 1) {
-            html += `<tr style="height:3px;"><td colspan="${4 + locations.length * 3}" style="background:#f0f0f0;padding:0;"></td></tr>`;
-        }
+    locations.forEach(loc => {
+        html += `
+            <tr>
+                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
+                ${phases.map(pha => `
+                    <td>
+                        ${numWindings > 1 ? `
+                            <div style="display:flex;flex-direction:column;gap:3px;">
+                                ${Array.from({length: numWindings}, (_, w) => `
+                                    <div style="display:flex;align-items:center;gap:4px;justify-content:center;border-bottom:1px dashed #eee;padding:2px 0;">
+                                        <span style="font-size:8px;color:#666;min-width:16px;font-weight:600;">C${w+1}</span>
+                                        ${excitationInputs(loc.id, pha, w+1)}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            ${excitationInputs(loc.id, pha, 1)}
+                        `}
+                    </td>
+                `).join('')}
+            </tr>
+        `;
     });
 
-    html += `</tbody></table>`;
+    html += `
+            </tbody>
+        </table>
+        <div style="font-size:9px;color:#666;margin-top:3px;">* Nhập 3 cặp giá trị U(V)/I(mA) cho mỗi cuộn dây</div>
+    `;
     container.innerHTML = html;
 }
 
-// Gọi render CT khi khởi tạo
+// ============================================================
+// KHỞI TẠO CT
+// ============================================================
 function initCtTables() {
     renderCtTables();
 }
-
     // ============================================================
     // TÍNH TOÁN (Đánh giá qua màu sắc)
     // ============================================================
@@ -1594,7 +1626,7 @@ function initCtTables() {
         });
         
         // Tỷ số biến - Kiểm tra sai số
-        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 17;
+        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
         for (let tap = 1; tap <= tapCount; tap++) {
             const el = document.getElementById(`mba_ratio_hv_mv_dabc_${tap}`);
             if (el) {
@@ -1749,16 +1781,9 @@ function initCtTables() {
         setTodayDate();
         fetchSubstations();
         renderAllTables();
+    	initCtTables();  // ← THÊM DÒNG NÀY
         
-        ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6', 'chk_sec7', 'chk_sec8', 'chk_sec9'].forEach(id => {
-            const chk = document.getElementById(id);
-            if (chk) {
-                chk.checked = true;
-                const sectionId = id.replace('chk', 'body');
-                const section = document.getElementById(sectionId);
-                if (section) section.classList.remove('hidden-section');
-            }
-        });
+
 
         if (localStorage.getItem(prefix + 'DRAFT')) {
             loadDraftData();

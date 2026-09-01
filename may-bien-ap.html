@@ -1248,9 +1248,8 @@
 
 
 // ============================================================
-// 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG
+// 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG (TỐI ƯU MOBILE)
 // ============================================================
-
 function changeCtWindings(delta) {
     const input = document.getElementById('mba_ct_windings');
     let val = parseInt(input.value) || 2;
@@ -1265,341 +1264,201 @@ function renderCtTables() {
     const temp = document.getElementById('mba_temp').value || '--';
     document.getElementById('mba_ct_temp_display').textContent = temp;
 
-    // Các vị trí CT (hàng dọc)
+    // Các vị trí CT (sẽ chuyển thành dòng tiêu đề phân cách)
     const locations = [
-        { id: 'HV', label: 'HV' },
-        { id: 'MV', label: 'MV' },
-        { id: 'LV', label: 'LV' },
-        { id: 'NEUTRAL', label: 'NE' }
+        { id: 'HV', label: 'HV (Cao Áp)' },
+        { id: 'MV', label: 'MV (Trung Áp)' },
+        { id: 'LV', label: 'LV (Hạ Áp)' },
+        { id: 'NEUTRAL', label: 'NE (Trung Tính)' }
     ];
-    // Các pha (cột ngang)
     const phases = ['A', 'B', 'C'];
     const phaseColors = { 'A': '#fff9c4', 'B': '#ffebee', 'C': '#e3f2fd' };
 
-    renderCtRcd(numWindings, locations, phases, phaseColors);
-    renderCtRdc(numWindings, locations, phases, phaseColors);
-    renderCtRatio(numWindings, locations, phases, phaseColors);
+    // Common CSS cho Input để ép auto co giãn, không vỡ layout
+    const inputStyle = "width:100%; box-sizing:border-box; font-size:11px; text-align:center; padding:4px 2px; border:1px solid #ccc; border-radius:3px; outline:none; background:#fff;";
+
+    renderCtRcd(numWindings, locations, phases, phaseColors, inputStyle);
+    renderCtRdc(numWindings, locations, phases, phaseColors, inputStyle);
+    renderCtRatio(numWindings, locations, phases, phaseColors, inputStyle);
     renderCtExcitation(numWindings, locations, phases, phaseColors);
 }
 
 // ============================================================
 // 8.1 CT - RCD (MΩ)
 // ============================================================
-function renderCtRcd(numWindings, locations, phases, phaseColors) {
+function renderCtRcd(numWindings, locations, phases, phaseColors, inputStyle) {
     const container = document.getElementById('ct_rcd_container');
     if (!container) return;
 
     let html = `
-        <table>
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
-                    ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
-                
+                    <th style="width:22%; font-size:11px; padding:6px 2px;">Cuộn</th>
+                    ${phases.map(p => `<th style="width:26%; background:${phaseColors[p]}; font-size:11px; padding:6px 2px;">Pha ${p}</th>`).join('')}
+                </tr>
             </thead>
             <tbody>
     `;
 
     locations.forEach(loc => {
-        html += `
-            <tr>
-                <!--<td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>-->
-                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
-
+        // Dòng tiêu đề Vị trí
+        html += `<tr><td colspan="4" style="background:#e0e0e0; font-weight:bold; font-size:11px; text-align:center; padding:4px; color:#333;">${loc.label}</td></tr>`;
+        // Vòng lặp các cuộn
+        for (let w = 1; w <= numWindings; w++) {
+            html += `<tr>
+                <td style="font-size:11px; font-weight:600; text-align:center; padding:2px;">C${w}</td>
                 ${phases.map(pha => `
-                    <td>
-                        ${numWindings > 1 ? `
-                            <div style="display:flex;flex-direction:column;gap:1px;">
-                                ${Array.from({length: numWindings}, (_, w) => `
-                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
-                                        <span style="font-size:8px;color:#666;">C${w+1}</span>
-                                        <input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w${w+1}" step="0.1" placeholder="Rcd" ;" oninput="handleNewInput(event); calculateAll()">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            <input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w1" step="0.1" placeholder="Rcd";" oninput="handleNewInput(event); calculateAll()">
-                        `}
+                    <td style="padding:2px;">
+                        <input type="number" id="mba_ct_rcd_${loc.id}_${pha}_w${w}" step="0.1" placeholder="Rcd" style="${inputStyle}" oninput="handleNewInput(event); calculateAll()">
                     </td>
                 `).join('')}
-            </tr>
-        `;
+            </tr>`;
+        }
     });
 
-    html += `
-            </tbody>
-        </table>
-        <div style="font-size:9px;color:#666;margin-top:3px;">* RCD đo giữa cuộn dây và vỏ (MΩ)</div>
-    `;
+    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* RCD đo giữa cuộn dây và vỏ (MΩ)</div>`;
     container.innerHTML = html;
 }
 
 // ============================================================
 // 8.2 CT - RDC (Ω)
 // ============================================================
-function renderCtRdc(numWindings, locations, phases, phaseColors) {
+function renderCtRdc(numWindings, locations, phases, phaseColors, inputStyle) {
     const container = document.getElementById('ct_rdc_container');
     if (!container) return;
 
     let html = `
-        <table>
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
-
-
-                    <!-- [SỬA] Thêm cột Đầu dây============================================= -->
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
-
-                    ${phases.map(p => `<th background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
-
+                    <th style="width:22%; font-size:11px; padding:6px 2px;">Đầu dây</th>
+                    ${phases.map(p => `<th style="width:26%; background:${phaseColors[p]}; font-size:11px; padding:6px 2px;">Pha ${p}</th>`).join('')}
+                </tr>
             </thead>
             <tbody>
     `;
 
     locations.forEach(loc => {
-
- // Tạo mảng các đầu dây cho từng cuộn====================================================
-        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
-        
-        html += `
-            <tr>
-                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
-               
-
- <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn ==================================-->
-                <td style="vertical-align:middle;">
-                    ${numWindings > 1 ? `
-                        <div style="display:flex;flex-direction:column;gap:1px;align-items:center;">
-                            ${terminalValues.map((val, idx) => `
-                                <div style="display:flex;align-items:center;justify-content:center;height:24px;">
-                                    <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${idx+1}" 
-                                           value="${val}" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : `
-                        <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w1" 
-                               value="1S1-1S" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
-                    `}
+        html += `<tr><td colspan="4" style="background:#e0e0e0; font-weight:bold; font-size:11px; text-align:center; padding:4px; color:#333;">${loc.label}</td></tr>`;
+        for (let w = 1; w <= numWindings; w++) {
+            html += `<tr>
+                <td style="padding:2px;">
+                    <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${w}" value="${w}S1-${w}S" style="${inputStyle} font-weight:bold; background:#f9f9f9;">
                 </td>
                 ${phases.map(pha => `
-                    <td style="vertical-align:middle;">
-                        ${numWindings > 1 ? `
-                            <div style="display:flex;flex-direction:column;gap:1px;">
-                                ${Array.from({length: numWindings}, (_, w) => `
-                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
-
-
-
-                                        <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w+1}" step="0.001" placeholder="Rdc" ;" oninput="handleNewInput(event); calculateAll()">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w1" step="0.001" placeholder="Rdc" ;" oninput="handleNewInput(event); calculateAll()">
-                        `}
+                    <td style="padding:2px;">
+                        <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w}" step="0.001" placeholder="Rdc" style="${inputStyle}" oninput="handleNewInput(event); calculateAll()">
                     </td>
                 `).join('')}
-            </tr>
-        `;
+            </tr>`;
+        }
     });
 
-    html += `
-            </tbody>
-        </table>
-        <div style="font-size:9px;color:#666;margin-top:3px;">* RDC - Điện trở một chiều các cuộn dây (Ω)</div>
-    `;
+    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* RDC - Điện trở một chiều các cuộn dây (Ω)</div>`;
     container.innerHTML = html;
 }
 
 // ============================================================
 // 8.3 CT - Tỉ số biến (Kđo)
 // ============================================================
-function renderCtRatio(numWindings, locations, phases, phaseColors) {
+function renderCtRatio(numWindings, locations, phases, phaseColors, inputStyle) {
     const container = document.getElementById('ct_ratio_container');
     if (!container) return;
 
     let html = `
-        <table>
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="font-size:10px; padding:2px ">Vị trí</th>
-                   <!-- [SỬA] Thêm cột Đầu dây -->
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
-
-                    ${phases.map(p => `<th style="min-width:55px;background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
-             
+                    <th style="width:22%; font-size:11px; padding:6px 2px;">Đầu dây</th>
+                    ${phases.map(p => `<th style="width:26%; background:${phaseColors[p]}; font-size:11px; padding:6px 2px;">Pha ${p}</th>`).join('')}
+                </tr>
             </thead>
             <tbody>
     `;
 
-   locations.forEach(loc => {
-
- // Tạo mảng các đầu dây cho từng cuộn
-        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
-
-        html += `
-            <tr>
-                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
-        
-
-
- <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn ==================================-->
-                <td style="vertical-align:middle;">
-                    ${numWindings > 1 ? `
-                        <div style="display:flex;flex-direction:column;gap:1px;align-items:center;">
-                            ${terminalValues.map((val, idx) => `
-                                <div style="display:flex;align-items:center;justify-content:center;height:24px;">
-                                    <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${idx+1}" 
-                                           value="${val}" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : `
-                        <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w1" 
-                               value="1S1-1S" style="width:60px;font-size:9px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:2px 4px;">
-                    `}
+    locations.forEach(loc => {
+        html += `<tr><td colspan="4" style="background:#e0e0e0; font-weight:bold; font-size:11px; text-align:center; padding:4px; color:#333;">${loc.label}</td></tr>`;
+        for (let w = 1; w <= numWindings; w++) {
+            html += `<tr>
+                <td style="padding:2px;">
+                    <input type="text" id="mba_ct_ratio_terminal_${loc.id}_w${w}" value="${w}S1-${w}S" style="${inputStyle} font-weight:bold; background:#f9f9f9;">
                 </td>
                 ${phases.map(pha => `
-                    <td style="vertical-align:middle;">
-
-
-                        ${numWindings > 1 ? `
-                            <div style="display:flex;flex-direction:column;gap:1px;">
-                                ${Array.from({length: numWindings}, (_, w) => `
-                                    <div style="display:flex;align-items:center;gap:2px;justify-content:center;">
-                                        <input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w${w+1}" step="0.001" placeholder="Kđo" ;" oninput="handleNewInput(event); calculateAll()">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            <input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w1" step="0.001" placeholder="Kđo"  oninput="handleNewInput(event); calculateAll()">
-                        `}
+                    <td style="padding:2px;">
+                        <input type="number" id="mba_ct_ratio_${loc.id}_${pha}_w${w}" step="0.001" placeholder="Kđo" style="${inputStyle}" oninput="handleNewInput(event); calculateAll()">
                     </td>
                 `).join('')}
-            </tr>
-        `;
+            </tr>`;
+        }
     });
 
-    html += `
-            </tbody>
-        </table>
-        <div style="font-size:9px;color:#666;margin-top:3px;">* Tỉ số biến đo được (Kđo)</div>
-    `;
+    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* Tỉ số biến đo được (Kđo)</div>`;
     container.innerHTML = html;
 }
 
 // ============================================================
-// 8.4 CT - Từ hóa U(V)/I(mA) - 3 điểm đo
+// 8.4 CT - Từ hóa U(V)/I(mA) - 3 điểm đo (U xếp trên I)
 // ============================================================
 function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_excitation_container');
     if (!container) return;
 
-    // [SỬA] Hàm tạo 3 điểm đo - U trên, I dưới
+    const baseInputStyle = "width:100%; box-sizing:border-box; font-size:10px; text-align:center; padding:3px; outline:none; background:#fff;";
+
     function excitationInputs(locId, pha, w) {
         return `
-            <div class="ct-excitation-group" style="display:flex;flex-direction:column;gap:1px;align-items:center;">
-                <!-- Điểm 1: U trên, I dưới -->
-                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;">1</span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u1" step="0.01" placeholder="U" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i1" step="0.0001" placeholder="I" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
+            <div style="display:flex; flex-direction:column; gap:4px; width:100%;">
+                <!-- Điểm 1 -->
+                <div style="border:1px solid #b0bec5; border-radius:3px; overflow:hidden;">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u1" step="0.01" placeholder="U1" style="${baseInputStyle} border:none; border-bottom:1px solid #cfd8dc; font-weight:600; color:#c62828;" oninput="handleNewInput(event)">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i1" step="0.0001" placeholder="I1" style="${baseInputStyle} border:none; color:#1565c0;" oninput="handleNewInput(event)">
                 </div>
                 <!-- Điểm 2 -->
-                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;">2</span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u2" step="0.01" placeholder="U" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i2" step="0.0001" placeholder="I" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
+                <div style="border:1px solid #b0bec5; border-radius:3px; overflow:hidden;">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u2" step="0.01" placeholder="U2" style="${baseInputStyle} border:none; border-bottom:1px solid #cfd8dc; font-weight:600; color:#c62828;" oninput="handleNewInput(event)">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i2" step="0.0001" placeholder="I2" style="${baseInputStyle} border:none; color:#1565c0;" oninput="handleNewInput(event)">
                 </div>
                 <!-- Điểm 3 -->
-                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;">3</span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u3" step="0.01" placeholder="U" oninput="handleNewInput(event)"font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
-                    <div style="display:flex;align-items:center;gap:1px;">
-                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
-                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i3" step="0.0001" placeholder="I" oninput="handleNewInput(event)"font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
-                    </div>
+                <div style="border:1px solid #b0bec5; border-radius:3px; overflow:hidden;">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u3" step="0.01" placeholder="U3" style="${baseInputStyle} border:none; border-bottom:1px solid #cfd8dc; font-weight:600; color:#c62828;" oninput="handleNewInput(event)">
+                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i3" step="0.0001" placeholder="I3" style="${baseInputStyle} border:none; color:#1565c0;" oninput="handleNewInput(event)">
                 </div>
             </div>
         `;
     }
 
     let html = `
-        <table>
+        <table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
-                    <!-- [SỬA] Thêm cột Đầu dây -->
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
-                    ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
-
+                    <th style="width:22%; font-size:11px; padding:6px 2px;">Đầu dây</th>
+                    ${phases.map(p => `<th style="width:26%; background:${phaseColors[p]}; font-size:11px; padding:6px 2px;">Pha ${p}</th>`).join('')}
+                </tr>
             </thead>
             <tbody>
     `;
 
     locations.forEach(loc => {
-        // Tạo mảng các đầu dây cho từng cuộn
-        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
-        
-        html += `
-            <tr>
-                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
-                <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn -->
-                <td style="vertical-align:middle;">
-                    ${numWindings > 1 ? `
-                        <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
-                            ${terminalValues.map((val, idx) => `
-                                <div style="display:flex;align-items:center;justify-content:center;">
-                                    <input type="text" id="mba_ct_exc_terminal_${loc.id}_w${idx+1}" 
-                                           value="${val}" font-size:8px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:1px 2px;">
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : `
-                        <input type="text" id="mba_ct_exc_terminal_${loc.id}_w1" 
-                               value="1S1-1S" font-size:8px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:1px 2px;">
-                    `}
+        html += `<tr><td colspan="4" style="background:#e0e0e0; font-weight:bold; font-size:11px; text-align:center; padding:4px; color:#333;">${loc.label}</td></tr>`;
+        for (let w = 1; w <= numWindings; w++) {
+            html += `<tr>
+                <td style="padding:2px; vertical-align:top;">
+                    <input type="text" id="mba_ct_exc_terminal_${loc.id}_w${w}" value="${w}S1-${w}S" style="${baseInputStyle} border:1px solid #ccc; border-radius:3px; font-weight:bold; background:#f9f9f9; padding:6px 2px;">
                 </td>
                 ${phases.map(pha => `
-                    <td style="vertical-align:middle;">
-                        ${numWindings > 1 ? `
-                            <div style="display:flex;flex-direction:column;gap:4px;">
-                                ${Array.from({length: numWindings}, (_, w) => `
-                                    <div style="display:flex;align-items:center;gap:4px;justify-content:center;border-bottom:1px dashed #eee;padding:2px 0;">
-                                        <span style="font-size:8px;color:#666;min-width:16px;font-weight:600;">${w+1}</span>
-                                        ${excitationInputs(loc.id, pha, w+1)}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        ` : `
-                            ${excitationInputs(loc.id, pha, 1)}
-                        `}
+                    <td style="padding:2px; vertical-align:top;">
+                        ${excitationInputs(loc.id, pha, w)}
                     </td>
                 `).join('')}
-            </tr>
-        `;
+            </tr>`;
+        }
     });
 
-    html += `
-            </tbody>
-        </table>
-    `;
+    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* Đặc tính từ hóa: Đỉnh U (V) / Đáy I (mA)</div>`;
     container.innerHTML = html;
 }
+
 // ============================================================
 // KHỞI TẠO CT
 // ============================================================

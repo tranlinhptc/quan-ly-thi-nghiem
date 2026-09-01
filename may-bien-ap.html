@@ -1267,10 +1267,10 @@ function renderCtTables() {
 
     // Các vị trí CT (hàng dọc)
     const locations = [
-        { id: 'HV', label: 'Cao áp' },
-        { id: 'MV', label: 'Trung áp' },
-        { id: 'LV', label: 'Hạ áp' },
-        { id: 'NEUTRAL', label: 'Trung tính' }
+        { id: 'HV', label: 'HV' },
+        { id: 'MV', label: 'MV' },
+        { id: 'LV', label: 'LV' },
+        { id: 'NEUTRAL', label: 'NE' }
     ];
     // Các pha (cột ngang)
     const phases = ['A', 'B', 'C'];
@@ -1303,7 +1303,9 @@ function renderCtRcd(numWindings, locations, phases, phaseColors) {
     locations.forEach(loc => {
         html += `
             <tr>
-                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
+                <!--<td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>-->
+                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
+
                 ${phases.map(pha => `
                     <td>
                         ${numWindings > 1 ? `
@@ -1540,9 +1542,9 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
         <table>
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Vị trí</th>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
                     <!-- [SỬA] Thêm cột Đầu dây -->
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:50px;">Đầu dây</th>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}">Đầu dây</th>
                     ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
 
             </thead>
@@ -1595,7 +1597,6 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     html += `
             </tbody>
         </table>
-        <div style="font-size:9px;color:#666;margin-top:3px;">* Từ hóa: Nhập 3 cặp giá trị U(V)/I(mA) cho mỗi cuộn dây</div>
     `;
     container.innerHTML = html;
 }

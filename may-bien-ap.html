@@ -1544,7 +1544,7 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
                 <tr>
                     <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
                     <!-- [SỬA] Thêm cột Đầu dây -->
-                    <th rowspan="${numWindings > 1 ? 2 : 1}">Đầu dây</th>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Đầu dây</th>
                     ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
 
             </thead>

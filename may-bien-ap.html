@@ -175,6 +175,7 @@
 .hidden-col {
     display: none !important;
 }
+
     </style>
 </head>
 <body>
@@ -1494,24 +1495,42 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     const container = document.getElementById('ct_excitation_container');
     if (!container) return;
 
-    // Hàm tạo 3 điểm đo cho 1 ô
+    // [SỬA] Hàm tạo 3 điểm đo - U trên, I dưới
     function excitationInputs(locId, pha, w) {
         return `
-            <div class="ct-excitation-group">
-                <div class="ct-excitation-row">
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u1" step="0.01" placeholder="U" oninput="handleNewInput(event)">
-                    <span>/</span>
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i1" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+            <div class="ct-excitation-group" style="display:flex;flex-direction:column;gap:1px;align-items:center;">
+                <!-- Điểm 1: U trên, I dưới -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;">1</span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u1" step="0.01" placeholder="U" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i1" step="0.0001" placeholder="I" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
                 </div>
-                <div class="ct-excitation-row">
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u2" step="0.01" placeholder="U" oninput="handleNewInput(event)">
-                    <span>/</span>
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i2" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+                <!-- Điểm 2 -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;">2</span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u2" step="0.01" placeholder="U" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i2" step="0.0001" placeholder="I" oninput="handleNewInput(event)" font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
                 </div>
-                <div class="ct-excitation-row">
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u3" step="0.01" placeholder="U" oninput="handleNewInput(event)">
-                    <span>/</span>
-                    <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i3" step="0.0001" placeholder="I" oninput="handleNewInput(event)">
+                <!-- Điểm 3 -->
+                <div style="display:flex;flex-direction:column;align-items:center;gap:0px;border:1px solid #e0e0e0;border-radius:3px;padding:2px 4px;min-width:50px;">
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;">3</span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_u3" step="0.01" placeholder="U" oninput="handleNewInput(event)"font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
+                    <div style="display:flex;align-items:center;gap:1px;">
+                        <span style="font-size:7px;color:#999;min-width:10px;"> </span>
+                        <input type="number" id="mba_ct_exc_${locId}_${pha}_w${w}_i3" step="0.0001" placeholder="I" oninput="handleNewInput(event)"font-size:9px;padding:1px 2px;border:1px solid #ddd;border-radius:2px;text-align:center;">
+                    </div>
                 </div>
             </div>
         `;
@@ -1521,22 +1540,42 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
         <table>
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:60px;">Vị trí</th>
+                    <!-- [SỬA] Thêm cột Đầu dây -->
+                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:50px;">Đầu dây</th>
                     ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
-                </tr>
-               <!-- ${numWindings > 1 ? `<tr>${phases.map(() => `<th style="font-size:8px;font-weight:400;">(${numWindings} cuộn)</th>`).join('')}</tr>` : ''}-->
+
             </thead>
             <tbody>
     `;
 
     locations.forEach(loc => {
+        // Tạo mảng các đầu dây cho từng cuộn
+        const terminalValues = Array.from({length: numWindings}, (_, i) => `${i+1}S1-${i+1}S`);
+        
         html += `
             <tr>
-                <td style="font-weight:600;text-align:left;font-size:10px;">${loc.label}</td>
+                <td style="font-weight:600;text-align:left;font-size:10px;vertical-align:middle;">${loc.label}</td>
+                <!-- [SỬA] Cột Đầu dây - xếp dọc theo số cuộn -->
+                <td style="vertical-align:middle;">
+                    ${numWindings > 1 ? `
+                        <div style="display:flex;flex-direction:column;gap:4px;align-items:center;">
+                            ${terminalValues.map((val, idx) => `
+                                <div style="display:flex;align-items:center;justify-content:center;">
+                                    <input type="text" id="mba_ct_exc_terminal_${loc.id}_w${idx+1}" 
+                                           value="${val}" font-size:8px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:1px 2px;">
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <input type="text" id="mba_ct_exc_terminal_${loc.id}_w1" 
+                               value="1S1-1S" font-size:8px;text-align:center;border:1px solid #ddd;border-radius:2px;padding:1px 2px;">
+                    `}
+                </td>
                 ${phases.map(pha => `
-                    <td>
+                    <td style="vertical-align:middle;">
                         ${numWindings > 1 ? `
-                            <div style="display:flex;flex-direction:column;gap:3px;">
+                            <div style="display:flex;flex-direction:column;gap:4px;">
                                 ${Array.from({length: numWindings}, (_, w) => `
                                     <div style="display:flex;align-items:center;gap:4px;justify-content:center;border-bottom:1px dashed #eee;padding:2px 0;">
                                         <span style="font-size:8px;color:#666;min-width:16px;font-weight:600;">${w+1}</span>
@@ -1556,10 +1595,10 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     html += `
             </tbody>
         </table>
+        <div style="font-size:9px;color:#666;margin-top:3px;">* Từ hóa: Nhập 3 cặp giá trị U(V)/I(mA) cho mỗi cuộn dây</div>
     `;
     container.innerHTML = html;
 }
-
 // ============================================================
 // KHỞI TẠO CT
 // ============================================================

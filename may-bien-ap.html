@@ -1521,8 +1521,8 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
         <table>
             <thead>
                 <tr>
-                    <th rowspan="${numWindings > 1 ? 2 : 1}" style="min-width:90px;">Vị trí</th>
-                    ${phases.map(p => `<th style="min-width:90px;background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
+                    <th rowspan="${numWindings > 1 ? 2 : 1}">Vị trí</th>
+                    ${phases.map(p => `<th style="background:${phaseColors[p]};">Pha ${p}</th>`).join('')}
                 </tr>
                <!-- ${numWindings > 1 ? `<tr>${phases.map(() => `<th style="font-size:8px;font-weight:400;">(${numWindings} cuộn)</th>`).join('')}</tr>` : ''}-->
             </thead>
@@ -1539,7 +1539,7 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
                             <div style="display:flex;flex-direction:column;gap:3px;">
                                 ${Array.from({length: numWindings}, (_, w) => `
                                     <div style="display:flex;align-items:center;gap:4px;justify-content:center;border-bottom:1px dashed #eee;padding:2px 0;">
-                                        <span style="font-size:8px;color:#666;min-width:16px;font-weight:600;">C${w+1}</span>
+                                        <span style="font-size:8px;color:#666;min-width:16px;font-weight:600;">${w+1}</span>
                                         ${excitationInputs(loc.id, pha, w+1)}
                                     </div>
                                 `).join('')}
@@ -1556,7 +1556,6 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
     html += `
             </tbody>
         </table>
-        <div style="font-size:9px;color:#666;margin-top:3px;">* Nhập 3 cặp giá trị U(V)/I(mA) cho mỗi cuộn dây</div>
     `;
     container.innerHTML = html;
 }

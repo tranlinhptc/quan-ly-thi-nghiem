@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MÁY BIẾN ÁP (MBA)</title>
-
     <link rel="stylesheet" href="fun/common.css">
+    
+    <!-- BỔ SUNG THƯ VIỆN PDF.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+    </script>
 
     <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
@@ -14,14 +21,13 @@
     <style>
         :root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                background: url('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
                background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
         .container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
         .header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .header-bar h2 { font-size: 15px; margin: 0; }
         .btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
-        
         .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
         .card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
@@ -29,12 +35,10 @@
         label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
         input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
-        
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
         th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
         th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
-        
         .sub-val { font-size: 10px; color: #1565c0; font-weight: 600; margin-top: 2px; display: block; }
         .chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
         .btn-view-old { background: #0288d1; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
@@ -44,7 +48,6 @@
         .btn-clear { background: #757575; font-size:11px; margin-top:4px; }
         .note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
         .hidden-section { display: none !important; }
-
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
@@ -53,28 +56,18 @@
         .history-date { font-weight: bold; color: #d84315; font-size: 14px; }
         .history-person { font-size: 12px; color: #666; margin-top: 4px; }
         .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         .bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
-
         .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
         #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
-
         /* ========== MÀU SẮC ========== */
-        .phase-a { background-color: #fff9c4 !important; }
-        .phase-b { background-color: #ffebee !important; }
-        .phase-c { background-color: #e3f2fd !important; }
-
+        .phase-a { background-color: #fff9c4 !important; } .phase-b { background-color: #ffebee !important; } .phase-c { background-color: #e3f2fd !important; }
         .old-data-latest { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
         .old-data-latest::placeholder { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; }
         .old-data-history { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
         .old-data-history::placeholder { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; }
-        .new-data { color: #000000; font-weight: bold !important; }
-        .pass-color { color: #1565c0 !important; font-weight: bold !important; }
-        .fail-color { color: #c62828 !important; font-weight: bold !important; }
-
+        .new-data { color: #000000; font-weight: bold !important; } .pass-color { color: #1565c0 !important; font-weight: bold !important; } .fail-color { color: #c62828 !important; font-weight: bold !important; }
         .ratio-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 90px; padding: 2px; }
         .ratio-cell .input-group { display: flex; flex-direction: column; gap: 2px; width: 100%; }
         .ratio-cell .input-row { display: flex; align-items: center; gap: 2px; width: 100%; }
@@ -83,16 +76,10 @@
         .ratio-cell .input-row .unit { font-size: 9px; color: #666; min-width: 14px; font-weight: 600; }
         .ratio-info { font-size: 9px; color: #666; display: flex; flex-direction: column; align-items: center; gap: 1px; margin-top: 2px; width: 100%; }
         .ratio-info .kdo { color: #1565c0; font-weight: 600; font-size: 10px; }
-
         /* ========== MBA TAB TABLE ========== */
-        .mba-tap-table { font-size: 10px; }
-        .mba-tap-table input { font-size: 10px; padding: 2px 4px; }
-        .mba-tap-table th { font-size: 9px; padding: 2px 4px; }
+        .mba-tap-table { font-size: 10px; } .mba-tap-table input { font-size: 10px; padding: 2px 4px; } .mba-tap-table th { font-size: 9px; padding: 2px 4px; }
         .btn-add-remove { background: var(--primary); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; margin: 0 2px; }
-        .btn-add-remove:hover { opacity: 0.8; }
-        .btn-add-remove.green { background: #2e7d32; }
-        .btn-add-remove.red { background: #c62828; }
-
+        .btn-add-remove:hover { opacity: 0.8; } .btn-add-remove.green { background: #2e7d32; } .btn-add-remove.red { background: #c62828; }
         /* ========== BUSBING CT ========== */
         .ct-section { border: 1px solid var(--border); border-radius: 6px; padding: 2px; margin-top: 2px; background: #fafafa; }
         .ct-section .ct-title { font-weight: 700; color: var(--primary); font-size: 13px; margin-bottom: 2px; }
@@ -102,84 +89,26 @@
         .ct-phase-tabs button:hover:not(.active) { background: #e0e0e0; }
         .ct-winding-select { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .ct-winding-select select { padding: 4px 8px; }
-        .ct-table-wrap { overflow-x: auto; }
-        .ct-table-wrap table { font-size: 10px; }
-        .ct-table-wrap table input { font-size: 10px; padding: 3px 4px;}
-
+        .ct-table-wrap { overflow-x: auto; } .ct-table-wrap table { font-size: 10px; } .ct-table-wrap table input { font-size: 10px; padding: 3px 4px;}
         .import-section { border: 1px dashed #0288d1; border-radius: 6px; padding: 2px; margin: 1px 0; background: #e3f2fd; text-align: center; }
         .import-section .btn-import { background: #0288d1; color: white; border: none; padding: 2px 2px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 13px; margin: 5px; }
-        .import-section .btn-import:hover { opacity: 0.8; }
-        .file-input-hidden { display: none; }
-
-
-
-
-
-
-/* ========== CT ========== */
-.ct-winding-select { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.ct-winding-select .btn-add-remove { 
-    background: var(--primary); 
-    color: white; 
-    border: none; 
-    padding: 2px 12px; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-size: 16px; 
-    font-weight: 700; 
-    line-height: 1.4;
-}
-.ct-winding-select .btn-add-remove.red { background: #c62828; }
-.ct-winding-select .btn-add-remove.green { background: #2e7d32; }
-
-.ct-table-wrap { overflow-x: auto; margin-top: 5px; }
-.ct-table-wrap table { font-size: 10px; width: 100%; min-width: 300px; border-collapse: collapse; }
-.ct-table-wrap table th { 
-    background: #f1f3f4; 
-    font-size: 9px; 
-    padding: 4px 3px; 
-    text-align: center; 
-    white-space: nowrap;
-    border: 1px solid #ddd;
-}
-.ct-table-wrap table td { 
-    padding: 2px 3px; 
-    text-align: center; 
-    vertical-align: middle; 
-    border: 1px solid #ddd;
-}
-.ct-table-wrap table input { 
-    font-size: 10px; 
-    padding: 3px 2px; 
-    border: 1px solid #ddd; 
-    border-radius: 2px; 
-    text-align: center; 
-    width: 100%;
-    min-width: 50px;
-}
-.ct-table-wrap table input:focus { border-color: var(--primary); outline: none; }
-.ct-table-wrap table input[readonly] { background: #f5f5f5; cursor: default; }
-
-.ct-excitation-group { display: flex; flex-direction: column; gap: 1px; align-items: center; }
-.ct-excitation-row { display: flex; gap: 2px; align-items: center; justify-content: center; }
-.ct-excitation-row input { }
-.ct-excitation-row span { font-size: 8px; color: #666; }
-
-@media (max-width: 480px) {
-    .ct-table-wrap table input { min-width: 35px; font-size: 9px; padding: 2px 1px; }
-    .ct-excitation-row input { font-size: 8px; }
-    .ct-table-wrap table { font-size: 9px; }
-    .ct-table-wrap table th { font-size: 8px; padding: 2px 2px; }
-}
-
-.hidden-col {
-    display: none !important;
-}
-
+        .import-section .btn-import:hover { opacity: 0.8; } .file-input-hidden { display: none; }
+        /* ========== CT ========== */
+        .ct-winding-select { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .ct-winding-select .btn-add-remove { background: var(--primary); color: white; border: none; padding: 2px 12px; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: 700; line-height: 1.4;}
+        .ct-winding-select .btn-add-remove.red { background: #c62828; } .ct-winding-select .btn-add-remove.green { background: #2e7d32; }
+        .ct-table-wrap { overflow-x: auto; margin-top: 5px; } .ct-table-wrap table { font-size: 10px; width: 100%; min-width: 300px; border-collapse: collapse; }
+        .ct-table-wrap table th { background: #f1f3f4; font-size: 9px; padding: 4px 3px; text-align: center; white-space: nowrap; border: 1px solid #ddd;}
+        .ct-table-wrap table td { padding: 2px 3px; text-align: center; vertical-align: middle; border: 1px solid #ddd;}
+        .ct-table-wrap table input { font-size: 10px; padding: 3px 2px; border: 1px solid #ddd; border-radius: 2px; text-align: center; width: 100%; min-width: 50px;}
+        .ct-table-wrap table input:focus { border-color: var(--primary); outline: none; } .ct-table-wrap table input[readonly] { background: #f5f5f5; cursor: default; }
+        .ct-excitation-group { display: flex; flex-direction: column; gap: 1px; align-items: center; } .ct-excitation-row { display: flex; gap: 2px; align-items: center; justify-content: center; }
+        .ct-excitation-row input { } .ct-excitation-row span { font-size: 8px; color: #666; }
+        @media (max-width: 480px) { .ct-table-wrap table input { min-width: 35px; font-size: 9px; padding: 2px 1px; } .ct-excitation-row input { font-size: 8px; } .ct-table-wrap table { font-size: 9px; } .ct-table-wrap table th { font-size: 8px; padding: 2px 2px; }}
+        .hidden-col { display: none !important;}
     </style>
 </head>
 <body>
-
 <!-- POPUP -->
 <div id="historyModal" class="modal-overlay">
     <div class="modal-content">
@@ -189,20 +118,17 @@
         <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
     </div>
 </div>
-
 <!-- LOADING -->
 <div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
     <div class="loader"></div>
     <div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...</div>
 </div>
-
 <!-- CONTAINER -->
 <div class="container">
     <div class="header-bar">
         <h2>⚡ THỬ NGHIỆM MÁY BIẾN ÁP (MBA)</h2>
         <a href="index.html" class="btn-back">← Trang Chủ</a>
     </div>
-
     <!-- 0. THÔNG TIN ĐỊNH DANH -->
     <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
         <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
@@ -224,7 +150,6 @@
         </div>
         <div id="unlock_message">⚠️ Vui lòng chọn Trạm và nhập Tên MBA để mở khóa Form!</div>
     </div>
-
     <!-- KHU VỰC BỊ KHÓA -->
     <!--div id="locked_zone" class="form-locked"-->
         <!-- CẤU HÌNH THIẾT BỊ -->
@@ -273,20 +198,22 @@
                 <div class="form-group"><label>Ghi chú:</label><input type="text" id="mba_ghichu" placeholder="Nhập ghi chú nếu cần"></div>
             </div>
         </div>
-
         <!-- IMPORT SECTION -->
         <div id="importSection" class="import-section" style="display:none;">
             <div style="font-weight:700;color:#0288d1;font-size:14px;margin-bottom:8px;">📤 NHẬP DỮ LIỆU TỪ FILE</div>
             <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
                 <button class="btn-import" onclick="document.getElementById('fileInputXml').click()">📄 Chọn file XML</button>
                 <button class="btn-import" onclick="document.getElementById('fileInputImage').click()">🖼️ Chọn file ảnh</button>
+                <!-- NÚT IMPORT PDF BỔ SUNG -->
+                <button class="btn-import" style="background:#6a1b9a;" onclick="importPdf()">📄 Import PDF</button>
                 <button class="btn-import" style="background:#757575;" onclick="document.getElementById('importSection').style.display='none'">✖ Đóng</button>
             </div>
             <input type="file" id="fileInputXml" class="file-input-hidden" accept=".xml" onchange="importFromXml(event)">
             <input type="file" id="fileInputImage" class="file-input-hidden" accept="image/*" onchange="importFromImage(event)">
+            <!-- THẺ INPUT PDF BỔ SUNG -->
+            <input type="file" id="pdfFileInput" class="file-input-hidden" accept=".pdf" onchange="handlePdfFile(event)">
             <div id="importStatus" style="margin-top:8px;font-size:12px;color:#666;"></div>
         </div>
-
         <!-- 1. KIỂM TRA BÊN NGOÀI -->
         <div class="card">
             <div class="card-title">
@@ -297,7 +224,6 @@
                 <input type="text" id="mba_visual" value="Bình thường.">
             </div>
         </div>
-
         <!-- 2. ĐIỆN TRỞ CÁCH ĐIỆN MBA -->
         <div class="card">
             <div class="card-title">
@@ -309,7 +235,6 @@
                 <div class="table-responsive" id="table_rcd_container"></div>
             </div>
         </div>
-
         <!-- 3. TỔ ĐẤU DÂY -->
         <div class="card">
             <div class="card-title">
@@ -320,7 +245,6 @@
                 <div class="table-responsive" id="table_vector_container"></div>
             </div>
         </div>
-
         <!-- 4. Tgδ CÁC CUỘN DÂY -->
         <div class="card">
             <div class="card-title">
@@ -333,10 +257,31 @@
             </div>
         </div>
 
+
+
+    
+<!-- BỔ SUNG: SỨ CÁCH ĐIỆN ĐẦU VÀO -->
+   
+
+<div class="card">
+    <div class="card-title">
+        <span>5. Đo Sứ Cách Điện Đầu Vào (Bushings)</span>
+        <label class="chk-disable"><input type="checkbox" id="chk_sec_bushing" onchange="toggleSection('body_sec_bushing', this)" checked> ✏️ Nhập</label>
+    </div>
+    <div id="body_sec_bushing" class="table-responsive">
+        <!-- <div class="note-text" style="margin-bottom: 10px;">
+            * Auto-fill: Nhập Kiểu loại/Hãng SX ở pha đầu tiên sẽ tự động điền các pha còn lại.<br>
+            * Giá trị $tg\delta$ quy đổi về $20^\circ C$ = Giá trị đo / Hệ số K.
+        </div>-->
+        <!-- Vùng chứa 4 bảng sứ -->
+        <div id="table_bushing_container"></div>
+    </div>
+</div>
+
         <!-- 5. ĐIỆN TRỞ MỘT CHIỀU MBA -->
         <div class="card">
             <div class="card-title">
-                <span>5. Điện Trở Một Chiều [mΩ]</span>
+                <span>6. Điện Trở Một Chiều [mΩ]</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec5" class="table-responsive hidden-section">
@@ -344,39 +289,34 @@
                 <div class="table-responsive" id="table_rdc_container"></div>
             </div>
         </div>
-
         <!-- 6. TỶ SỐ BIẾN MBA -->
         <div class="card">
             <div class="card-title">
-                <span>6. Tỷ Số Biến</span>
+                <span>7. Tỷ Số Biến</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec6" class="table-responsive hidden-section">
                 <div class="table-responsive" id="table_ratio_container"></div>
             </div>
         </div>
-
         <!-- 7. BỘ ĐIỀU ÁP DƯỚI TẢI -->
         <div class="card">
             <div class="card-title">
-                <span>7. Bộ Điều Áp Dưới Tải (OLTC)</span>
+                <span>8. Bộ Điều Áp Dưới Tải (OLTC)</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec7" onchange="toggleSection('body_sec7', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec7" class="table-responsive hidden-section">
                 <div class="table-responsive" id="table_oltc_container"></div>
             </div>
         </div>
-
-<!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG -->
 <!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
 <div class="card">
     <div class="card-title">
-        <span>8. Biến Dòng Chân Sứ (Bushing CT)</span>
+        <span>9. Biến Dòng Chân Sứ (Bushing CT)</span>
         <label class="chk-disable"><input type="checkbox" id="chk_sec8" onchange="toggleSection('body_sec8', this)"> ✏️ Nhập</label>
     </div>
     <div id="body_sec8" class="table-responsive hidden-section">
         <div class="note-text">* Đo ở nhiệt độ: <span id="mba_ct_temp_display">-</span> °C</div>
-        
         <!-- Chọn số cuộn dây chung -->
         <div class="ct-winding-select" style="margin:10px 0;padding:8px;background:#f5f5f5;border-radius:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <label style="font-weight:600;font-size:13px;">Số cuộn dây:</label>
@@ -386,7 +326,6 @@
             <input type="hidden" id="mba_ct_windings" value="2">
             <span style="font-size:10px;color:#666;">(Áp dụng cho tất cả)</span>
         </div>
-
         <!-- 4 bảng riêng biệt -->
         <div style="margin-top:10px;">
             <!-- 8.1 RCD -->
@@ -394,19 +333,16 @@
                 <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">📊 8.1 RCD (MΩ) - Điện trở cách điện</div>
                 <div id="ct_rcd_container"></div>
             </div>
-
             <!-- 8.2 RDC -->
             <div style="margin-bottom:20px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
                 <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">⚡ 8.2 RDC (Ω) - Điện trở một chiều</div>
                 <div id="ct_rdc_container"></div>
             </div>
-
             <!-- 8.3 Tỉ số biến -->
             <div style="margin-bottom:20px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
                 <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">📐 8.3 Tỉ số biến (Kđo)</div>
                 <div id="ct_ratio_container"></div>
             </div>
-
             <!-- 8.4 Từ hóa -->
             <div style="margin-bottom:10px;border:1px solid #e0e0e0;border-radius:6px;padding:10px;background:#fafafa;">
                 <div style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:8px;">🌀 8.4 Từ hóa U(V)/I(mA) - 3 điểm đo</div>
@@ -415,7 +351,6 @@
         </div>
     </div>
 </div>
-
         <!-- KẾT LUẬN -->
         <div class="card">
             <div class="card-title">
@@ -426,7 +361,6 @@
                 <textarea id="mba_conclusion" rows="3" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;font-size:12px;">Các hạng mục đã kiểm định, thí nghiệm đạt yêu cầu kỹ thuật.</textarea>
             </div>
         </div>
-
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
@@ -523,10 +457,10 @@
         const zone = document.getElementById('locked_zone');
         const msg = document.getElementById('unlock_message');
         if (tram && tram !== "" && nganLo && nganLo !== "") {
-            zone.classList.remove('form-locked');
+            // zone.classList.remove('form-locked');
             if (msg) msg.style.display = 'none';
         } else {
-            zone.classList.add('form-locked');
+            // zone.classList.add('form-locked');
             if (msg) msg.style.display = 'block';
         }
     }
@@ -575,10 +509,7 @@
             try {
                 const parser = new DOMParser();
                 const xml = parser.parseFromString(e.target.result, 'text/xml');
-                // Parse XML và đổ dữ liệu vào form
-                // Đây là phần mẫu, bạn sẽ custom theo format XML thực tế
                 document.getElementById('importStatus').textContent = '✅ Đã đọc file XML: ' + file.name;
-                // Gọi hàm parseXmlData(xml) để xử lý
                 parseXmlData(xml);
             } catch(err) {
                 document.getElementById('importStatus').textContent = '❌ Lỗi đọc XML: ' + err.message;
@@ -592,12 +523,10 @@
         const file = event.target.files[0];
         if (!file) return;
         document.getElementById('importStatus').textContent = '📷 Đã chọn ảnh: ' + file.name + ' (Xử lý OCR sẽ được tích hợp sau)';
-        // TODO: Tích hợp OCR sau
         event.target.value = '';
     }
 
     function parseXmlData(xml) {
-        // TODO: Parse XML theo format thực tế
         console.log('XML Data:', xml);
         document.getElementById('importStatus').textContent += ' - Đã parse dữ liệu thành công!';
     }
@@ -722,9 +651,9 @@
     // ============================================================
     function captureInputs() {
         const data = {};
-        document.querySelectorAll('input, select, textarea').forEach(el => { 
-            if (el.id && el.value) data[el.id] = el.value; 
-        });
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+             if (el.id && el.value) data[el.id] = el.value;
+         });
         return data;
     }
 
@@ -760,12 +689,12 @@
     // RENDER BẢNG
     // ============================================================
     function renderAllTables() {
-    renderRcdTable();
-    renderVectorTable();
-    renderTgTable();
-    renderRdcWindingTable();
-    renderRatioTable();
-    renderOltcTable();
+        renderRcdTable();
+        renderVectorTable();
+        renderTgTable();
+        renderRdcWindingTable();
+        renderRatioTable();
+        renderOltcTable();
     }
 
     function isConfigField(id) {
@@ -794,58 +723,69 @@
     // ============================================================
     // 2. BẢNG RCD MBA
     // ============================================================
-    function renderRcdTable() {
-        const container = document.getElementById('table_rcd_container');
-        if (!container) return;
-        const temp = document.getElementById('mba_temp').value || '--';
-        document.getElementById('mba_rcd_temp_display').textContent = temp;
-        
-        let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th rowspan="2">Đối tượng đo</th>
-                    <th colspan="2">Giá trị đo (MΩ)</th>
-                    <th rowspan="2">K<sub>ht</sub></th>
-                    <th rowspan="2">PI</th>
-                    <th rowspan="2">Điện áp đo (V)</th>
-                </tr>
-                <tr>
-                    <th>15"</th>
-                    <th>60"</th>
-                </tr>
-            </thead>
-            <tbody>
+   function renderRcdTable() {
+    const container = document.getElementById('table_rcd_container');
+    if (!container) return;
+    const temp = document.getElementById('mba_temp').value || '--';
+    if(document.getElementById('mba_rcd_temp_display')) document.getElementById('mba_rcd_temp_display').textContent = temp;
+
+    let html = `
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="2">Đối tượng đo</th>
+                <th colspan="3">Giá trị đo (MΩ)</th>
+                <th rowspan="2">K<sub>ht</sub></th>
+                <th rowspan="2">PI</th>
+                <th rowspan="2">Điện áp đo (V)</th>
+            </tr>
+            <tr>
+                <th>15"</th>
+                <th>60"</th>
+                <th>600"</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    const items = [
+        { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ' },
+        { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ' },
+        { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ' },
+        { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung' },
+        { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ' },
+        { id: 'lv_e', label: 'Hạ ~ Vỏ' },
+        { id: 'core_e', label: 'Lõi từ - Vỏ' },
+        { id: 'clamp_e', label: 'Gông từ - Vỏ' },
+        { id: 'core_clamp', label: 'Lõi từ - Gông từ' }
+    ];
+
+    items.forEach(item => {
+        html += `
+<tr>
+                <td style="text-align:left;font-size:10px;">${item.label}</td>
+                <td style="vertical-align:top;">
+                    <input type="number" id="mba_rcd_15_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                    <div id="mba_rcd_15_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                </td>
+                <td style="vertical-align:top;">
+                    <input type="number" id="mba_rcd_60_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                    <div id="mba_rcd_60_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                </td>
+                <td style="vertical-align:top;">
+                    <input type="number" id="mba_rcd_600_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                    <div id="mba_rcd_600_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                </td>
+                <td style="vertical-align:top;"><input type="number" id="mba_rcd_kht_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;" ></td>
+                <td style="vertical-align:top;"><input type="number" id="mba_rcd_pi_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;" ></td>
+                <td style="vertical-align:top;"><input type="number" id="mba_rcd_volt_${item.id}" step="500" value="2500" oninput="handleNewInput(event); calculateAll()"></td>
+            </tr>
         `;
-        
-        const items = [
-            { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ (HV,MV~LV&E)' },
-            { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ (LV~HV,MV&E)' },
-            { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ (MV,HV,LV~E)' },
-            { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung (LV~HV,MV)' },
-            { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ (HV,MV~E)' },
-            { id: 'lv_e', label: 'Hạ ~ Vỏ (LV~E)' },
-            { id: 'core_e', label: 'Lõi từ - Vỏ (Core -- Earth)' },
-            { id: 'clamp_e', label: 'Gông từ - Vỏ (Clamp -- Earth)' },
-            { id: 'core_clamp', label: 'Lõi từ - Gông từ (Core -- Clamp)' }
-        ];
-        
-        items.forEach(item => {
-            html += `
-                <tr>
-                    <td style="text-align:left;font-size:10px;">${item.label}</td>
-                    <td><input type="number" id="mba_rcd_15_${item.id}" oninput="handleNewInput(event); calculateAll()" ></td>
-                    <td><input type="number" id="mba_rcd_60_${item.id}" oninput="handleNewInput(event); calculateAll()" ></td>
-                    <td><input type="number" id="mba_rcd_kht_${item.id}" step="0.0001" oninput="handleNewInput(event); calculateAll()" ></td>
-                    <td><input type="number" id="mba_rcd_pi_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" ></td>
-                    <td><input type="number" id="mba_rcd_volt_${item.id}" value="2500" oninput="handleNewInput(event); calculateAll()" ></td>
-                </tr>
-            `;
-        });
-        
-        html += `</tbody></table>`;
-        container.innerHTML = html;
-    }
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
 
     // ============================================================
     // 3. TỔ ĐẤU DÂY
@@ -878,7 +818,7 @@
         if (!container) return;
         const temp = document.getElementById('mba_temp').value || '--';
         document.getElementById('mba_tg_temp_display').textContent = temp;
-        
+
         let html = `
         <table>
             <thead>
@@ -886,29 +826,29 @@
                     <th>Đối tượng đo</th>
                     <th>Tgδ (%)</th>
                     <th>C (pF)</th>
-                    <th>Điện áp đo (kV)</th>
+                    <th class="hidden-col">Điện áp đo (kV)</th>
                     <th>Sơ đồ đo</th>
                 </tr>
             </thead>
             <tbody>
         `;
-        
+
         const items = [
-            { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ (HV,MV~LV,E)' },
-            { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ (LV~HV,MV,E)' },
-            { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ (MV,HV,LV~E)' },
-            { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung (LV~HV,MV)' },
-            { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ (HV,MV~E)' },
-            { id: 'lv_e', label: 'Hạ ~ Vỏ (LV~E)' }
+            { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ' },
+            { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ' },
+            { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ' },
+            { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung' },
+            { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ' },
+            { id: 'lv_e', label: 'Hạ ~ Vỏ' }
         ];
-        
+
         items.forEach(item => {
             html += `
                 <tr>
                     <td style="text-align:left;font-size:10px;">${item.label}</td>
                     <td><input type="number" id="mba_tg_${item.id}" step="0.001" oninput="handleNewInput(event); calculateAll()" ></td>
                     <td><input type="number" id="mba_c_${item.id}" step="0.01" oninput="handleNewInput(event); calculateAll()" ></td>
-                    <td><input type="number" id="mba_tg_volt_${item.id}" value="10" oninput="handleNewInput(event); calculateAll()" ></td>
+                    <td class="hidden-col"><input type="number" id="mba_tg_volt_${item.id}" value="10" oninput="handleNewInput(event); calculateAll()" ></td>
                     <td>
                         <select id="mba_tg_diagram_${item.id}" onchange="handleNewInput(event)" >
                             <option value="GND">GND</option>
@@ -919,10 +859,239 @@
                 </tr>
             `;
         });
-        
+
         html += `</tbody></table>`;
         container.innerHTML = html;
     }
+
+
+    // ============================================================
+// ĐO SỨ CÁCH ĐIỆN ĐẦU VÀO (BUSHINGS)
+    // ============================================================
+
+// ============================================================
+// ĐO SỨ CÁCH ĐIỆN ĐẦU VÀO (BUSHINGS) - GOM HEADER VÀO 1 HÀNG ĐẦU BẢNG
+// ============================================================
+function renderBushingTables() {
+    const container = document.getElementById('table_bushing_container');
+    if (!container) return;
+
+    const locations = [
+        { id: 'HV', label: 'Sứ phía 220kV (Cao áp)', phases: ['A', 'B', 'C'] },
+        { id: 'MV', label: 'Sứ phía 110kV (Trung áp)', phases: ['Am', 'Bm', 'Cm'] },
+        { id: 'LV', label: 'Sứ phía 22kV (Hạ áp)', phases: ['a', 'b', 'c'] },
+        { id: 'NEUTRAL', label: 'Sứ phía Trung tính', phases: ['N'] }
+    ];
+
+    const inputStyle = "width:100%; box-sizing:border-box; font-size:10px; text-align:center; padding:3px 2px; border:1px solid #ccc; border-radius:3px; outline:none; background:#fff;";
+    let html = '';
+
+    locations.forEach(loc => {
+        const isSinglePhase = loc.phases.length === 1;
+        const colWidth = isSinglePhase ? "40%" : "20%";
+
+        html += `
+        <div style="margin-bottom:20px; border:1px solid #e0e0e0; border-radius:6px; padding:10px; background:#fafafa;">
+            <div style="font-size:13px; font-weight:700; color:var(--primary); margin-bottom:8px;">${loc.label}</div>
+            
+            <table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
+                <thead>
+                    <!-- HÀNG ĐẦU BẢNG: TÊN, NHIỆT ĐỘ, LOẠI SỨ, HỆ SỐ K -->
+                    <tr>
+                        <th colspan="${loc.phases.length + 1}" style="background:#f1f3f4; padding:6px 8px; text-align:left; font-size:11px; border:1px solid #ddd;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                                <span><b>Thông số đo:</b></span>
+                                <div style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                    <span>Nhiệt độ đo t =</span>
+                                    <input type="number" id="mba_bushing_temp_${loc.id}" style="width:45px; text-align:center; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;" value="30" oninput="handleNewInput(event); calculateBushings()">
+                                    <span>°C</span>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                    <span>Loại sứ:</span>
+                                    <select id="mba_bushing_type_cat_${loc.id}" style="padding:2px 4px; font-size:10px; border:1px solid #ccc; border-radius:3px;" onchange="handleNewInput(event)">
+                                        <option value="OIP">OIP</option>
+                                        <option value="RIP" selected>RIP</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:6px; font-weight:normal;">
+                                    <span>Hệ số K =</span>
+                                    <input type="number" id="mba_bushing_k_${loc.id}" step="0.01" value="1.0" style="width:55px; text-align:center; padding:2px; font-size:10px; border:1px solid #ccc; border-radius:3px;" oninput="handleNewInput(event); calculateBushings()">
+                                </div>
+                            </div>
+                        </th>
+                        <th style="width:15%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">U đo (kV)</th>
+                        <th style="width:15%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">Sơ đồ</th>
+                    </tr>
+                    <!-- HÀNG PHA -->
+                    <tr>
+                        <th style="width:25%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">Pha (Phase)</th>
+                        ${loc.phases.map(p => `<th style="width:${colWidth}; font-size:11px; padding:6px 2px; background:#e3f2fd; border:1px solid #ddd;">${p}</th>`).join('')}
+                        <th style="font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">/</th>
+                        <th style="font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">/</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- THÔNG TIN SỨ GOM CHUNG 1 HÀNG -->
+                    <tr>
+                        <td style="font-size:11px; font-weight:600; text-align:center; padding:4px; background:#f9f9f9; border:1px solid #ddd;">
+                            Thông tin sứ<br><span style="font-size:9px; color:#666; font-weight:normal;">(Kiểu / Hãng / S/N)</span>
+                        </td>
+                        ${loc.phases.map((p, idx) => `
+                            <td style="padding:2px; vertical-align:middle; border:1px solid #ddd;">
+                                <div style="display:flex; flex-direction:column; gap:2px;">
+                                    <input type="text" id="mba_bushing_type_${loc.id}_${p}" placeholder="Kiểu loại" style="${inputStyle}" oninput="handleNewInput(event); ${idx === 0 ? `autoFillBushingInfo('${loc.id}', 'type', '${p}')` : `this.dataset.autofilled='false'`}">
+                                    <input type="text" id="mba_bushing_mfg_${loc.id}_${p}" placeholder="Hãng SX" style="${inputStyle}" oninput="handleNewInput(event); ${idx === 0 ? `autoFillBushingInfo('${loc.id}', 'mfg', '${p}')` : `this.dataset.autofilled='false'`}">
+                                    <input type="text" id="mba_bushing_sn_${loc.id}_${p}" placeholder="Số chế tạo" style="${inputStyle}" oninput="handleNewInput(event)">
+                                </div>
+                            </td>
+                        `).join('')}
+                        <td style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
+                        <td style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
+                    </tr>
+
+                    <!-- Giữa lõi - ty sứ -->
+                    <tr>
+                        <td rowspan="3" style="font-size:11px; font-weight:600; text-align:center; padding:4px; vertical-align:middle; background:#f9f9f9; border:1px solid #ddd;">Giữa lõi - ty sứ<br><i>(Core-test tap)</i></td>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; vertical-align:top; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">tgδ (%)</div>
+                                <input type="number" id="mba_bushing_tg1_${loc.id}_${p}" step="0.01" style="${inputStyle}" oninput="handleNewInput(event); calculateBushings()">
+                                <div id="mba_bushing_tg1_20c_${loc.id}_${p}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:2px; min-height:12px;"></div>
+                            </td>
+                        `).join('')}
+                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_${loc.id}" value="10" style="${inputStyle} font-weight:bold;"></td>
+                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_diag1_${loc.id}" value="UST" style="${inputStyle} font-weight:bold;"></td>
+                    </tr>
+                    <tr>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">C1 (pF)</div>
+                                <input type="number" id="mba_bushing_c1_${loc.id}_${p}" step="0.1" style="${inputStyle}" oninput="handleNewInput(event)">
+                            </td>
+                        `).join('')}
+                    </tr>
+                    <tr>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">Rcđ (MΩ)</div>
+                                <input type="number" id="mba_bushing_rcd1_${loc.id}_${p}" style="${inputStyle}" oninput="handleNewInput(event)">
+                            </td>
+                        `).join('')}
+                        <td style="padding:2px; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_rcd_${loc.id}" value="1" style="${inputStyle}"></td>
+                        <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                    </tr>
+
+                    <!-- Ty sứ - Vỏ -->
+                    <tr>
+                        <td rowspan="3" style="font-size:11px; font-weight:600; text-align:center; padding:4px; vertical-align:middle; background:#f9f9f9; border:1px solid #ddd;">Ty sứ - Vỏ<br><i>(Test tap-Earth)</i></td>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; vertical-align:top; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">tgδ (%)</div>
+                                <input type="number" id="mba_bushing_tg2_${loc.id}_${p}" step="0.01" style="${inputStyle}" oninput="handleNewInput(event); calculateBushings()">
+                                <div id="mba_bushing_tg2_20c_${loc.id}_${p}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:2px; min-height:12px;"></div>
+                            </td>
+                        `).join('')}
+                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u2_${loc.id}" value="1" style="${inputStyle} font-weight:bold;"></td>
+                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_diag2_${loc.id}" value="GST" style="${inputStyle} font-weight:bold;"></td>
+                    </tr>
+                    <tr>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">C2 (pF)</div>
+                                <input type="number" id="mba_bushing_c2_${loc.id}_${p}" step="0.1" style="${inputStyle}" oninput="handleNewInput(event)">
+                            </td>
+                        `).join('')}
+                    </tr>
+                    <tr>
+                        ${loc.phases.map(p => `
+                            <td style="padding:2px; border:1px solid #ddd;">
+                                <div style="font-size:9px; color:#666; margin-bottom:2px;">Rcđ (MΩ)</div>
+                                <input type="number" id="mba_bushing_rcd2_${loc.id}_${p}" style="${inputStyle}" oninput="handleNewInput(event)">
+                            </td>
+                        `).join('')}
+                        <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                        <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+// Logic Auto-fill Kiểu loại & Hãng SX sang pha B, C
+function autoFillBushingInfo(locId, field, currentPhase) {
+    if (locId === 'NEUTRAL') return;
+    
+    const sourceEl = document.getElementById(`mba_bushing_${field}_${locId}_${currentPhase}`);
+    if (!sourceEl) return;
+    const val = sourceEl.value;
+    
+    const phases = (locId === 'HV') ? ['B', 'C'] : ((locId === 'MV') ? ['Bm', 'Cm'] : ['b', 'c']);
+    
+    phases.forEach(p => {
+        const el = document.getElementById(`mba_bushing_${field}_${locId}_${p}`);
+        if (el) {
+            // Cho phép điền nếu ô đang trống HOẶC ô đó trước đó đang được tự động điền (chưa bị người dùng bấm vào gõ sửa tay)
+            if (el.value.trim() === '' || el.dataset.autofilled === 'true') {
+                el.value = val;
+                el.dataset.autofilled = 'true'; // Đánh dấu là đang được auto-fill
+                el.classList.add('new-data');
+            }
+        }
+    });
+}
+
+// Logic tính toán quy đổi tg_delta về 20°C
+function calculateBushings() {
+    const locations = [
+        { id: 'HV', phases: ['A', 'B', 'C'] },
+        { id: 'MV', phases: ['Am', 'Bm', 'Cm'] },
+        { id: 'LV', phases: ['a', 'b', 'c'] },
+        { id: 'NEUTRAL', phases: ['N'] }
+    ];
+
+    locations.forEach(loc => {
+        const kFactorInput = document.getElementById(`mba_bushing_k_${loc.id}`);
+        const kFactor = kFactorInput ? parseFloat(kFactorInput.value) : NaN;
+
+        loc.phases.forEach(p => {
+            // Lõi - Ty Sứ (tg1)
+            const tg1Input = document.getElementById(`mba_bushing_tg1_${loc.id}_${p}`);
+            const tg1Display = document.getElementById(`mba_bushing_tg1_20c_${loc.id}_${p}`);
+            if (tg1Input && tg1Display) {
+                let tg1 = parseFloat(tg1Input.value);
+                if (!isNaN(tg1) && !isNaN(kFactor) && kFactor > 0) {
+                    tg1Display.textContent = `QĐ 20°C: ${(tg1 * kFactor).toFixed(3)} %`;
+                } else {
+                    tg1Display.textContent = "";
+                }
+            }
+
+            // Ty Sứ - Vỏ (tg2)
+            const tg2Input = document.getElementById(`mba_bushing_tg2_${loc.id}_${p}`);
+            const tg2Display = document.getElementById(`mba_bushing_tg2_20c_${loc.id}_${p}`);
+            if (tg2Input && tg2Display) {
+                let tg2 = parseFloat(tg2Input.value);
+                if (!isNaN(tg2) && !isNaN(kFactor) && kFactor > 0) {
+                    tg2Display.textContent = `QĐ 20°C: ${(tg2 * kFactor).toFixed(3)} %`;
+                } else {
+                    tg2Display.textContent = "";
+                }
+            }
+        });
+    });
+}
+
+
+
+
+
+
+
+
 
     // ============================================================
     // 5. ĐIỆN TRỞ MỘT CHIỀU MBA (CÓ NÚC ĐIỀU ÁP)
@@ -931,7 +1100,7 @@
         const container = document.getElementById('table_rdc_container');
         if (!container) return;
         const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
-        
+
         let html = `
             <div style="margin-bottom:8px;">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
@@ -950,7 +1119,7 @@
                 </div>
             </div>
         `;
-        
+
         // HV Winding
         html += `
             <div style="margin-top:10px;">
@@ -986,7 +1155,7 @@
             `;
         }
         html += `</tbody></table></div></div>`;
-        
+
         // MV Winding
         html += `
             <div style="margin-top:15px;">
@@ -1019,7 +1188,7 @@
                 </div>
             </div>
         `;
-        
+
         // LV Winding
         html += `
             <div style="margin-top:15px;">
@@ -1052,7 +1221,7 @@
                 </div>
             </div>
         `;
-        
+
         container.innerHTML = html;
     }
 
@@ -1063,7 +1232,7 @@
         const container = document.getElementById('table_ratio_container');
         if (!container) return;
         const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
-        
+
         let html = `
             <div style="margin-bottom:10px;">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
@@ -1086,7 +1255,7 @@
                 </div>
             </div>
         `;
-        
+
         // HV:MV Ratio
         html += `
             <div style="margin-top:10px;">
@@ -1105,8 +1274,8 @@
                                 <th>U<sub>CA</sub>/U<sub>CmAm</sub></th>
                                 <th class="hidden-col">ΔK<sub>CA/CmAm</sub> (%)</th>
 
-                                <th>ΔK(A,B,C) (%)</th>            
-
+                                <th>ΔK(A,B,C) (%)</th>
+            
                             </tr>
                         </thead>
                         <tbody>
@@ -1126,7 +1295,7 @@
             `;
         }
         html += `</tbody></table></div></div>`;
-        
+
         // HV:LV Ratio
         html += `
             <div style="margin-top:15px;">
@@ -1162,7 +1331,7 @@
             `;
         }
         html += `</tbody></table></div></div>`;
-        
+
         // MV:LV Ratio
         html += `
             <div style="margin-top:15px;">
@@ -1195,7 +1364,7 @@
                 </div>
             </div>
         `;
-        
+
         container.innerHTML = html;
     }
 
@@ -1246,7 +1415,6 @@
         `;
     }
 
-
 // ============================================================
 // 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG (TỐI ƯU MOBILE)
 // ============================================================
@@ -1262,7 +1430,8 @@ function changeCtWindings(delta) {
 function renderCtTables() {
     const numWindings = parseInt(document.getElementById('mba_ct_windings').value) || 2;
     const temp = document.getElementById('mba_temp').value || '--';
-    document.getElementById('mba_ct_temp_display').textContent = temp;
+    if(document.getElementById('mba_ct_temp_display')) document.getElementById('mba_ct_temp_display').textContent = temp;
+    if(document.getElementById('mba_ct_rcd_temp')) document.getElementById('mba_ct_rcd_temp').textContent = temp;
 
     // Các vị trí CT (sẽ chuyển thành dòng tiêu đề phân cách)
     const locations = [
@@ -1464,93 +1633,111 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
 function initCtTables() {
     renderCtTables();
 }
+
     // ============================================================
     // TÍNH TOÁN (Đánh giá qua màu sắc)
     // ============================================================
     function calculateAll() {
-        const temp = parseFloat(document.getElementById('mba_temp').value) || 30;
-        document.getElementById('mba_rcd_temp_display').textContent = temp;
-        document.getElementById('mba_tg_temp_display').textContent = temp;
+    const temp = parseFloat(document.getElementById('mba_temp').value);
+    if(document.getElementById('mba_rcd_temp_display')) document.getElementById('mba_rcd_temp_display').textContent = isNaN(temp) ? '--' : temp;
+    if(document.getElementById('mba_tg_temp_display')) document.getElementById('mba_tg_temp_display').textContent = isNaN(temp) ? '--' : temp;
+    
+    // Tự động quét cấp điện áp MBA để xác định ngưỡng Bảng 44 (>=110kV -> 600 MΩ, <110kV -> 300 MΩ)
+    const voltageStr = document.getElementById('mba_voltage')?.value || "";
+    const hasHighVoltage = (voltageStr.match(/\d+/g) || []).some(v => parseInt(v) >= 110);
+    const windingThreshold = (hasHighVoltage || voltageStr === "") ? 600 : 300;
+
+    const k1Factor = (!isNaN(temp)) ? getTemperatureCorrectionFactor(temp, 20) : 1;
+
+ // --- ĐÁNH GIÁ RCD ---
+    const rcdWindingItems = ['hv_mv_lv_e', 'lv_hv_mv_e', 'hv_mv_lv_e2', 'lv_hv_mv', 'hv_mv_e', 'lv_e'];
+    const rcdCoreItems = ['core_e', 'clamp_e', 'core_clamp'];
+    const allRcdItems = rcdWindingItems.concat(rcdCoreItems);
+
+    allRcdItems.forEach(id => {
+        const el15 = document.getElementById(`mba_rcd_15_${id}`);
+        const el60 = document.getElementById(`mba_rcd_60_${id}`);
+        const el600 = document.getElementById(`mba_rcd_600_${id}`);
+        const elKht = document.getElementById(`mba_rcd_kht_${id}`);
+        const elPi = document.getElementById(`mba_rcd_pi_${id}`);
         
-        // RCD - Đánh giá dựa trên tiêu chuẩn (R60 > 1000 MΩ)
-        const rcdItems = ['hv_mv_lv_e', 'lv_hv_mv_e', 'hv_mv_lv_e2', 'lv_hv_mv', 'hv_mv_e', 'lv_e'];
-        rcdItems.forEach(id => {
-            const el = document.getElementById(`mba_rcd_60_${id}`);
-            if (el) {
-                const val = parseFloat(el.value) || 0;
-                if (val > 0) {
-                    const pass = val >= 1000;
-                    el.style.color = pass ? '#1565c0' : '#c62828';
-                    el.style.fontWeight = 'bold';
-                } else {
-                    el.style.color = '';
-                    el.style.fontWeight = '';
-                }
-            }
-        });
-        
-        // Core và Clamp (R60 > 500 MΩ)
-        ['core_e', 'clamp_e', 'core_clamp'].forEach(id => {
-            const el = document.getElementById(`mba_rcd_60_${id}`);
-            if (el) {
-                const val = parseFloat(el.value) || 0;
-                if (val > 0) {
-                    const pass = val >= 500;
-                    el.style.color = pass ? '#1565c0' : '#c62828';
-                    el.style.fontWeight = 'bold';
-                } else {
-                    el.style.color = '';
-                    el.style.fontWeight = '';
-                }
-            }
-        });
-        
-        // Tgδ - Đánh giá (tiêu chuẩn < 0.5%)
-        const tgItems = ['hv_mv_lv_e', 'lv_hv_mv_e', 'hv_mv_lv_e2', 'lv_hv_mv', 'hv_mv_e', 'lv_e'];
-        tgItems.forEach(id => {
-            const el = document.getElementById(`mba_tg_${id}`);
-            if (el) {
-                const val = parseFloat(el.value) || 0;
-                if (val > 0) {
-                    const pass = val <= 0.5;
-                    el.style.color = pass ? '#1565c0' : '#c62828';
-                    el.style.fontWeight = 'bold';
-                } else {
-                    el.style.color = '';
-                    el.style.fontWeight = '';
-                }
-            }
-        });
-        
-        // Tỷ số biến - Kiểm tra sai số
-        const tapCount = parseInt(document.getElementById('mba_tap_count').value) || 19;
-        for (let tap = 1; tap <= tapCount; tap++) {
-            const el = document.getElementById(`mba_ratio_hv_mv_dabc_${tap}`);
-            if (el) {
-                const val = parseFloat(el.value) || 0;
-                if (val !== 0) {
-                    const pass = Math.abs(val) <= 0.5;
-                    el.style.color = pass ? '#1565c0' : '#c62828';
-                    el.style.fontWeight = 'bold';
-                } else {
-                    el.style.color = '';
-                    el.style.fontWeight = '';
-                }
-            }
-            const el2 = document.getElementById(`mba_ratio_hv_lv_dabc_${tap}`);
-            if (el2) {
-                const val = parseFloat(el2.value) || 0;
-                if (val !== 0) {
-                    const pass = Math.abs(val) <= 0.5;
-                    el2.style.color = pass ? '#1565c0' : '#c62828';
-                    el2.style.fontWeight = 'bold';
-                } else {
-                    el2.style.color = '';
-                    el2.style.fontWeight = '';
-                }
-            }
+        const display15_20c = document.getElementById(`mba_rcd_15_20c_${id}`);
+        const display60_20c = document.getElementById(`mba_rcd_60_20c_${id}`);
+        const display600_20c = document.getElementById(`mba_rcd_600_20c_${id}`);
+
+        let r15 = el15 ? parseFloat(el15.value) : 0;
+        let r60 = el60 ? parseFloat(el60.value) : 0;
+        let r600 = el600 ? parseFloat(el600.value) : 0;
+
+        // Tính Kht và PI
+        if (elKht) elKht.value = (r15 > 0 && r60 > 0) ? (r60 / r15).toFixed(2) : "";
+        if (elPi) elPi.value = (r60 > 0 && r600 > 0) ? (r600 / r60).toFixed(2) : "";
+
+        // Quy đổi R15 về 20°C
+        if (r15 > 0 && !isNaN(temp)) {
+            let r15_20 = (temp > 20) ? (r15 * k1Factor) : (r15 / k1Factor);
+            if (display15_20c) display15_20c.textContent = `QĐ 20°C: ${r15_20.toFixed(0)} MΩ`;
+        } else {
+            if (display15_20c) display15_20c.textContent = "";
         }
+
+        // Quy đổi R60 về 20°C và đánh giá màu sắc
+        if (r60 > 0 && !isNaN(temp)) {
+            let r60_20 = (temp > 20) ? (r60 * k1Factor) : (r60 / k1Factor);
+            if (display60_20c) display60_20c.textContent = `QĐ 20°C: ${r60_20.toFixed(0)} MΩ`;
+            
+            let isPass = rcdWindingItems.includes(id) ? (r60_20 >= windingThreshold) : (r60_20 >= 500);
+            if (el60) {
+                el60.style.color = isPass ? '#1565c0' : '#c62828';
+                el60.style.fontWeight = 'bold';
+            }
+        } else {
+            if (display60_20c) display60_20c.textContent = "";
+            if (el60) { el60.style.color = ''; el60.style.fontWeight = ''; }
+        }
+
+        // Quy đổi R600 về 20°C
+        if (r600 > 0 && !isNaN(temp)) {
+            let r600_20 = (temp > 20) ? (r600 * k1Factor) : (r600 / k1Factor);
+            if (display600_20c) display600_20c.textContent = `QĐ 20°C: ${r600_20.toFixed(0)} MΩ`;
+            if (el600) {
+                el600.style.color = '#1565c0';
+                el600.style.fontWeight = 'bold';
+            }
+        } else {
+            if (display600_20c) display600_20c.textContent = "";
+            if (el600) { el600.style.color = ''; el600.style.fontWeight = ''; }
+        }
+    });
+    
+    // --- ĐÁNH GIÁ Tgδ ---
+    const tgItems = ['hv_mv_lv_e', 'lv_hv_mv_e', 'hv_mv_lv_e2', 'lv_hv_mv', 'hv_mv_e', 'lv_e'];
+    tgItems.forEach(id => {
+        const el = document.getElementById(`mba_tg_${id}`);
+        if (el && parseFloat(el.value) > 0) {
+            const pass = parseFloat(el.value) <= 0.5;
+            el.style.color = pass ? '#1565c0' : '#c62828';
+            el.style.fontWeight = 'bold';
+        } else if (el) {
+            el.style.color = ''; el.style.fontWeight = '';
+        }
+    });
+    
+    // --- ĐÁNH GIÁ TỶ SỐ BIẾN ---
+    const tapCount = parseInt(document.getElementById('mba_tap_count')?.value) || 19;
+    for (let tap = 1; tap <= tapCount; tap++) {
+        ['hv_mv', 'hv_lv'].forEach(type => {
+            const el = document.getElementById(`mba_ratio_${type}_dabc_${tap}`);
+            if (el && parseFloat(el.value) !== 0 && !isNaN(parseFloat(el.value))) {
+                const pass = Math.abs(parseFloat(el.value)) <= 0.5;
+                el.style.color = pass ? '#1565c0' : '#c62828';
+                el.style.fontWeight = 'bold';
+            } else if (el) {
+                el.style.color = ''; el.style.fontWeight = '';
+            }
+        });
     }
+}
 
     // ============================================================
     // ĐIỀU HƯỚNG TAB
@@ -1678,8 +1865,8 @@ function initCtTables() {
         setTodayDate();
         fetchSubstations();
         renderAllTables();
-    	initCtTables();  // ← THÊM DÒNG NÀY
-        
+    	initCtTables();
+	renderBushingTables(); 
 
 
         if (localStorage.getItem(prefix + 'DRAFT')) {
@@ -1702,6 +1889,177 @@ function initCtTables() {
     function renderCtLocation() {
         renderCtTables();
     }
+
+    // ============================================================
+    // PDF IMPORT & PARSER 
+    // ============================================================
+    function importPdf() {
+        document.getElementById('pdfFileInput').click();
+    }
+
+    async function handlePdfFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        showLoading("Đang xử lý PDF...");
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+            
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                fullText += pageText + '\n';
+            }
+            
+            hideLoading();
+            const parsedData = parsePdfDataForMba(fullText);
+            
+            if (parsedData && Object.keys(parsedData).length > 0) {
+                fillFormWithData(parsedData);
+                alert(`✅ Đã bóc tách thành công ${Object.keys(parsedData).length} trường dữ liệu từ PDF!`);
+            } else {
+                alert('⚠️ Không thể đọc dữ liệu từ file PDF này. Vui lòng kiểm tra lại định dạng biên bản!');
+            }
+        } catch (err) {
+            hideLoading();
+            alert('❌ Lỗi xử lý file PDF: ' + err.message);
+            console.error(err);
+        }
+        event.target.value = '';
+    }
+
+    function parsePdfDataForMba(text) {
+        const data = {};
+        const p = 'mba_';
+        
+        // Làm sạch văn bản để tránh ngắt dòng bất thường
+        const cleanText = text.replace(/\n|\r/g, ' ').replace(/\s{2,}/g, ' ');
+
+        // 1. Nhận diện Meta Data cơ bản
+        const metaSpecs = [
+            { id: 'info_nganlo', regex: /Vị trí lắp đặt[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'mfg', regex: /Hãng sản xuất[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'sn', regex: /Số chế tạo[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'year', regex: /Năm sản xuất[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'type', regex: /Kiểu loại[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'power', regex: /Công suất[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'voltage', regex: /Điện áp định mức[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'vector', regex: /Tổ đấu dây[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'current', regex: /Dòng định mức[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'reason', regex: /Lý do ki[êể]m định[^\:]*\:\s*([^\|]+)/i },
+            { id: p + 'temp', regex: /Temp[^\=]*\=\s*(\d+)/i },
+            { id: p + 'humidity', regex: /Độ ẩm[^\=]*\=\s*(\d+)/i },
+            { id: p + 'ghichu', regex: /GHI CHÚ[^\:]*\:\s*(.*?)(?=KẾT LUẬN|Người thực hiện|Trang \d|\/$)/i },
+            { id: p + 'conclusion', regex: /KẾT LUẬN[^\:]*\:\s*(.*?)(?=Người thực hiện|TUQ|TỔNG CÔNG TY|Trang \d)/i }
+        ];
+
+        metaSpecs.forEach(r => {
+            const match = cleanText.match(r.regex);
+            if (match && match[1]) data[r.id] = match[1].trim();
+        });
+
+        const dateMatch = cleanText.match(/Ngày kiểm định.*?(\d{1,2})[\s\/tháng-]+(\d{1,2})[\s\/năm-]+(\d{4})/i) || cleanText.match(/ngày\s+(\d{1,2})\s+tháng\s+(\d{1,2})\s+năm\s+(\d{4})/i);
+        if (dateMatch) data['info_ngay'] = `${dateMatch[3]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[1].padStart(2, '0')}`;
+
+        // 2. Bóc tách Bảng Điện Trở Các Cuộn Dây (RDC - Section 7)
+        // 7.1 HV
+        let hvSection = text.match(/7\.1 Cuộn dây cao thế.*?(?=7\.2)/is);
+        if(hvSection) {
+            let lines = hvSection[0].match(/^\s*\d{1,2}\s*\|.*?\|.*?$/gm);
+            if(lines) {
+                lines.forEach(line => {
+                    let m = line.match(/^\s*(\d{1,2})\s*\|\s*([\d\.]+)\s*\|\s*\|\s*([\d\.]+)\s*\|\s*\|\s*([\d\.]+)\s*\|\s*\|\s*([\d\.]+)/);
+                    if(m) {
+                        data[`${p}rdc_hv_an_${m[1]}`] = m[2];
+                        data[`${p}rdc_hv_bn_${m[1]}`] = m[3];
+                        data[`${p}rdc_hv_cn_${m[1]}`] = m[4];
+                        data[`${p}rdc_hv_dabc_${m[1]}`] = m[5];
+                    }
+                });
+            }
+        }
+
+        // 7.2 MV (M.V Winding)[cite: 1]
+        let mvSection = cleanText.match(/7\.2 Cuộn dây trung áp.*?([\d\.]+)\s*([\d\.]+)\s*([\d\.]+)\s*([\d\.]+)/i);
+        if(mvSection) {
+            data[`${p}rdc_mv_amn`] = mvSection[1];
+            data[`${p}rdc_mv_bmn`] = mvSection[2];
+            data[`${p}rdc_mv_cmn`] = mvSection[3];
+            data[`${p}rdc_mv_dabc`] = mvSection[4];
+        }
+
+        // 7.3 LV
+        let lvSection = cleanText.match(/7\.3 Cuộn dây hạ thế.*?([\d\.]+)\s*([\d\.]+)\s*([\d\.]+)\s*([\d\.]+)/i);
+        if(lvSection) {
+            data[`${p}rdc_lv_ab`] = lvSection[1];
+            data[`${p}rdc_lv_bc`] = lvSection[2];
+            data[`${p}rdc_lv_ca`] = lvSection[3];
+            data[`${p}rdc_lv_dabc`] = lvSection[4];
+        }
+
+        // 3. Biến Dòng Chân Sứ (CT) - Phía cao áp (11.2.1 H.V)[cite: 1]
+        let ctRcdHvSection = text.match(/11\.2\.1 Phía cao áp \(H\.V\).*?(?=11\.2\.2|11\.3)/is);
+        if (ctRcdHvSection) {
+            let lines = ctRcdHvSection[0].match(/Thứ cấp \d+.*?(\d+)\s+(\d+)\s+(\d+)/ig);
+            if (lines) {
+                lines.forEach((line, idx) => {
+                    let m = line.match(/(\d+)\s+(\d+)\s+(\d+)$/);
+                    if (m) {
+                        data[`${p}ct_rcd_HV_A_w${idx+1}`] = m[1];
+                        data[`${p}ct_rcd_HV_B_w${idx+1}`] = m[2];
+                        data[`${p}ct_rcd_HV_C_w${idx+1}`] = m[3];
+                    }
+                });
+            }
+        }
+
+        return data;
+    }
+
+    function fillFormWithData(data) {
+        let filledCount = 0;
+        
+        for (const [id, value] of Object.entries(data)) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.value = value;
+                el.classList.add('new-data');
+                filledCount++;
+            }
+        }
+
+        checkUnlockForm();
+        calculateAll();
+        console.log(`✅ Điền thành công ${filledCount} trường dữ liệu.`);
+    }
+
+// Tính hệ số K1 dựa vào chênh lệch nhiệt độ================================================================
+function getTemperatureCorrectionFactor(tDo, tChuan = 20) {
+    if (isNaN(tDo) || tDo === tChuan) return 1;
+    let deltaT = Math.abs(tDo - tChuan);
+    let k1 = 1.0;
+    
+    // Bảng 45: Hệ số K1 tương ứng với từng mốc Delta T
+    const kMap = [
+        { dt: 30, k: 3.4 }, { dt: 25, k: 2.75 }, { dt: 20, k: 2.25 },
+        { dt: 15, k: 1.84 }, { dt: 10, k: 1.5 }, { dt: 5, k: 1.22 },
+        { dt: 4, k: 1.17 }, { dt: 3, k: 1.13 }, { dt: 2, k: 1.08 }, { dt: 1, k: 1.04 }
+    ];
+
+    // Thuật toán tách thừa số: VD: dt = 9 => 5 + 4 => K1 = K(5) * K(4) = 1.22 * 1.17
+    let remainingDt = deltaT;
+    for (let i = 0; i < kMap.length; i++) {
+        while (remainingDt >= kMap[i].dt) {
+            k1 *= kMap[i].k;
+            remainingDt -= kMap[i].dt;
+        }
+    }
+    return k1;
+}
+
 </script>
 </body>
 </html>

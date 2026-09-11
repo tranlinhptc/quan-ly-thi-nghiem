@@ -676,7 +676,7 @@ function getInterpolatedPriRcd(temp, u1Str) {
                 const K_do = u1_tn_val / u2_do;
                 kdoEl.textContent = `Kđo: ${K_do.toFixed(3)}`;
                 
-                const error = ((K_do - K_dm) / K_dm) * 100;
+                const error = ((K_dm-K_do) / K_dm) * 100;
                 errEl.value = error.toFixed(3);
                 
                 const isPass = Math.abs(error) <= accLimit;

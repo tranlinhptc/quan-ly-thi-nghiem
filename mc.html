@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -372,7 +373,7 @@
         <!-- NÚT CHỨC NĂNG TÍCH HỢP -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
-            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
+            <button class="btn-action" onclick="exportWordMC()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
             <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
             <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp</button>
         </div>
@@ -567,7 +568,8 @@
                 html += `<td><div class="err-box" id="mc_err_td_${act.id}_${p}">-</div></td></tr>`;
             });
             html += `<tr><td colspan="${numTd + 1}" style="text-align:right;"><b>Độ lệch giữa 3 Pha (Δ Pha MAX):</b></td>`;
-            html += `<td><div class="err-box" style="font-weight:bold;" id="mc_err_pha_${act.id}">-</div></td></tr>`;
+        //    html += `<td><div class="err-box" style="font-weight:bold;" id="mc_err_pha_${act.id}">-</div></td></tr>`;
+	html += `<td><input type="text" class="err-box" style="width:100%; text-align:center; border:none; background:transparent; font-weight:bold; color:inherit;" readonly id="mc_err_pha_${act.id}"></td></tr>`;
             html += `</tbody></table>`;
         });
         document.getElementById('table_timing_container').innerHTML = html;
@@ -654,13 +656,52 @@
             const errPhaBox = document.getElementById(`mc_err_pha_${act}`);
             if(errPhaBox && allPhaseTimes.length > 0) {
                 const diffGlobal = Math.max(...allPhaseTimes) - Math.min(...allPhaseTimes);
-                errPhaBox.innerText = diffGlobal.toFixed(1) + " ms";
+                errPhaBox.value = diffGlobal.toFixed(1) + " ms";
                 errPhaBox.style.color = diffGlobal <= limitPha ? "#2e7d32" : "#c62828";
                 errPhaBox.style.background = diffGlobal <= limitPha ? "transparent" : "#ffebee";
             
     }
         });
   }
+
+function exportWordMC() {
+    const customPayload = {};
+
+    // 1. Bộ công tắc ẩn/hiện section của MC
+    ['sec1', 'sec2', 'sec3', 'sec4', 'sec5', 'sec6'].forEach(sec => {
+        const chk = document.getElementById(`chk_${sec}`);
+        if (chk && chk.checked) {
+            customPayload[`is_${sec}`] = true;
+        }
+    });
+
+    // 2. Cấu hình tủ điều khiển
+    const tuDK = document.getElementById('mc_tudk');
+    if (tuDK) {
+        customPayload["is_1tu"] = (tuDK.value === "1");
+        customPayload["is_3tu"] = (tuDK.value === "3");
+    }
+
+    // 3. Cấu hình cuộn dây
+    const cuonDay = document.getElementById('mc_cuonday');
+    if (cuonDay) {
+        customPayload["is_1C2O"] = (cuonDay.value === "1C2O");
+        customPayload["is_2C1O"] = (cuonDay.value === "2C1O");
+        customPayload["is_2C2O"] = (cuonDay.value === "2C2O");
+    }
+
+    // 4. Cấu hình số tiếp điểm
+    const tiepDiem = document.getElementById('mc_tiepdiem');
+    if (tiepDiem) {
+        customPayload["is_1TD"] = (tiepDiem.value === "1");
+        customPayload["is_2TD"] = (tiepDiem.value === "2");
+        customPayload["is_3TD"] = (tiepDiem.value === "3");
+        customPayload["is_4TD"] = (tiepDiem.value === "4");
+    }
+
+    // Gọi hàm xuất Word chung từ common.js kèm theo gói cấu hình riêng của MC
+    exportWordFromDrive(customPayload);
+}
 	
 </script>
 </body>

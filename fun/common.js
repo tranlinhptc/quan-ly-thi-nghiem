@@ -434,14 +434,7 @@ async function exportWordFromDrive() {
             payload["is_4TD"] = (tiepDiem === "4");
             // ------------------------------------------------
 
-        const num_windings = document.getElementById(prefix + 'num_windings').value;
-        payload["is_2wind"] = (num_windings === "2");
-        payload["is_3wind"] = (num_windings === "3");
-        payload["is_4wind"] = (num_windings === "4");
-        payload["is_5wind"] = (num_windings === "5");
-        payload["is_6wind"] = (num_windings === "6");
-        payload["is_7wind"] = (num_windings === "7");
-        payload["is_8wind"] = (num_windings === "8");
+
 
         if (payload["ngayTN"]) {
             const m = payload["ngayTN"].match(/^(\d{4})-(\d{2})-(\d{2})$/);

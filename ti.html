@@ -284,7 +284,7 @@
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
-            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
+            <button class="btn-action" onclick="exportWordTI()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
             <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
             <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Reset Form</button>
         </div>
@@ -1400,6 +1400,18 @@ for (let i = 1; i <= numWindings; i++) {
             }
         }
     }
+	function exportWordTI() {
+    const customPayload = {};
+      const num_windings = document.getElementById(prefix + 'num_windings').value;
+        payload["is_2wind"] = (num_windings === "2");
+        payload["is_3wind"] = (num_windings === "3");
+        payload["is_4wind"] = (num_windings === "4");
+        payload["is_5wind"] = (num_windings === "5");
+        payload["is_6wind"] = (num_windings === "6");
+        payload["is_7wind"] = (num_windings === "7");
+        payload["is_8wind"] = (num_windings === "8");
+    exportWordFromDrive(customPayload);
+}
 </script>
 </body>
 </html>

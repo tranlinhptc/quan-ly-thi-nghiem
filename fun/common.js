@@ -376,7 +376,7 @@ function syncOneDrive() {
 // 6. HÀM XUẤT WORD
 // ============================================================
 
-async function exportWordFromDrive() {
+async function exportWordFromDrive(customPayload = {}) {
     if (!TEMPLATE_DRIVE_ID) {
         alert("⚠️ Chưa cấu hình TEMPLATE_DRIVE_ID!");
         return;
@@ -397,44 +397,14 @@ async function exportWordFromDrive() {
         payload["ngayTN"] = document.getElementById('info_ngay').value || "";
         payload["nguoiTN"] = "";
 
+        // Quét toàn bộ input/select có tiền tố của module hiện tại (mc_, ti_,...)
         document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
             let val = getVal(el.id);
             payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
         });
 
-        //const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'];
-        //checkboxes.forEach(id => {
-            //const checked = document.getElementById(id)?.checked;
-            //if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
-       // });
-
-
-
-                    // --- BỘ CÔNG TẮC ĐIỀU KIỆN ẨN/HIỆN FORM WORD ---
-			const sec1 = document.getElementById('chk_sec1').checked; if (sec1) {payload["is_sec1"] = true;} else {    delete payload["is_sec1"];}
-			const sec2 = document.getElementById('chk_sec2').checked; if (sec2) {payload["is_sec2"] = true;} else {    delete payload["is_sec2"];}
-			const sec3 = document.getElementById('chk_sec3').checked; if (sec3) {payload["is_sec3"] = true;} else {    delete payload["is_sec3"];}
-			const sec4 = document.getElementById('chk_sec4').checked; if (sec4) {payload["is_sec4"] = true;} else {    delete payload["is_sec4"];}
-			const sec5 = document.getElementById('chk_sec5').checked; if (sec5) {payload["is_sec5"] = true;} else {    delete payload["is_sec5"];}
-			const sec6 = document.getElementById('chk_sec6').checked; if (sec6) {payload["is_sec6"] = true;} else {    delete payload["is_sec6"];}
-
-			const tuDK = document.getElementById('mc_tudk').value;
-            payload["is_1tu"] = (tuDK === "1"); // Bằng true nếu là 1 tủ
-            payload["is_3tu"] = (tuDK === "3"); // Bằng true nếu là 3 tủ
-            
-            const cuonDay = document.getElementById('mc_cuonday').value;
-            payload["is_1C2O"] = (cuonDay === "1C2O");
-            payload["is_2C1O"] = (cuonDay === "2C1O");
-            payload["is_2C2O"] = (cuonDay === "2C2O");
-
-            const tiepDiem = document.getElementById('mc_tiepdiem').value;
-            payload["is_1TD"] = (tiepDiem === "1");
-            payload["is_2TD"] = (tiepDiem === "2");
-            payload["is_3TD"] = (tiepDiem === "3");
-            payload["is_4TD"] = (tiepDiem === "4");
-            // ------------------------------------------------
-
-
+        // 🟢 Bổ sung các cấu hình/công tắc riêng biệt do module truyền vào (nếu có)
+        Object.assign(payload, customPayload);
 
         if (payload["ngayTN"]) {
             const m = payload["ngayTN"].match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -444,16 +414,19 @@ async function exportWordFromDrive() {
         const zip = new PizZip(bytes.buffer);
         const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
         doc.render(payload);
-        const out = doc.getZip().generate({ type: "blob",
+        
+        const out = doc.getZip().generate({ 
+            type: "blob",
             mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            compression: "DEFLATE" });
+            compression: "DEFLATE" 
+        });
 
         const dateStr = payload["ngayTN"] ? payload["ngayTN"].replace(/\//g, '-') : "New";
         const tramStr = payload[prefix + 'tram'] ? payload[prefix + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
         const nganLoStr = payload[prefix + 'nganlo'] ? payload[prefix + 'nganlo'].replace(/[\/\\]/g, '-') : "NL";
         const wordPrefix = prefix.replace('_', '').toUpperCase();
+        
         saveAs(out, `Bien ban thi nghiem ${wordPrefix}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
-
         hideLoading();
     } catch (e) {
         hideLoading();

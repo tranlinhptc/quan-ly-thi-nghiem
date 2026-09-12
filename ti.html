@@ -284,7 +284,10 @@
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
-            <button class="btn-action" onclick="exportWordTI()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+        <button class="btn-action" onclick="exportWordTI(false)" style="background:#0288d1; margin:0;">📝 Xuất BB (Chỉ nhập)</button>
+        <button class="btn-action" onclick="exportWordTI(true)" style="background:#f57c00; margin:0;">📝 Xuất BB (Kèm số cũ)</button>
+    </div>
             <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
             <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Reset Form</button>
         </div>
@@ -1400,11 +1403,11 @@ for (let i = 1; i <= numWindings; i++) {
             }
         }
     }
-function exportWordTI() {
+function exportWordTI(includeOldData = false) {
     const customPayload = {};
     const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
     
-    // --- 1. ĐỊNH DANH (Bắt buộc) ---
+    // --- 1. ĐỊNH DANH ---
     const tramSelect = document.getElementById('info_tram');
     if (tramSelect && tramSelect.selectedIndex > -1) {
         const tramText = tramSelect.options[tramSelect.selectedIndex].text;
@@ -1426,27 +1429,22 @@ function exportWordTI() {
     customPayload["is_7wind"] = (num_windings === "7");
     customPayload["is_8wind"] = (num_windings === "8");
 
-    // --- 3. LỰA CHỌN CHẾ ĐỘ XUẤT (Không ảnh hưởng common.js) ---
-    // Hiển thị popup hỏi người dùng chọn Mode 1 hay Mode 2
-        const includeOldData = confirm("CHẾ ĐỘ XUẤT WORD:\n\n- Bấm 'OK': Xuất dữ liệu nhập + Số liệu cũ (từ Placeholder)\n- Bấm 'Cancel': CHỈ xuất dữ liệu thực tế vừa nhập");
-
+    // --- 3. LỌC SỐ LIỆU CŨ (Nếu bấm nút màu cam) ---
     if (includeOldData) {
-        // Quét toàn bộ thẻ input trong form
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
             if (input.id && input.id.startsWith(prefix)) {
-                const key = input.id.substring(prefix.length); // Cắt bỏ tiền tố 'ti_'
+                const key = input.id.substring(prefix.length); 
                 
-                // Nếu ô trống, ta xét lấy placeholder
+                // Nếu ô trống và có placeholder
                 if (input.value === "" && input.placeholder) {
                     const ph = input.placeholder.trim();
                     
-                    // Bộ lọc: Bỏ qua các placeholder mặc định của form (chứa ký tự đặc biệt hoặc chữ hướng dẫn)
-                    const isDefaultFormText = ph.includes('±') || ph.includes('%') || ph.includes('Ω') || 
+                    // Bỏ qua các placeholder text mặc định của form
+                    const isDefaultFormText = ph.includes('±') || ph.includes('%') || ph.includes('Ω') || 
                                               ph.includes('Ví dụ') || ph.includes('Nhập') || ph.includes('Đo') || 
-                                              ph.includes('U') || ph.includes('I') || ph === "";
+                                              ph.includes('Serial') || ph.includes('U') || ph.includes('I') || ph === "";
                     
-                    // Nếu không phải text mặc định -> Đích thị là số liệu cũ load về -> Bơm vào Word
                     if (!isDefaultFormText) {
                         customPayload[key] = ph;
                     }
@@ -1455,9 +1453,9 @@ function exportWordTI() {
         });
     }
 
-    // Gọi thư viện xuất Word (customPayload sẽ tự động đè lên dữ liệu quét mặc định)
     exportWordFromDrive(customPayload);
 }
+
 </script>
 </body>
 </html>

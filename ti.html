@@ -241,12 +241,13 @@
             </div>
             <div id="body_sec4" class="table-responsive hidden-section">
                 <div class="grid" style="margin-bottom:8px;">
-                    <div class="form-group">
+                    <!--div class="form-group">
                         <label>I_Thử Nghiệm (A):</label>
                         <input type="number" id="ti_i1_tn" value="10" oninput="calculateAll()">
-                    </div>
+                    </div-->
                 </div>
-                <div class="table-responsive" id="table_ratio_container"></div>
+                <!--div class="table-responsive" id="table_ratio_container"></div-->
+		<div id="table_ratio_main_container"></div>
             </div>
         </div>
 
@@ -258,9 +259,10 @@
             </div>
             <div id="body_sec5" class="table-responsive hidden-section">
                 <div id="table_tuhoa_container">
-                    <div id="table_tuhoa_a_container"></div>
+                    <!--div id="table_tuhoa_a_container"></div>
                     <div id="table_tuhoa_b_container"></div>
-                    <div id="table_tuhoa_c_container"></div>
+                    <div id="table_tuhoa_c_container"></div-->
+		<div id="table_tuhoa_main_container"></div>
                 </div>
             </div>
         </div>
@@ -268,7 +270,7 @@
         <!-- 6. TAN DELTA & ĐIỆN DUNG -->
         <div class="card">
             <div class="card-title">
-                <span>5. Tgδ(%) & Điện Dung (pF)</span>
+                <span>5. Tgδ(%)</span>
                 <div>
                     <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
                 </div>
@@ -281,10 +283,10 @@
 
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
-            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
-            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản Word (Auto Template)</button>
-            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ Google Sheet</button>
-            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp làm lại</button>
+            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
+            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản</button>
+            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
+            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Reset Form</button>
         </div>
     </div> <!-- HẾT KHU VỰC KHÓA -->
 </div> <!-- HẾT CONTAINER -->
@@ -392,21 +394,21 @@
         if (!container) return;
 
         const num = parseInt(document.getElementById('ti_num_windings').value);
-        let html = `<table><thead><tr><th>Stt Cuộn</th><th>Đầu dây</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th>Cuộn</th><th>Đầu dây</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
         for(let i=1; i<=num; i++) {
             html += `<tr>
                 <td><b>Cuộn ${i}</b></td>
                 <td><input type="text" id="ti_rdc_terminal_${i}" value="${i}S1-${i}S" onkeydown="handleRdcTab(event, ${i}, 'terminal')" onkeypress="handleEnterToNext(event)"></td>
                 <td>
-                    <input type="number" id="ti_rdc_m_${i}_a" oninput="handleNewInput(event); calculateAll()" placeholder="Đo A" onkeydown="handleRdcTab(event, ${i}, 'a')" onkeypress="handleEnterToNext(event)">
+                    <input type="number" id="ti_rdc_m_${i}_a" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'a')" onkeypress="handleEnterToNext(event)">
                     <span class="sub-val" id="ti_rdc_75_${i}_a">75°C: -</span>
                 </td>
                 <td>
-                    <input type="number" id="ti_rdc_m_${i}_b" oninput="handleNewInput(event); calculateAll()" placeholder="Đo B" onkeydown="handleRdcTab(event, ${i}, 'b')" onkeypress="handleEnterToNext(event)">
+                    <input type="number" id="ti_rdc_m_${i}_b" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'b')" onkeypress="handleEnterToNext(event)">
                     <span class="sub-val" id="ti_rdc_75_${i}_b">75°C: -</span>
                 </td>
                 <td>
-                    <input type="number" id="ti_rdc_m_${i}_c" oninput="handleNewInput(event); calculateAll()" placeholder="Đo C" onkeydown="handleRdcTab(event, ${i}, 'c')" onkeypress="handleEnterToNext(event)">
+                    <input type="number" id="ti_rdc_m_${i}_c" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'c')" onkeypress="handleEnterToNext(event)">
                     <span class="sub-val" id="ti_rdc_75_${i}_c">75°C: -</span>
                 </td>
             </tr>`;
@@ -461,224 +463,666 @@
     // ============================================================
     // BẢNG TỈ SỐ BIẾN
     // ============================================================
-    function renderRatioTable() {
-        const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-        let html = `
-            <table>
-                <thead>
-                    <tr>
-                        <th rowspan="2" style="min-width:90px;vertical-align:middle;">Cuộn /<br>Thông số</th>
-                        <th colspan="3" style="min-width:180px;padding:6px 4px;">
-                            <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-                                <span style="flex:1;text-align:center;font-size:12px;color:#f57f17;font-weight:700;">🟡 Pha A</span>
-                                <span style="flex:1;text-align:center;font-size:12px;color:#c62828;font-weight:700;">🔴 Pha B</span>
-                                <span style="flex:1;text-align:center;font-size:12px;color:#0d47a1;font-weight:700;">🔵 Pha C</span>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        for (let i = 1; i <= num; i++) {
-            html += `
-                <tr>
-                    <td style="min-width:90px;vertical-align:middle;">
-                        <div style="display:flex;flex-direction:column;gap:3px;align-items:center;padding:4px 0;">
-                            <b style="font-size:13px;color:#d84315;">Cuộn ${i}</b>
-                            <select id="ti_ratio_dm_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
-                                <option value="200">200</option>
-                                <option value="400" selected>400</option>
-                                <option value="600">600</option>
-                                <option value="800">800</option>
-                                <option value="1000">1.000</option>
-                                <option value="1200">1.200</option>
-                                <option value="1500">1.500</option>
-                                <option value="2000">2.000</option>
-                                <option value="3000">3.000</option>
-                            </select>
-                            <select id="ti_i2_dm_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
-                                <option value="1" selected>Thứ cấp 1A</option>
-                                <option value="5">Thứ cấp 5A</option>
-                            </select>
-                            <select id="ti_acc_w${i}" onchange="calculateRatio(${i})" style="font-size:10px;width:100%;padding:3px 4px;border-radius:3px;border:1px solid var(--border);">
-                                <option value="0.2">Cấp 0.2</option>
-                                <option value="0.5" selected>Cấp 0.5</option>
-                                <option value="5P">Cấp 5P</option>
-                                <option value="10P">Cấp 10P</option>
-                            </select>
-                        </div>
-                    </td>
-            `;
-            ['A', 'B', 'C'].forEach(pha => {
-                let bgColor = '', borderLeft = '', borderRight = '';
-                let phaseClass = '';
-                if (pha === 'A') {
-                    bgColor = '#fff9c4';
-                    borderLeft = '3px solid #fbc02d';
-                    borderRight = '1px solid #fbc02d';
-                    phaseClass = 'phase-a';
-                } else if (pha === 'B') {
-                    bgColor = '#ffebee';
-                    borderLeft = '1px solid #ef5350';
-                    borderRight = '1px solid #ef5350';
-                    phaseClass = 'phase-b';
-                } else if (pha === 'C') {
-                    bgColor = '#e3f2fd';
-                    borderLeft = '1px solid #42a5f5';
-                    borderRight = '3px solid #42a5f5';
-                    phaseClass = 'phase-c';
-                }
-                html += `
-                    <td style="background:${bgColor};border-left:${borderLeft};border-right:${borderRight};padding:4px 2px;">
-                        <div class="ratio-cell">
-                            <div class="input-group">
-                                <div class="input-row">
-                                    <input type="number" step="0.01" 
-                                        id="ti_err_w${i}_${pha}" 
-                                        class="${phaseClass}"
-                                        placeholder="± % sai số"
-                                        oninput="handleNewInput(event); calculateRatio(${i}, '${pha}', 'err')" 
-                                        onfocus="this.select()"
-                                        onkeydown="handleRatioTab(event, ${i}, '${pha}', 'err')"
-                                        style="font-size:12px;background:#fff;width:100%;"
-                                    >
-                                </div>
-                            </div>
-                            <div class="ratio-info">
-                                <span class="kdo" id="ti_kdo_w${i}_${pha}">TSB: </span>
-                            </div>
-                        </div>
-                    </td>
-                `;
-            });
-            html += `</tr>`;
+let currentRatioTab = 'A'; // Mặc định mở Tab Pha A
+
+// Hàm chuyển Tab cho Tỉ số biến (Không làm mất dữ liệu đã nhập)
+function switchRatioTab(phaId) {
+    currentRatioTab = phaId;
+    ['A', 'B', 'C'].forEach(id => {
+        const wrapper = document.getElementById(`ratio_tab_content_${id}`);
+        if (wrapper) wrapper.style.display = (id === phaId) ? 'block' : 'none';
+        
+        const btn = document.getElementById(`btn_tab_ratio_${id}`);
+        if (btn) {
+            btn.style.background = (id === phaId) ? '#0288d1' : '#e0e0e0';
+            btn.style.color = (id === phaId) ? '#fff' : '#000';
         }
-        html += `</tbody></table>`;
-        document.getElementById('table_ratio_container').innerHTML = html;
-        setTimeout(() => {
-            for (let i = 1; i <= num; i++) {
-                calculateRatio(i);
+    });
+}
+
+
+// ============================================================
+// LƯU / KHÔI PHỤC GIÁ TRỊ BẢNG TỈ SỐ BIẾN
+// ============================================================
+function saveRatioValues() {
+    const saved = {};
+    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+
+    ['A', 'B', 'C'].forEach(pha => {
+        for (let i = 1; i <= num; i++) {
+            const ids = [
+                `ti_ratio_dm_w${i}_${pha}`,
+                `ti_i2_dm_w${i}_${pha}`,
+                `ti_acc_w${i}_${pha}`,
+                `ti_err_w${i}_${pha}`
+            ];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) saved[id] = el.value;
+            });
+        }
+    });
+
+    window.__savedRatioValues = saved;
+}
+
+function restoreRatioValues() {
+    const saved = window.__savedRatioValues;
+    if (!saved) return;
+
+    Object.keys(saved).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = saved[id];
+            if (id.startsWith('ti_err_')) {
+                el.classList.add('new-data');
+                el.style.color = '#1565c0';
+                el.style.fontWeight = 'bold';
             }
-        }, 100);
+        }
+    });
+
+    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+    for (let i = 1; i <= num; i++) {
+        ['A', 'B', 'C'].forEach(p => calculateRatio(i, p));
     }
+}
+
+
+
+// Render giao diện Tab và Bảng Tỉ số biến
+function renderRatioTable() {
+    const container = document.getElementById('table_ratio_main_container');
+    if (!container) return;
+
+saveRatioValues();   
+
+    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+    
+    const phases = [
+        { id: 'A', name: 'Pha A', color: '#fff9c4000', border: '#fbc02d', class: 'phase-a' },
+        { id: 'B', name: 'Pha B', color: '#ffebee000', border: '#ef5350', class: 'phase-b' },
+        { id: 'C', name: 'Pha C', color: '#e3f2fd000', border: '#42a5f5', class: 'phase-c' }
+    ];
+
+    // Vẽ thanh nút bấm Tab
+    let html = `<div style="display:flex; gap:8px; margin-bottom:12px;">`;
+    phases.forEach(pha => {
+        const isActive = (pha.id === currentRatioTab);
+        const bg = isActive ? '#0288d1' : '#e0e0e0';
+        const color = isActive ? '#fff' : '#000';
+        html += `<button id="btn_tab_ratio_${pha.id}" onclick="switchRatioTab('${pha.id}')" 
+                    style="padding:6px 16px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; background:${bg}; color:${color}; transition:0.3s;">
+                    ${pha.name}
+                 </button>`;
+    });
+    html += `</div>`;
+
+    // Vẽ nội dung 3 Tab tương ứng
+    phases.forEach(pha => {
+        const isVisible = (pha.id === currentRatioTab) ? 'block' : 'none';
+        html += `<div id="ratio_tab_content_${pha.id}" style="display:${isVisible};">`;
+        
+        // Tiêu đề tab kèm nút "+" nạp XML riêng cho từng pha
+        html += `
+            <div style="display:flex; align-items:center; margin-bottom:6px;">
+                <b style="color:#1565c0; font-size:14px; margin-right:8px;">Bảng Tỉ số biến - ${pha.name}</b>
+                <button type="button" title="Nạp file XML cho ${pha.name}" onclick="openRatioXml('${pha.id}')"
+                     style="width:160px; height:24px; line-height:22px; padding:0; border:none; border-radius:10%;  font-size:12px; cursor:pointer;">
+                    import XML
+                </button>
+
+
+
+
+
+            </div>
+            <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc; width:120px;">Cuộn dây</th>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc; width:180px;">Tỉ số biến</th>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Sai số đo (%)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+            
+        for (let i = 1; i <= num; i++) {
+            html += `<tr>
+                <td style="background:${pha.color}; border:1px solid #ccc; text-align:center; padding:6px;">
+                    <b style="font-size:12px; color:#d84315000;">Cuộn ${i}</b>
+                </td>
+                <td style="background:${pha.color}; border:1px solid #ccc; padding:4px;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <select id="ti_ratio_dm_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
+                            <option value="200">200 A</option>
+                            <option value="400" selected>400 A</option>
+                            <option value="600">600 A</option>
+                            <option value="800">800 A</option>
+                            <option value="1000">1.000 A</option>
+                            <option value="1200">1.200 A</option>
+                            <option value="1500">1.500 A</option>
+                            <option value="2000">2.000 A</option>
+                            <option value="3000">3.000 A</option>
+                        </select>
+                        <!--//CU-->
+<select id="ti_i2_dm_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
+    <option value="1" selected>Thứ cấp: 1A</option>
+    <option value="5">Thứ cấp: 5A</option>
+</select>
+<select id="ti_acc_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
+    <option value="0.2">Class: 0.2</option>
+    <option value="0.5" selected>Class: 0.5</option>
+    <option value="5P">Class: 5P</option>
+    <option value="10P">Class: 10P</option>
+    <option value="X">Class: X</option>
+</select>
+                    </div>
+                </td>
+                <td style="border:1px solid #ccc; padding:6px;">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <input type="number" step="0.01" 
+                            id="ti_err_w${i}_${pha.id}" 
+                            class="${pha.class}"
+                            placeholder="± %"
+                            oninput="handleNewInput(event); calculateRatio(${i}, '${pha.id}', 'err')" 
+                            style="font-size:12px; background:#fff; width:100%; padding:4px; box-sizing:border-box;"
+                        >
+                        <div class="ratio-info" style="font-size:11px; color:#333;">
+                            <span class="kdo" id="ti_kdo_w${i}_${pha.id}">Ratio: </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+        }
+        html += `</tbody></table></div>`;
+    });
+    
+    container.innerHTML = html;
+    
+    // Tính toán lại giá trị ban đầu sau khi render
+    setTimeout(() => {
+        restoreRatioValues();   // ← THÊM DÒNG NÀY
+
+        for (let i = 1; i <= num; i++) {
+            calculateRatio(i);
+        }
+    }, 100);
+}
+
+// 3. Hàm mở cửa sổ chọn file XML cho Tỉ số biến theo từng Pha
+// 1. Mở cửa sổ chọn file XML Tỉ số biến đúng chuẩn theo từng Pha (A, B, C)
+function openRatioXml(phaId) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xml,application/xml,text/xml';
+    input.style.display = 'none';
+    input.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                processRatioXml(ev.target.result, phaId);
+            } catch (err) {
+                alert('❌ Lỗi đọc file XML Tỉ số biến: ' + err.message);
+            }
+        };
+        reader.readAsText(file, 'UTF-8');
+    };
+    document.body.appendChild(input);
+    input.click();
+    setTimeout(() => document.body.removeChild(input), 1000);
+}
+
+// 2. Xử lý bóc tách chuẩn xác file XML Tỉ số biến====================================================================
+function processRatioXml(xmlText, phaId) {
+    
+	const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, 'application/xml');
+    
+    if (xml.querySelector('parsererror')) throw new Error('File XML bị hỏng cấu trúc');
+    
+    // Lấy tất cả Cards_Item (dùng getElementsByTagName để bỏ qua namespace)
+    const cards = xml.getElementsByTagName('Cards_Item');
+    if (!cards.length) throw new Error('Không tìm thấy dữ liệu Cards_Item trong file XML');
+
+    let maxWinding = 0;
+    const ratioMap = {};
+
+    for (const card of cards) {
+        // Chỉ xử lý card CTRatio (clsid BD6C0297...)
+        const clsid = card.getAttribute('clsid') || '';
+        if (!clsid.includes('BD6C0297')) continue;
+
+        const nameEl = card.getElementsByTagName('bstrName')[0];
+        const name = nameEl ? nameEl.textContent.trim() : '';
+        
+        // Lấy số thứ tự cuộn từ tên "CTRatio 1", "CTRatio 2"...
+        const m = name.match(/(\d+)/);
+        if (!m) continue;
+        const w = parseInt(m[1]);
+        if (w < 1 || w > 20) continue;
+        if (w > maxWinding) maxWinding = w;
+
+        // --- A. LẤY DÒNG ĐỊNH MỨC SƠ CẤP & THỨ CẤP ---
+        let primaryVal = null;
+        let secondaryVal = null;
+
+        const primNomNode = card.getElementsByTagName('IPrimNom')[0];
+        if (primNomNode) {
+            const v = primNomNode.getElementsByTagName('dValue')[0];
+            if (v) primaryVal = parseFloat(v.textContent);
+        }
+        const secNomNode = card.getElementsByTagName('ISecNom')[0];
+        if (secNomNode) {
+            const v = secNomNode.getElementsByTagName('dValue')[0];
+            if (v) secondaryVal = parseFloat(v.textContent);
+        }
+
+        // --- B. LẤY SAI SỐ % TỪ <Deviation> ---
+        let errorVal = null;
+        const devNodes = card.getElementsByTagName('Deviation');
+        for (const devNode of devNodes) {
+            const unitNode = devNode.getElementsByTagName('bstrUnit')[0];
+            const valNode  = devNode.getElementsByTagName('dValue')[0];
+            if (unitNode && unitNode.textContent.trim() === '%' && valNode) {
+                const val = parseFloat(valNode.textContent);
+                if (!isNaN(val)) { errorVal = val; break; }
+            }
+        }
+
+        ratioMap[w] = { primaryVal, secondaryVal, errorVal };
+    }
+
+
+    // --- C. CẬP NHẬT GIAO DIỆN ---
+const numWindingsEl = document.getElementById('ti_num_windings');
+let needRender = false;
+
+if (numWindingsEl && maxWinding > 0) {
+    const currentW = parseInt(numWindingsEl.value) || 0;
+    if (maxWinding !== currentW) {
+        numWindingsEl.value = maxWinding;
+        needRender = true;
+    }
+}
+
+if (needRender && typeof renderRatioTable === 'function') {
+    renderRatioTable();
+}
+
+    setTimeout(() => {
+        Object.keys(ratioMap).forEach(wStr => {
+            const w = parseInt(wStr);
+            const data = ratioMap[w];
+            if (!data) return;
+
+            if (data.primaryVal !== null) {
+    const primSelect = document.getElementById(`ti_ratio_dm_w${w}_${phaId}`);
+    if (primSelect) {
+        primSelect.value = data.primaryVal;
+        primSelect.dispatchEvent(new Event('change'));
+    }
+}
+            if (data.secondaryVal !== null) {
+    const secSelect = document.getElementById(`ti_i2_dm_w${w}_${phaId}`);
+    if (secSelect) {
+        secSelect.value = data.secondaryVal;
+        secSelect.dispatchEvent(new Event('change'));
+    }
+}
+            if (data.errorVal !== null) {
+                const errInput = document.getElementById(`ti_err_w${w}_${phaId}`);
+                if (errInput) {
+                    errInput.value = data.errorVal;
+                    errInput.style.color = '#1565c0';
+                    errInput.style.fontWeight = 'bold';
+                    errInput.classList.add('new-data');
+                    errInput.dispatchEvent(new Event('input'));
+                }
+            }
+        });
+
+        if (typeof calculateRatio === 'function') {
+            for (let i = 1; i <= maxWinding; i++) calculateRatio(i, phaId);
+        }
+        
+console.log('✅ Đã nạp xong. Kiểm tra:');
+console.log('  ti_ratio_dm_w1_' + phaId + ' =', document.getElementById(`ti_ratio_dm_w1_${phaId}`)?.value);
+console.log('  ti_i2_dm_w1_' + phaId + ' =', document.getElementById(`ti_i2_dm_w1_${phaId}`)?.value);
+console.log('  ti_err_w1_' + phaId + ' =', document.getElementById(`ti_err_w1_${phaId}`)?.value);
+alert(`✅ Nạp dữ liệu Tỉ số biến thành công cho ${phaId} (${maxWinding} cuộn)!`);
+    }, 100);
+}
+
 
     // ============================================================
     // TÍNH TỈ SỐ BIẾN
     // ============================================================
     function calculateRatio(winding, pha, source = null) {
-        const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}`)?.value || "400";
-        const ratio_dm = parseFloat(ratioDmStr) || 400;
-        const accStr = document.getElementById(`ti_acc_w${winding}`)?.value || "0.5";
+    // Xác định pha để đọc đúng select
+    const phaKey = pha || 'A';
 
-        let accLimit = parseFloat(accStr) || 0.5;
-        if (accStr === "5P") accLimit = 5;
-        else if (accStr === "10P") accLimit = 10;
+    const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}_${phaKey}`)?.value || "400";
+    const i2DmStr = document.getElementById(`ti_i2_dm_w${winding}_${phaKey}`)?.value || "1";
 
-        const K_dm = ratio_dm;
-        const kdmEl = document.getElementById(`ti_kdm_w${winding}`);
-        if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
+    const ratio_dm = parseFloat(ratioDmStr) || 400;
+    const accStr = document.getElementById(`ti_acc_w${winding}_${phaKey}`)?.value || "0.5";
 
-        if (!pha) {
-            ['A', 'B', 'C'].forEach(p => {
-                const errEl = document.getElementById(`ti_err_w${winding}_${p}`);
-                const kdoEl = document.getElementById(`ti_kdo_w${winding}_${p}`);
-                if (!errEl || !kdoEl) return;
-                const error = parseFloat(errEl.value);
-                if (!isNaN(error)) {
-                    const K_do = K_dm * (1 + error / 100);
-                    kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
-                    const isPass = Math.abs(error) <= accLimit;
-                    if (errEl.classList.contains('new-data')) {
-                        errEl.style.color = isPass ? '#1565c0' : '#c62828';
-                        errEl.style.fontWeight = 'bold';
-                    }
-                    errEl.dataset.source = 'err';
-                } else {
-                    kdoEl.textContent = 'TSB: -';
-                    if (!errEl.classList.contains('new-data')) {
-                        errEl.style.color = '';
-                        errEl.style.fontWeight = '';
-                    }
-                    delete errEl.dataset.source;
+    let accLimit = parseFloat(accStr) || 0.5;
+    if (accStr === "5P") accLimit = 5;
+    else if (accStr === "10P") accLimit = 10;
+
+    const K_dm = ratio_dm/i2DmStr;
+    const kdmEl = document.getElementById(`ti_kdm_w${winding}_${phaKey}`);
+    if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
+
+    // Nếu không truyền pha → cập nhật cả 3 pha
+    if (!pha) {
+        ['A', 'B', 'C'].forEach(p => {
+            const errEl = document.getElementById(`ti_err_w${winding}_${p}`);
+            const kdoEl = document.getElementById(`ti_kdo_w${winding}_${p}`);
+            if (!errEl || !kdoEl) return;
+            const error = parseFloat(errEl.value);
+            if (!isNaN(error)) {
+                const K_do = K_dm * (1 + error / 100);
+                kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
+                const isPass = Math.abs(error) <= accLimit;
+                if (errEl.classList.contains('new-data')) {
+                    errEl.style.color = isPass ? '#1565c0' : '#c62828';
+                    errEl.style.fontWeight = 'bold';
                 }
-            });
-            return;
-        }
-
-        const errEl = document.getElementById(`ti_err_w${winding}_${pha}`);
-        const kdoEl = document.getElementById(`ti_kdo_w${winding}_${pha}`);
-        if (!errEl || !kdoEl) return;
-
-        const error = parseFloat(errEl.value);
-        if (!isNaN(error)) {
-            const K_do = K_dm * (1 + error / 100);
-            kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
-            const isPass = Math.abs(error) <= accLimit;
-            if (errEl.classList.contains('new-data')) {
-                errEl.style.color = isPass ? '#1565c0' : '#c62828';
-                errEl.style.fontWeight = 'bold';
+                errEl.dataset.source = 'err';
+            } else {
+                kdoEl.textContent = 'TSB: -';
+                if (!errEl.classList.contains('new-data')) {
+                    errEl.style.color = '';
+                    errEl.style.fontWeight = '';
+                }
+                delete errEl.dataset.source;
             }
-            errEl.dataset.source = 'err';
-        } else {
-            kdoEl.textContent = 'TSB: -';
-            if (!errEl.classList.contains('new-data')) {
-                errEl.style.color = '';
-                errEl.style.fontWeight = '';
-            }
-            delete errEl.dataset.source;
-        }
+        });
+        return;
     }
+
+    // Có pha cụ thể
+    const errEl = document.getElementById(`ti_err_w${winding}_${pha}`);
+    const kdoEl = document.getElementById(`ti_kdo_w${winding}_${pha}`);
+    if (!errEl || !kdoEl) return;
+
+    const error = parseFloat(errEl.value);
+    if (!isNaN(error)) {
+        const K_do = K_dm * (1 + error / 100);
+        kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
+        const isPass = Math.abs(error) <= accLimit;
+        if (errEl.classList.contains('new-data')) {
+            errEl.style.color = isPass ? '#1565c0' : '#c62828';
+            errEl.style.fontWeight = 'bold';
+        }
+        errEl.dataset.source = 'err';
+    } else {
+        kdoEl.textContent = 'TSB: -';
+        if (!errEl.classList.contains('new-data')) {
+            errEl.style.color = '';
+            errEl.style.fontWeight = '';
+        }
+        delete errEl.dataset.source;
+    }
+}
 
     // ============================================================
     // TỪ HÓA
     // ============================================================
-    function renderTuHoaTables() {
-        const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
-        const numWindingsEl = document.getElementById(prefix + 'num_windings');
-        const num = numWindingsEl ? parseInt(numWindingsEl.value) || 4 : 4;
-        const phases = [
-            { id: 'a', name: 'Pha A', color: '#fff9c4' },
-            { id: 'b', name: 'Pha B', color: '#ffebee' },
-            { id: 'c', name: 'Pha C', color: '#e3f2fd' }
-        ];
-        phases.forEach(pha => {
-            const container = document.getElementById(`table_tuhoa_${pha.id}_container`);
-            if (!container) return;
-            let html = `<table>
-                <thead>
-                    <tr>
-                        <th style="font-size:10px;">Cuộn / Đầu dây</th>
-                        <th style="font-size:10px;">Điện áp (3 giá trị)</th>
-                        <th style="font-size:10px;">Dòng điện (3 giá trị)</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-            for (let i = 1; i <= num; i++) {
-                html += `<tr>
-                    <td style="background:${pha.color};">
-                        <b>C${i}</b><br>
-                        <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:10px; padding:2px; text-align:center;">
-                    </td>
-                    <td style="padding:2px;">
-                        <div style="display:flex; flex-direction:column; gap:2px;">
-                            <input type="number" step="0.001" id="${prefix}th_${pha.id}_u1_${i}" placeholder="U1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                            <input type="number" step="0.001" id="${prefix}th_${pha.id}_u2_${i}" placeholder="U2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                            <input type="number" step="0.001" id="${prefix}th_${pha.id}_u3_${i}" placeholder="U3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                        </div>
-                    </td>
-                    <td style="padding:2px;">
-                        <div style="display:flex; flex-direction:column; gap:2px;">
-                            <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i1_${i}" placeholder="I1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                            <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i2_${i}" placeholder="I2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                            <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i3_${i}" placeholder="I3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:3px;">
-                        </div>
-                    </td>
-                </tr>`;
+    let currentTuHoaTab = 'a'; // Mặc định mở Tab Pha A
+
+// Hàm chuyển Tab an toàn (CSS hiển thị, không xóa DOM)
+function switchTuHoaTab(phaId) {
+    currentTuHoaTab = phaId;
+    ['a', 'b', 'c'].forEach(id => {
+        const wrapper = document.getElementById(`tuhoa_tab_content_${id}`);
+        if (wrapper) wrapper.style.display = (id === phaId) ? 'block' : 'none';
+        
+        const btn = document.getElementById(`btn_tab_tuhoa_${id}`);
+        if (btn) {
+            btn.style.background = (id === phaId) ? '#0288d1' : '#e0e0e0';
+            btn.style.color = (id === phaId) ? '#fff' : '#000';
+        }
+    });
+}
+
+// Render giao diện Tab và Bảng
+function renderTuHoaTables() {
+    const container = document.getElementById('table_tuhoa_main_container');
+    if (!container) return;
+    
+    const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
+    const numWindingsEl = document.getElementById(prefix + 'num_windings');
+    const num = numWindingsEl ? parseInt(numWindingsEl.value) || 4 : 4;
+    
+    const phases = [
+        { id: 'a', name: 'Pha A', color: '#fff9c4000' },
+        { id: 'b', name: 'Pha B', color: '#ffebee000' },
+        { id: 'c', name: 'Pha C', color: '#e3f2fd000' }
+    ];
+
+    // Vẽ thanh nút bấm Tab
+    let html = `<div style="display:flex; gap:8px; margin-bottom:12px;">`;
+    phases.forEach(pha => {
+        const isActive = (pha.id === currentTuHoaTab);
+        const bg = isActive ? '#0288d1' : '#e0e0e0';
+        const color = isActive ? '#fff' : '#000';
+        html += `<button id="btn_tab_tuhoa_${pha.id}" onclick="switchTuHoaTab('${pha.id}')" 
+                    style="padding:6px 16px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; background:${bg}; color:${color}; transition:0.3s;">
+                    ${pha.name}
+                 </button>`;
+    });
+    html += `</div>`;
+
+    // Vẽ nội dung 3 Tab
+    phases.forEach(pha => {
+        const isVisible = (pha.id === currentTuHoaTab) ? 'block' : 'none';
+        html += `<div id="tuhoa_tab_content_${pha.id}" style="display:${isVisible};">`;
+        html += `
+            <div style="display:flex; align-items:center; margin-bottom:6px;">
+                <b style="color:#1565c0; font-size:14px; margin-right:8px;">Bảng đo ${pha.name}</b>
+                <button type="button" title="Nạp file XML cho ${pha.name}" onclick="openTuHoaXml('${pha.id}', '${prefix}')"
+		style="width:160px; height:24px; line-height:22px; padding:0; border:none; border-radius:10%;  font-size:12px; cursor:pointer;">
+                    import XML
+
+                </button>
+            </div>
+            <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Cuộn / Đầu dây</th>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Điện áp (V) </th>
+                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Dòng điện (µA)</th>
+                </tr>
+            </thead>
+            <tbody>`;
+            
+        for (let i = 1; i <= num; i++) {
+            html += `<tr>
+                <td style="background:${pha.color}; text-align:center; border:1px solid #ccc; padding:4px;">
+                    <b style="font-size:11px;">Cuộn ${i}</b><br>
+                    <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:11px; padding:2px; text-align:center; width:90%; box-sizing:border-box;">
+                </td>
+                <td style="padding:8px; border:1px solid #ccc;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u1_${i}" placeholder="U1 (50%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u2_${i}" placeholder="U2 (75%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u3_${i}" placeholder="U3 (95%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                    </div>
+                </td>
+                <td style="padding:8px; border:1px solid #ccc;">
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i1_${i}" placeholder="I1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i2_${i}" placeholder="I2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i3_${i}" placeholder="I3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
+                    </div>
+                </td>
+            </tr>`;
+        }
+        html += `</tbody></table></div>`;
+    });
+    
+    container.innerHTML = html;
+}
+
+// Hàm mở cửa sổ chọn file XML
+function openTuHoaXml(phaId, prefix) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xml,application/xml,text/xml';
+    input.style.display = 'none';
+    input.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                processTuHoaXml(ev.target.result, phaId, prefix);
+            } catch (err) {
+                alert('❌ Lỗi đọc file XML: ' + err.message);
             }
-            html += `</tbody></table>`;
-            container.innerHTML = html;
+        };
+        reader.readAsText(file, 'UTF-8');
+    };
+    document.body.appendChild(input);
+    input.click();
+    setTimeout(() => document.body.removeChild(input), 1000);
+}
+
+// Xử lý nạp dữ liệu thẳng vào các thẻ Input
+function processTuHoaXml(xmlText, phaId, prefix) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, 'application/xml');
+    
+    if (xml.querySelector('parsererror')) throw new Error('File XML bị hỏng cấu trúc');
+    
+    const cards = xml.querySelectorAll('Cards_Item');
+    if (!cards.length) throw new Error('Không tìm thấy dữ liệu đo trong file XML');
+
+    let maxWinding = 0;
+    const cardMap = {};
+
+    cards.forEach(card => {
+        const nameEl = card.querySelector('bstrName');
+        const name = nameEl ? nameEl.textContent.trim() : '';
+        const m = name.match(/^(\d+)/); 
+        if (!m) return;
+        
+        const w = parseInt(m[1]);
+        if (w < 1 || w > 20) return;
+        if (w > maxWinding) maxWinding = w;
+
+        let vknee = null;
+        const vkneeEl = card.querySelector('Vknee > dValue');
+        if (vkneeEl) vknee = parseFloat(vkneeEl.textContent);
+
+        const points = [];
+        card.querySelectorAll('Results > Results_Item').forEach(item => {
+            const vEl = item.querySelector('V > dValue');
+            const iEl = item.querySelector('I > dValue');
+            if (!vEl || !iEl) return;
+
+            let v = parseFloat(vEl.textContent);
+            let i = parseFloat(iEl.textContent);
+            
+            const vMulti = item.querySelector('V > bstrMulti')?.textContent.trim().toLowerCase() || '';
+            const iMulti = item.querySelector('I > bstrMulti')?.textContent.trim().toLowerCase() || '';
+
+            if (vMulti === 'k') v *= 1000;
+            else if (vMulti === 'm') v /= 1000;
+
+            if (iMulti === 'u' || iMulti === 'µ' || iMulti === 'ua') i *= 1000; 
+            else if (iMulti === 'n' || iMulti === 'na') i *= 1;  
+            else if (iMulti !== 'm' && iMulti !== 'ma') i *= 0.001;  
+
+            if (isFinite(v) && isFinite(i)) points.push({ v, i });
         });
+
+        points.sort((a, b) => a.v - b.v);
+        cardMap[w] = { points, vknee };
+    });
+
+    // 1. Kiểm tra số cuộn và cập nhật tự động nếu thiếu
+    const numWindingsEl = document.getElementById(prefix + 'num_windings');
+    if (numWindingsEl) {
+        const currentW = parseInt(numWindingsEl.value) || 0;
+        if (maxWinding > currentW) {
+            numWindingsEl.value = maxWinding;
+            if (typeof changeWindingCount === 'function') {
+                changeWindingCount(); // Render lại HTML để tạo đủ các hàng input mới
+            }
+        }
     }
+
+    // 2. Trích xuất 3 điểm theo mốc 50%, 75%, 95% và BẮN THẲNG vào giao diện
+    setTimeout(() => { // Đợi DOM cập nhật xong nếu changeWindingCount vừa chạy
+        Object.keys(cardMap).forEach(wStr => {
+            const w = parseInt(wStr);
+            const card = cardMap[w];
+            
+            const three = pickThreePointsTuHoa(card.points, card.vknee);
+            if (!three) return;
+
+            // Bắn trực tiếp dữ liệu vào ô
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = val;
+                    el.dispatchEvent(new Event('input')); // Kích hoạt sự kiện để tính toán lại
+                }
+            };
+
+            setVal(`${prefix}th_${phaId}_u1_${w}`, round(three[0].v, 2));
+            setVal(`${prefix}th_${phaId}_i1_${w}`, round(three[0].i, 4));
+            
+            setVal(`${prefix}th_${phaId}_u2_${w}`, round(three[1].v, 2));
+            setVal(`${prefix}th_${phaId}_i2_${w}`, round(three[1].i, 4));
+            
+            setVal(`${prefix}th_${phaId}_u3_${w}`, round(three[2].v, 2));
+            setVal(`${prefix}th_${phaId}_i3_${w}`, round(three[2].i, 4));
+        });
+    }, 50);
+}
+
+// Chọn 3 điểm với tỷ lệ: 50%, 75%, 95%
+function pickThreePointsTuHoa(points, vknee) {
+    if (!points || points.length < 3) return null;
+
+    let vref = vknee;
+    if (!vref || !isFinite(vref) || vref <= 0) {
+        vref = points[points.length - 1].v;
+    }
+
+    const targets = [0.50, 0.75, 0.95].map(r => r * vref); // <-- Đã sửa mốc tỷ lệ
+    const used = new Set();
+    const result = [];
+
+    targets.forEach(t => {
+        let best = null, bestDiff = Infinity;
+        points.forEach((p, idx) => {
+            if (used.has(idx)) return;
+            const diff = Math.abs(p.v - t);
+            if (diff < bestDiff) { bestDiff = diff; best = { p, idx }; }
+        });
+        if (best) {
+            used.add(best.idx);
+            result.push(best.p);
+        }
+    });
+
+    result.sort((a, b) => a.v - b.v);
+    return result.length === 3 ? result : null;
+}
+
+function round(x, digits) {
+    const f = Math.pow(10, digits);
+    return Math.round(x * f) / f;
+}
 
     // ============================================================
     // Tgδ
@@ -796,9 +1240,9 @@
 
         // Tỉ số biến
         const numWindings = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-        for (let i = 1; i <= numWindings; i++) {
-            calculateRatio(i);
-        }
+for (let i = 1; i <= numWindings; i++) {
+    ['A', 'B', 'C'].forEach(p => calculateRatio(i, p));
+}
 
         // Tgδ
         const insulation = document.getElementById('ti_insulation').value;

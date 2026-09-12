@@ -1404,6 +1404,24 @@ function exportWordTI() {
     const customPayload = {};
     const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
     
+    // --- 1. LẤY THÔNG TIN ĐỊNH DANH (TRẠM, NGĂN LỘ, NGÀY) ---
+    const tramSelect = document.getElementById('info_tram');
+    if (tramSelect && tramSelect.selectedIndex > -1) {
+        // Lấy tên hiển thị của Trạm (VD: "Trạm 220kV Cai Lậy")
+        const tramText = tramSelect.options[tramSelect.selectedIndex].text;
+        customPayload["info_tram"] = tramText;
+        customPayload["tram"] = tramText; // Backup nếu file Word dùng thẻ {{tram}}
+    }
+    
+    const nganLoVal = document.getElementById('info_nganlo') ? document.getElementById('info_nganlo').value : '';
+    customPayload["info_nganlo"] = nganLoVal;
+    customPayload["nganlo"] = nganLoVal; // Backup nếu file Word dùng thẻ {{nganlo}}
+    
+    const ngayVal = document.getElementById('info_ngay') ? document.getElementById('info_ngay').value : '';
+    customPayload["info_ngay"] = ngayVal;
+    customPayload["ngay"] = ngayVal;
+
+    // --- 2. CẤU HÌNH SỐ CUỘN ---
     const numWindingsEl = document.getElementById(prefix + 'num_windings');
     const num_windings = numWindingsEl ? numWindingsEl.value : "4";
     

@@ -1404,27 +1404,20 @@ function exportWordTI() {
     const customPayload = {};
     const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
     
-    // --- 1. LẤY THÔNG TIN ĐỊNH DANH (TRẠM, NGĂN LỘ, NGÀY) ---
+    // --- 1. ĐỊNH DANH (Bắt buộc) ---
     const tramSelect = document.getElementById('info_tram');
     if (tramSelect && tramSelect.selectedIndex > -1) {
-        // Lấy tên hiển thị của Trạm (VD: "Trạm 220kV Cai Lậy")
         const tramText = tramSelect.options[tramSelect.selectedIndex].text;
         customPayload["info_tram"] = tramText;
-        customPayload["tram"] = tramText; // Backup nếu file Word dùng thẻ {{tram}}
+        customPayload["tram"] = tramText;
     }
-    
     const nganLoVal = document.getElementById('info_nganlo') ? document.getElementById('info_nganlo').value : '';
     customPayload["info_nganlo"] = nganLoVal;
-    customPayload["nganlo"] = nganLoVal; // Backup nếu file Word dùng thẻ {{nganlo}}
-    
-    const ngayVal = document.getElementById('info_ngay') ? document.getElementById('info_ngay').value : '';
-    customPayload["info_ngay"] = ngayVal;
-    customPayload["ngay"] = ngayVal;
+    customPayload["nganlo"] = nganLoVal;
+    customPayload["ngay"] = document.getElementById('info_ngay') ? document.getElementById('info_ngay').value : '';
 
     // --- 2. CẤU HÌNH SỐ CUỘN ---
-    const numWindingsEl = document.getElementById(prefix + 'num_windings');
-    const num_windings = numWindingsEl ? numWindingsEl.value : "4";
-    
+    const num_windings = document.getElementById(prefix + 'num_windings') ? document.getElementById(prefix + 'num_windings').value : "4";
     customPayload["is_2wind"] = (num_windings === "2");
     customPayload["is_3wind"] = (num_windings === "3");
     customPayload["is_4wind"] = (num_windings === "4");
@@ -1432,7 +1425,37 @@ function exportWordTI() {
     customPayload["is_6wind"] = (num_windings === "6");
     customPayload["is_7wind"] = (num_windings === "7");
     customPayload["is_8wind"] = (num_windings === "8");
-    
+
+    // --- 3. LỰA CHỌN CHẾ ĐỘ XUẤT (Không ảnh hưởng common.js) ---
+    // Hiển thị popup hỏi người dùng chọn Mode 1 hay Mode 2
+    const includeOldData = confirm("CHẾ ĐỘ XUẤT WORD:\n\n- Bấm 'OK': Xuất dữ liệu nhập + Số liệu cũ (từ Placeholder)\n- Bấm 'Cancel': CHỈ xuất dữ liệu thực tế vừa nhập");
+
+    if (includeOldData) {
+        // Quét toàn bộ thẻ input trong form
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.id && input.id.startsWith(prefix)) {
+                const key = input.id.substring(prefix.length); // Cắt bỏ tiền tố 'ti_'
+                
+                // Nếu ô trống, ta xét lấy placeholder
+                if (input.value === "" && input.placeholder) {
+                    const ph = input.placeholder.trim();
+                    
+                    // Bộ lọc: Bỏ qua các placeholder mặc định của form (chứa ký tự đặc biệt hoặc chữ hướng dẫn)
+                    const isDefaultFormText = ph.includes('±') || ph.includes('%') || ph.includes('Ω') || 
+                                              ph.includes('Ví dụ') || ph.includes('Nhập') || ph.includes('Đo') || 
+                                              ph.includes('U') || ph.includes('I') || ph === "";
+                    
+                    // Nếu không phải text mặc định -> Đích thị là số liệu cũ load về -> Bơm vào Word
+                    if (!isDefaultFormText) {
+                        customPayload[key] = ph;
+                    }
+                }
+            }
+        });
+    }
+
+    // Gọi thư viện xuất Word (customPayload sẽ tự động đè lên dữ liệu quét mặc định)
     exportWordFromDrive(customPayload);
 }
 </script>

@@ -283,14 +283,21 @@
 
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
-            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
-    <div style="display:flex; gap:8px; margin-top:8px;">
-        <button class="btn-action" onclick="exportWordTI(false)" style="background:#0288d1; margin:0;">📝 Xuất BB (Chỉ nhập)</button>
-        <button class="btn-action" onclick="exportWordTI(true)" style="background:#f57c00; margin:0;">📝 Xuất BB (Kèm số cũ)</button>
-    </div>
+<div style="display:flex; gap:8px; margin-top:8px;">
+
+			<button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
             <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
+</div>
+
+
+<div style="display:flex; gap:8px; margin-top:8px;">
+<button class="btn-action" onclick="exportWordTI(false)" style="background:#0288d1; margin:0;">📝 Xuất BB (Chỉ nhập)</button>
+<button class="btn-action" onclick="exportWordTI(true)" style="background:#f57c00; margin:0;">📝 Xuất BB (Kèm số cũ)</button>
+</div>
             <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Reset Form</button>
         </div>
+
+
     </div> <!-- HẾT KHU VỰC KHÓA -->
 </div> <!-- HẾT CONTAINER -->
 
@@ -594,6 +601,7 @@ saveRatioValues();
             html += `<tr>
                 <td style="background:${pha.color}; border:1px solid #ccc; text-align:center; padding:6px;">
                     <b style="font-size:12px; color:#d84315000;">Cuộn ${i}</b>
+                    <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:11px; padding:2px; text-align:center; width:90%; box-sizing:border-box;">
                 </td>
                 <td style="background:${pha.color}; border:1px solid #ccc; padding:4px;">
                     <div style="display:flex; flex-direction:column; gap:4px;">
@@ -803,36 +811,44 @@ alert(`✅ Nạp dữ liệu Tỉ số biến thành công cho ${phaId} (${maxWi
     // ============================================================
     // TÍNH TỈ SỐ BIẾN
     // ============================================================
-    function calculateRatio(winding, pha, source = null) {
-    // Xác định pha để đọc đúng select
-    const phaKey = pha || 'A';
+function calculateRatio(winding, pha, source = null) {
+        // 💡 Thuật toán gộp: Nếu truyền pha cụ thể thì tính 1 pha, không truyền thì tự động tính cả 3 pha
+        const phases = pha ? [pha] : ['A', 'B', 'C'];
 
-    const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}_${phaKey}`)?.value || "400";
-    const i2DmStr = document.getElementById(`ti_i2_dm_w${winding}_${phaKey}`)?.value || "1";
+        phases.forEach(p => {
+            // Lấy thông số định mức độc lập theo TỪNG PHA
+            const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}_${p}`)?.value || "400";
+            const i2DmStr = document.getElementById(`ti_i2_dm_w${winding}_${p}`)?.value || "1";
+            const ratio_dm = parseFloat(ratioDmStr) || 400;
+            const accStr = document.getElementById(`ti_acc_w${winding}_${p}`)?.value || "0.5";
 
-    const ratio_dm = parseFloat(ratioDmStr) || 400;
-    const accStr = document.getElementById(`ti_acc_w${winding}_${phaKey}`)?.value || "0.5";
+            let accLimit = parseFloat(accStr) || 0.5;
+            if (accStr === "5P") accLimit = 5;
+            else if (accStr === "10P") accLimit = 10;
 
-    let accLimit = parseFloat(accStr) || 0.5;
-    if (accStr === "5P") accLimit = 5;
-    else if (accStr === "10P") accLimit = 10;
+            const K_dm = ratio_dm / parseFloat(i2DmStr);
 
-    const K_dm = ratio_dm/i2DmStr;
-    const kdmEl = document.getElementById(`ti_kdm_w${winding}_${phaKey}`);
-    if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
+            const kdmEl = document.getElementById(`ti_kdm_w${winding}_${p}`);
+            if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
 
-    // Nếu không truyền pha → cập nhật cả 3 pha
-    if (!pha) {
-        ['A', 'B', 'C'].forEach(p => {
             const errEl = document.getElementById(`ti_err_w${winding}_${p}`);
             const kdoEl = document.getElementById(`ti_kdo_w${winding}_${p}`);
             if (!errEl || !kdoEl) return;
-            const error = parseFloat(errEl.value);
+
+            // 💡 CHÌA KHÓA: Ưu tiên lấy value thật, nếu rỗng thì vét số mờ ở placeholder lên
+            let errValStr = errEl.value;
+            if (errValStr === "" && errEl.placeholder && errEl.placeholder !== "± %") {
+                errValStr = errEl.placeholder;
+            }
+
+            const error = parseFloat(errValStr);
             if (!isNaN(error)) {
                 const K_do = K_dm * (1 + error / 100);
                 kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
+                
                 const isPass = Math.abs(error) <= accLimit;
-                if (errEl.classList.contains('new-data')) {
+                // Tô màu xanh/đỏ cho cả số mới nhập và số mờ lịch sử
+                if (errEl.classList.contains('new-data') || errEl.dataset.dataType) {
                     errEl.style.color = isPass ? '#1565c0' : '#c62828';
                     errEl.style.fontWeight = 'bold';
                 }
@@ -846,33 +862,7 @@ alert(`✅ Nạp dữ liệu Tỉ số biến thành công cho ${phaId} (${maxWi
                 delete errEl.dataset.source;
             }
         });
-        return;
     }
-
-    // Có pha cụ thể
-    const errEl = document.getElementById(`ti_err_w${winding}_${pha}`);
-    const kdoEl = document.getElementById(`ti_kdo_w${winding}_${pha}`);
-    if (!errEl || !kdoEl) return;
-
-    const error = parseFloat(errEl.value);
-    if (!isNaN(error)) {
-        const K_do = K_dm * (1 + error / 100);
-        kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
-        const isPass = Math.abs(error) <= accLimit;
-        if (errEl.classList.contains('new-data')) {
-            errEl.style.color = isPass ? '#1565c0' : '#c62828';
-            errEl.style.fontWeight = 'bold';
-        }
-        errEl.dataset.source = 'err';
-    } else {
-        kdoEl.textContent = 'TSB: -';
-        if (!errEl.classList.contains('new-data')) {
-            errEl.style.color = '';
-            errEl.style.fontWeight = '';
-        }
-        delete errEl.dataset.source;
-    }
-}
 
     // ============================================================
     // TỪ HÓA
@@ -1227,11 +1217,20 @@ function round(x, digits) {
             });
         }
 
-        // RDC
+// RDC
         for(let i=1; i<=num; i++) {
             ['a', 'b', 'c'].forEach(p => {
-                const mVal = parseFloat(document.getElementById(`ti_rdc_m_${i}_${p}`)?.value) || 0;
+                const el = document.getElementById(`ti_rdc_m_${i}_${p}`);
+                
+                // 💡 CHÌA KHÓA: Nếu value trống, lấy từ placeholder (bỏ chữ mặc định 'Ω')
+                let mValStr = el ? el.value : "";
+                if (mValStr === "" && el && el.placeholder && el.placeholder !== "Ω") {
+                    mValStr = el.placeholder;
+                }
+                
+                const mVal = parseFloat(mValStr) || 0;
                 const el75 = document.getElementById(`ti_rdc_75_${i}_${p}`);
+                
                 if(mVal > 0) {
                     const r75 = mVal * ((235 + 75) / (235 + temp));
                     if(el75) el75.innerText = `75°C: ${r75.toFixed(4)} Ω`;
@@ -1403,24 +1402,30 @@ for (let i = 1; i <= numWindings; i++) {
             }
         }
     }
+
+
+
 function exportWordTI(includeOldData = false) {
-    const customPayload = {};
-    const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
+    const prefixLocal = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
     
-    // --- 1. ĐỊNH DANH ---
+    // 🔑 Truyền cờ includeOld qua customPayload
+    const customPayload = { _includeOld: includeOldData };
+
+    // --- Định danh ---
     const tramSelect = document.getElementById('info_tram');
     if (tramSelect && tramSelect.selectedIndex > -1) {
         const tramText = tramSelect.options[tramSelect.selectedIndex].text;
         customPayload["info_tram"] = tramText;
         customPayload["tram"] = tramText;
     }
-    const nganLoVal = document.getElementById('info_nganlo') ? document.getElementById('info_nganlo').value : '';
+    const nganLoVal = document.getElementById('info_nganlo')?.value || '';
     customPayload["info_nganlo"] = nganLoVal;
     customPayload["nganlo"] = nganLoVal;
-    customPayload["ngay"] = document.getElementById('info_ngay') ? document.getElementById('info_ngay').value : '';
+    customPayload["ngay"] = document.getElementById('info_ngay')?.value || '';
 
-    // --- 2. CẤU HÌNH SỐ CUỘN ---
-    const num_windings = document.getElementById(prefix + 'num_windings') ? document.getElementById(prefix + 'num_windings').value : "4";
+    // --- Cấu hình số cuộn (nếu module có) ---
+    const numWindingsEl = document.getElementById(prefixLocal + 'num_windings');
+    const num_windings = numWindingsEl ? numWindingsEl.value : "";
     customPayload["is_2wind"] = (num_windings === "2");
     customPayload["is_3wind"] = (num_windings === "3");
     customPayload["is_4wind"] = (num_windings === "4");
@@ -1429,33 +1434,8 @@ function exportWordTI(includeOldData = false) {
     customPayload["is_7wind"] = (num_windings === "7");
     customPayload["is_8wind"] = (num_windings === "8");
 
-    // --- 3. LỌC SỐ LIỆU CŨ (Nếu bấm nút màu cam) ---
-    if (includeOldData) {
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            if (input.id && input.id.startsWith(prefix)) {
-                const key = input.id.substring(prefix.length); 
-                
-                // Nếu ô trống và có placeholder
-                if (input.value === "" && input.placeholder) {
-                    const ph = input.placeholder.trim();
-                    
-                    // Bỏ qua các placeholder text mặc định của form
-                    const isDefaultFormText = ph.includes('±') || ph.includes('%') || ph.includes('Ω') || 
-                                              ph.includes('Ví dụ') || ph.includes('Nhập') || ph.includes('Đo') || 
-                                              ph.includes('Serial') || ph.includes('U') || ph.includes('I') || ph === "";
-                    
-                    if (!isDefaultFormText) {
-                        customPayload[key] = ph;
-                    }
-                }
-            }
-        });
-    }
-
     exportWordFromDrive(customPayload);
 }
-
 </script>
 </body>
 </html>

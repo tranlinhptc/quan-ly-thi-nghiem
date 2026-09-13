@@ -192,7 +192,13 @@ function showHistoryModal(dataArray) {
         div.className = 'history-item';
         const modeMap = { "new": "Mới", "1yr": "Sau 1 năm", "3yr": "Sau 3 năm", "6yr": "Sau 6 năm", "boost": "Tăng cường" };
         const modeText = modeMap[row[prefix + 'mode']] || row[prefix + 'mode'] || 'Không ghi nhận';
-        div.innerHTML = `<div class="history-date">📅 Ngày: ${row.ngayTN || '?'}</div><div class="history-person" style="color: #0288d1; font-weight: bold;">⚙️ Chế độ: ${modeText}</div>`;
+<!--thêm1.1     -->
+const ghichuBs = row[prefix + 'ghichubs'] || '';
+        div.innerHTML = `<div class="history-date">📅 Ngày: ${row.ngayTN || '?'}</div>
+	<div class="history-person" style="color: #0288d1; font-weight: bold;">⚙️ Chế độ: ${modeText}</div>
+<!--thêm1.2     -->
+${ghichuBs ? `<div class="history-person" style="color: #666; font-style: italic;">📝 Ghi chú: ${ghichuBs}</div>` : ''}
+`;
         div.onclick = () => applyHistoryData(index);
         listDiv.appendChild(div);
     });
@@ -349,18 +355,28 @@ function syncOneDrive() {
         nguoiTN: nguoiDo || ""
     };
 
-    document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
-        let value = "";
-        if (el.tagName === "INPUT") {
-            value = el.value.trim() || el.value.trim();
-        } else if (el.tagName === "SELECT") {
-            value = el.value;
-        } else {
-            value = el.value;
-        }
-        value = value ? value.replace("75°C:", "").replace("ms", "").trim() : "";
-        if (value && value !== '-' && value !== 'NaN' && value !== '0') payload[el.id] = value;
-    });
+document.querySelectorAll(
+    `input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"], span[id^="${prefix}"]`
+).forEach(el => {
+    let value = "";
+    if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        value = el.value.trim();
+    } else if (el.tagName === "SELECT") {
+        value = el.value;
+    } else if (el.tagName === "SPAN") {
+        value = el.textContent.trim();
+    }
+    value = value
+        ? value
+            .replace("75°C:", "")
+            .replace("TSB:", "")
+            .replace("Ratio:", "")
+            .replace("Ω", "")
+            .replace("ms", "")
+            .trim()
+        : "";
+    if (value && value !== '-' && value !== 'NaN' && value !== '0') payload[el.id] = value;
+});
 
     const formData = new FormData();
     formData.append('payload', JSON.stringify(payload));
@@ -391,19 +407,23 @@ async function exportWordFromDrive(customPayload = {}) {
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
 
+        // 🔑 Lấy cờ includeOld ra khỏi customPayload (không gửi vào template)
+        const includeOld = customPayload._includeOld === true;
+        delete customPayload._includeOld;
+
         const payload = {};
         payload[prefix + 'tram'] = document.getElementById('info_tram').value || "";
         payload[prefix + 'nganlo'] = document.getElementById('info_nganlo').value || "";
         payload["ngayTN"] = document.getElementById('info_ngay').value || "";
         payload["nguoiTN"] = "";
 
-        // Quét toàn bộ input/select có tiền tố của module hiện tại (mc_, ti_,...)
-        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"]`).forEach(el => {
-            let val = getVal(el.id);
-            payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
+        // 🔑 Dùng getValSmart thay vì getVal
+        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], span[id^="${prefix}"]`).forEach(el => {
+            let val = getValSmart(el.id, includeOld);
+            payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").replace("TSB:", "").replace("Ω", "").trim() : "";
         });
 
-        // 🟢 Bổ sung các cấu hình/công tắc riêng biệt do module truyền vào (nếu có)
+        // Gộp customPayload (is_2wind, is_3wind, is_sec1, ...)
         Object.assign(payload, customPayload);
 
         if (payload["ngayTN"]) {
@@ -414,25 +434,27 @@ async function exportWordFromDrive(customPayload = {}) {
         const zip = new PizZip(bytes.buffer);
         const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
         doc.render(payload);
-        
-        const out = doc.getZip().generate({ 
+
+        const out = doc.getZip().generate({
             type: "blob",
             mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            compression: "DEFLATE" 
+            compression: "DEFLATE"
         });
 
         const dateStr = payload["ngayTN"] ? payload["ngayTN"].replace(/\//g, '-') : "New";
         const tramStr = payload[prefix + 'tram'] ? payload[prefix + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
         const nganLoStr = payload[prefix + 'nganlo'] ? payload[prefix + 'nganlo'].replace(/[\/\\]/g, '-') : "NL";
         const wordPrefix = prefix.replace('_', '').toUpperCase();
-        
         saveAs(out, `Bien ban thi nghiem ${wordPrefix}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
+
         hideLoading();
     } catch (e) {
         hideLoading();
         alert("❌ Lỗi xuất Word: " + e.message);
     }
 }
+
+
 
 // ============================================================
 // 7. HÀM ĐIỀU HƯỚNG TAB
@@ -580,4 +602,55 @@ function getVal(id) {
         return (el.value && el.value.trim() !== "") ? el.value : (el.placeholder || "");
     }
     return el.value || "";
+}
+
+// ============================================================
+// 9. 🎯 HÀM MỚI: getValSmart — PHÂN BIỆT 3 LOẠI DỮ LIỆU
+// ============================================================
+/**
+ * Lấy giá trị thông minh theo NGỮ CẢNH xuất Word:
+ * 
+ * @param {string} id - ID của input
+ * @param {boolean} includeOld - 
+ *     false = CHỈ LẤY loại 01 (người dùng nhập / tính toán ra)
+ *     true  = LẤY loại 01 + loại 02 (placeholder từ lịch sử), BỎ loại 03
+ * 
+ * @returns {string}
+ * 
+ * CƠ CHẾ:
+ *   - Loại 01: value có sẵn → luôn lấy (dù includeOld = true/false)
+ *   - Loại 02: value rỗng + placeholder có sẵn + có dataset.dataType ∈ {latest, history}
+ *              → chỉ lấy khi includeOld = true
+ *   - Loại 03: value rỗng + placeholder có sẵn + KHÔNG có dataset.dataType
+ *              → KHÔNG BAO GIỜ lấy
+ */
+function getValSmart(id, includeOld = false) {
+    const el = document.getElementById(id);
+    if (!el) return "";
+
+    // SPAN/DIV → lấy innerText (các ô tính toán tự động như R75, đánh giá ĐẠT/LỖI)
+    if (el.tagName === "SPAN" || el.tagName === "DIV") {
+        const txt = (el.innerText || "").trim();
+        return (txt === "-" || txt === "NaN") ? "" : txt;
+    }
+
+    // 1️⃣ Ưu tiên value (loại 01 — người dùng nhập)
+    const val = (el.value || "").trim();
+    if (val !== "" && val !== "-" && val !== "NaN" && val !== "0") {
+        return val;
+    }
+
+    // 2️⃣ Nếu KHÔNG includeOld → dừng, trả rỗng (bỏ hết placeholder)
+    if (!includeOld) return "";
+
+    // 3️⃣ includeOld = true: chỉ lấy placeholder KHI có cờ dataset.dataType
+    //    Đây là dấu hiệu chắc chắn placeholder đến từ lịch sử (loại 02)
+    const dt = el.dataset ? el.dataset.dataType : null;
+    if (dt === "latest" || dt === "history") {
+        const ph = (el.placeholder || "").trim();
+        return (ph === "-" || ph === "NaN" || ph === "0") ? "" : ph;
+    }
+
+    // 4️⃣ Mọi placeholder khác (loại 03 - form sinh ra) → BỎ QUA
+    return "";
 }

@@ -1,1441 +1,656 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIẾN DÒNG ĐIỆN</title>
-
-    <link rel="stylesheet" href="fun/common.css">
-
-    <!-- Cụm thư viện xuất Word chuẩn gốc -->
-    <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
-    <style>
-        :root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
-               background: url('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
-               background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
-        .container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .header-bar h2 { font-size: 15px; margin: 0; }
-        .btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
-        
-        .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-        .card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
-        input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
-        input:focus, select:focus { outline: none; border-color: var(--primary); }
-        
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
-        th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
-        th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
-        
-        .sub-val { font-size: 10px; color: #1565c0; font-weight: 600; margin-top: 2px; display: block; }
-        .chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
-        .btn-view-old { background: #0288d1; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
-        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 15px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 4px 0; width: 100%; }
-        .btn-cloud { background: #2e7d32; }
-        .btn-draft { background: #0288d1; }
-        .btn-clear { background: #757575; font-size:11px; margin-top:4px; }
-        .pass { color: #2e7d32; font-weight: bold; }
-        .fail { color: #c62828; font-weight: bold; }
-        .note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
-        .hidden-section { display: none !important; }
-
-        /* Popups & Loading */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
-        .history-item { padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #fafafa; }
-        .history-item:hover { background: #fbe9e7; border-color: var(--primary); transform: scale(1.02); }
-        .history-date { font-weight: bold; color: #d84315; font-size: 14px; }
-        .history-person { font-size: 12px; color: #666; margin-top: 4px; }
-        .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        /*.loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }*/
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-
-        .bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
-        .err-box { background: #ffebee; border: 1px solid #ef5350; border-radius: 4px; padding: 2px; margin-top: 2px;}
-
-        /* CSS KHÓA FORM */
-        .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
-        #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
-
-        /* Style cho U₂ L1/L2 dọc */
-        .u2-input-group { display: flex; flex-direction: column; gap: 2px; width: 100%; }
-        .u2-input-group input { font-size: 11px; background: #fff; width: 100%; padding: 2px 4px; border: 1px solid var(--border); border-radius: 3px; text-align: center; }
-        .u2-input-group input:focus { border-color: var(--primary); outline: none; }
-        .u2-avg-display { font-size: 9px; color: #1565c0; text-align: center; font-weight: bold; }
-    </style>
-
-</head>
-
-<body>
-
-<!-- Giao diện Popup -->
-<div id="historyModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-title">⏱ LỊCH SỬ THÍ NGHIỆM</div>
-        <div style="font-size: 12px; color: #666; margin-bottom: 10px; text-align:center;">Chọn để điền mờ (Placeholder) số liệu cũ đối chiếu</div>
-        <div id="historyList"></div>
-        <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
-    </div>
-</div>
-
-<div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
-    <div class="loader"></div>
-    <div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...</div>
-</div>
-
-<div class="container">
-    <div class="header-bar">
-        <h2>⚡ THỬ NGHIỆM BIẾN DÒNG ĐIỆN (CT/TI)</h2>
-        <a href="index.html" class="btn-back">← Trang Chủ</a>
-    </div>
-
-    <!-- 0. KHU VỰC BẮT BUỘC (ĐỊNH DANH) -->
-    <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
-        <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
-        <div class="grid">
-            <div class="form-group">
-                <label>Trạm (Lấy từ hệ thống): <span style="color:red">*</span></label>
-                <select id="info_tram" onchange="checkUnlockForm()">
-                    <option value="" disabled selected>Đang tải ...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ngăn Lộ / Chỉ danh: <span style="color:red">*</span></label>
-                <input type="text" id="info_nganlo" placeholder="Ví dụ: 271, 131..." oninput="checkUnlockForm()">
-            </div>
-            <div class="form-group">
-                <label>Ngày Thí Nghiệm:</label>
-                <input type="date" id="info_ngay" onchange="checkUnlockForm()">
-            </div>
-        </div>
-        <div id="unlock_message">⚠️ Vui lòng chọn Trạm và gõ Ngăn lộ để mở khóa Form nhập liệu!</div>
-    </div>
-
-    <!-- KHU VỰC BỊ KHÓA (SẼ MỞ KHI ĐỦ ĐIỀU KIỆN) -->
-    <!-- [SỬA] THÊM DẤU < VÀO ĐÂY -->
-    <!--div id="locked_zone" class="form-locked"-->
-        <!-- 0. CẤU HÌNH ĐỘNG -->
-        <div class="card">
-            <div class="card-title"><span>CẤU HÌNH THIẾT BỊ</span>
-                <button class="btn-view-old" style="background:#f57c00; margin-right: 5px;" onclick="loadLatestData()">⚡Tất cả kết quả mới nhất</button>
-                <button class="btn-view-old" onclick="loadOldDataSection()">👁️ Lịch sử</button>
-            </div>
-            <div class="grid">
-                <div class="form-group">
-                    <label>Chế Độ Thí Nghiệm:</label>
-                    <select id="ti_mode" onchange="calculateAll()">
-                        <option value="new" selected>Mới / Sau lắp đặt</option>
-                        <option value="1yr">Sau 1 năm vận hành</option>
-                        <option value="3yr">Sau 3 năm vận hành</option>
-                        <option value="6yr">Sau 6 năm vận hành</option>
-                        <option value="boost">Thí nghiệm tăng cường</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Hiệu:</label>
-                    <select id="ti_mfg" onchange="calculateAll()">
-                        <option value="ABB">ABB (R_CĐ nhị thứ ≥ 5 MΩ)</option>
-                        <option value="Sieyun">Sieyun TYD (R_CĐ nhị thứ ≥ 1000 MΩ)</option>
-                        <option value="Areva">Areva (R_CĐ nhị thứ ≥ 50 MΩ)</option>
-                        <option value="Alstom">Alstom (R_CĐ nhị thứ ≥ 25 MΩ)</option>
-                        <option value="GE">GE (R_CĐ nhị thứ ≥ 50 MΩ)</option>
-                        <option value="Other" selected>Hãng khác (R_CĐ nhị thứ > 200 MΩ)</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Kiểu (Type):</label><input type="text" id="ti_kieu" placeholder="LTB145"></div>
-                <div class="form-group"><label>Năm SX:</label><input type="number" id="ti_namsx" placeholder="2020"></div>
-                <div class="form-group"><label>Uđm (kV):</label><input type="number" id="ti_udm" placeholder="245"></div>
-                <div class="form-group"><label>No:</label><input type="text" id="ti_no" placeholder="Serial:"></div>
-                <div class="form-group"><label>Công suất:</label><input type="text" id="ti_csuat" placeholder="50/50"></div>
-                <div class="form-group"><label>Điện dung (pF) (Type):</label><input type="number" id="ti_ddung" placeholder="4400"></div>
-                <div class="form-group">
-                    <label>Vật Liệu Cách Điện:</label>
-                    <select id="ti_insulation" onchange="calculateAll()">
-                        <option value="paper" selected>Loại Giấy (Mới ≤0.5%, Cũ ≤0.8%)</option>
-                        <option value="paper_film_paper">Giấy-Film-Giấy (Mới ≤0.2%, Cũ ≤0.3%)</option>
-                        <option value="film_paper_film">Film-Giấy-Film (Mới ≤0.2%, Cũ ≤0.3%)</option>
-                        <option value="film">Loại Film (Mới ≤0.1%, Cũ ≤0.15%)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Số Cuộn:</label>
-                    <select id="ti_num_windings" onchange="changeWindingCount()">
-                        <option value="2">2 Cuộn</option>
-                        <option value="3">3 Cuộn</option>
-                        <option value="4" selected>4 Cuộn</option>
-                        <option value="5">5 Cuộn</option>
-                        <option value="6">6 Cuộn</option>
-                        <option value="7">7 Cuộn</option>
-                        <option value="8">8 Cuộn</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Nhiệt độ MT (°C):</label>
-                    <input type="number" id="ti_temp" value="" oninput="calculateAll()">
-                </div>
-                <div class="form-group">
-                    <label>Độ ẩm (%):</label>
-                    <input type="number" id="ti_humidity" value="" oninput="calculateAll()">
-                </div>
-                <div class="form-group">
-                    <label>Ghi chú:</label>
-                    <input type="text" id="ti_ghichu" placeholder="Nhập ghi chú nếu cần">
-                </div>
-            </div>
-        </div>
-
-        <!-- 1. KIỂM TRA BÊN NGOÀI -->
-        <div class="card" style="display:none">
-            <div class="card-title">
-                <span>1. Kiểm Tra Bên Ngoài</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec1" class="table-responsive hidden-section">
-                <input type="text" id="ti_visual" value="Bình thường, sứ không nứt vỡ, không rò rỉ dầu.">
-            </div>
-        </div>
-
-        <!-- 2. ĐIỆN TRỞ MỘT CHIỀU NHỊ THỨ -->
-        <div class="card">
-            <div class="card-title">
-                <span>1. R Một Chiều [Ω]</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec2" class="table-responsive hidden-section">
-                <div class="note-text">* TI động quy đổi 75°C và đánh giá NGAY KHI NHẬ.</div>
-                <div class="table-responsive" id="table_rdc_container"></div>
-            </div>
-        </div>
-
-        <!-- 3. ĐO ĐIỆN TRỞ CÁCH ĐIỆN -->
-        <div class="card">
-            <div class="card-title">
-                <span>2. Cách Điện [MΩ]</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec3" class="table-responsive hidden-section">
-                <div class="note-text" id="rcd_std_note">* R_CĐ NỘI SUY THEO NHIỆT ĐỘ.</div>
-                <div class="table-responsive" id="table_rcd_container"></div>
-            </div>
-        </div>
-
-        <!-- 4. TỈ SỐ BIẾN -->
-        <div class="card">
-            <div class="card-title">
-                <span>3. Tỉ Số Biến</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec4" onchange="toggleSection('body_sec4', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec4" class="table-responsive hidden-section">
-                <div class="grid" style="margin-bottom:8px;">
-                    <!--div class="form-group">
-                        <label>I_Thử Nghiệm (A):</label>
-                        <input type="number" id="ti_i1_tn" value="10" oninput="calculateAll()">
-                    </div-->
-                </div>
-                <!--div class="table-responsive" id="table_ratio_container"></div-->
-		<div id="table_ratio_main_container"></div>
-            </div>
-        </div>
-
-        <!-- 5. TỪ HÓA -->
-        <div class="card">
-            <div class="card-title">
-                <span>4. Từ Hóa</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec5" class="table-responsive hidden-section">
-                <div id="table_tuhoa_container">
-                    <!--div id="table_tuhoa_a_container"></div>
-                    <div id="table_tuhoa_b_container"></div>
-                    <div id="table_tuhoa_c_container"></div-->
-		<div id="table_tuhoa_main_container"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 6. TAN DELTA & ĐIỆN DUNG -->
-        <div class="card">
-            <div class="card-title">
-                <span>5. Tgδ(%)</span>
-                <div>
-                    <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
-                </div>
-            </div>
-            <div id="body_sec6" class="table-responsive hidden-section">
-                <div class="note-text">* Tiêu chuẩn Tgδ theo vật liệu cách điện.</div>
-                <div class="table-responsive" id="table_tg_container"></div>
-            </div>
-        </div>
-
-        <!-- ĐIỀU KHIỂN -->
-        <div class="card">
-<div style="display:flex; gap:8px; margin-top:8px;">
-
-			<button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu</button>
-            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ</button>
-</div>
-
-
-<div style="display:flex; gap:8px; margin-top:8px;">
-<button class="btn-action" onclick="exportWordTI(false)" style="background:#0288d1; margin:0;">📝 Xuất BB (Chỉ nhập)</button>
-<button class="btn-action" onclick="exportWordTI(true)" style="background:#f57c00; margin:0;">📝 Xuất BB (Kèm số cũ)</button>
-</div>
-            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Reset Form</button>
-        </div>
-
-
-    </div> <!-- HẾT KHU VỰC KHÓA -->
-</div> <!-- HẾT CONTAINER -->
-
-<!-- Load common -->
-<script src="fun/config.js"></script>
-<script src="fun/common.js"></script>
-
-<!-- Code riêng của TI -->
-<script>
-    // ============================================================
-    // CẤU HÌNH MODULE TI
-    // ============================================================
-    const CURRENT_MODULE = 'TI';
-    const TEMPLATE_DRIVE_ID = "1YquppRPhfL5asm25CS8wO7jz56JHUXgR";
-    const MODULE_PREFIX = "ti_";
-    window.prefix = MODULE_PREFIX;
-
-    // ============================================================
-    // HÀM toggleSection - FALLBACK
-    // ============================================================
-    function toggleSection(sectionId, chk) { 
-        const section = document.getElementById(sectionId);
-        if (section) {
-            if (chk && chk.checked) {
-                section.classList.remove('hidden-section');
-            } else {
-                section.classList.add('hidden-section');
-            }
-        }
-    }
-
-    // ============================================================
-    // CODE RIÊNG CỦA TI
-    // ============================================================
-    window.onload = function() {
-        initPrefix();
-        setTodayDate();
-        fetchSubstations();
-        refreshTables();
-        renderAllTables();
-        
-        if (localStorage.getItem(MODULE_PREFIX + 'DRAFT')) {
-            checkUnlockForm();
-        }
-    };
-
-    function refreshTables() {
-        renderRatioTable(); 
-        renderTgTable(); 
-        calculateAll();
-    }
-
-    function restoreInputValues(savedValues) {
-        for (let id in savedValues) {
-            const el = document.getElementById(id);
-            if (el && savedValues[id] !== "") el.value = savedValues[id];
-        }
-        calculateAll();
-    }
-
-    function changeWindingCount() {
-        renderAllTables();
-    }
-
-    function renderAllTables() {
-        renderRcdTable();
-        renderRdcTable();
-        renderRatioTable();
-        renderTuHoaTables(); 
-        renderTgTable();
-        calculateAll();
-    }
-
-    function getInterpolatedPriRcd(temp, u1Str) {
-        let points = [];
-        const u = parseFloat(u1Str) || 0; 
-        if (u >= 110) {
-            points = [[20, 1200], [30, 600], [40, 300], [50, 150], [60, 75]];
-        } else if (u >= 22 && u < 110) {
-            points = [[20, 1000], [30, 500], [40, 250], [50, 125], [60, 65]];
-        } else if (u === 15) {
-            points = [[20, 800], [30, 400], [40, 200], [50, 100], [60, 50]];
-        } else {
-            points = [[20, 400], [30, 200], [40, 100], [50, 50], [60, 25]];
-        }
-        for (let p of points) { if (temp === p[0]) return p[1]; }
-        if (temp < points[0][0]) return points[0][1];
-        if (temp > points[points.length - 1][0]) return points[points.length - 1][1];
-        for (let i = 0; i < points.length - 1; i++) {
-            if (temp > points[i][0] && temp < points[i+1][0]) {
-                const t1 = points[i][0], r1 = points[i][1];
-                const t2 = points[i+1][0], r2 = points[i+1][1];
-                return r1 + (r2 - r1) * (temp - t1) / (t2 - t1);
-            }
-        }
-        return 300;
-    }
-
-    // ============================================================
-    // BẢNG RDC
-    // ============================================================
-    function renderRdcTable() {
-        const container = document.getElementById('table_rdc_container');
-        if (!container) return;
-
-        const num = parseInt(document.getElementById('ti_num_windings').value);
-        let html = `<table><thead><tr><th>Cuộn</th><th>Đầu dây</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
-        for(let i=1; i<=num; i++) {
-            html += `<tr>
-                <td><b>Cuộn ${i}</b></td>
-                <td><input type="text" id="ti_rdc_terminal_${i}" value="${i}S1-${i}S" onkeydown="handleRdcTab(event, ${i}, 'terminal')" onkeypress="handleEnterToNext(event)"></td>
-                <td>
-                    <input type="number" id="ti_rdc_m_${i}_a" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'a')" onkeypress="handleEnterToNext(event)">
-                    <span class="sub-val" id="ti_rdc_75_${i}_a">75°C: -</span>
-                </td>
-                <td>
-                    <input type="number" id="ti_rdc_m_${i}_b" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'b')" onkeypress="handleEnterToNext(event)">
-                    <span class="sub-val" id="ti_rdc_75_${i}_b">75°C: -</span>
-                </td>
-                <td>
-                    <input type="number" id="ti_rdc_m_${i}_c" oninput="handleNewInput(event); calculateAll()" placeholder="Ω" onkeydown="handleRdcTab(event, ${i}, 'c')" onkeypress="handleEnterToNext(event)">
-                    <span class="sub-val" id="ti_rdc_75_${i}_c">75°C: -</span>
-                </td>
-            </tr>`;
-        }
-        html += `</tbody></table>`;
-        container.innerHTML = html;
-    }
-
-    // ============================================================
-    // BẢNG RCD
-    // ============================================================
-    function renderRcdTable() {
-        const container = document.getElementById('table_rcd_container');
-        if (!container) return;
-
-        const num = parseInt(document.getElementById('ti_num_windings').value) || 4;
-        let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th>Phép Đo</th>
-                    <th>Tiêu Chuẩn</th>
-                    <th>🟡Pha A</th>
-                    <th>🔴Pha B</th>
-                    <th>🔵Pha C</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
-        html += `
-        <tr>
-            <td><b>Sơ cấp - ∑</b></td>
-            <td id="ti_std_rcd_pri">-</td>
-            <td><input type="number" id="ti_rcd_pri_a" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'a', true)"></td>
-            <td><input type="number" id="ti_rcd_pri_b" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'b', true)"></td>
-            <td><input type="number" id="ti_rcd_pri_c" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, 0, 'c', true)"></td>
-        </tr>`;
-        for (let i = 1; i <= num; i++) {
-            html += `
-            <tr>
-                <td><b>Cuộn ${i} - ∑</b></td>
-                <td id="ti_std_rcd_sec${i}">-</td>
-                <td><input type="number" id="ti_rcd_sec${i}_a" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'a', false)"></td>
-                <td><input type="number" id="ti_rcd_sec${i}_b" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'b', false)"></td>
-                <td><input type="number" id="ti_rcd_sec${i}_c" oninput="handleNewInput(event); calculateAll()" onkeydown="handleRcdTab(event, ${i}, 'c', false)"></td>
-            </tr>`;
-        }
-        html += `</tbody></table>`;
-        container.innerHTML = html;
-    }
-
-    // ============================================================
-    // BẢNG TỈ SỐ BIẾN
-    // ============================================================
-let currentRatioTab = 'A'; // Mặc định mở Tab Pha A
-
-// Hàm chuyển Tab cho Tỉ số biến (Không làm mất dữ liệu đã nhập)
-function switchRatioTab(phaId) {
-    currentRatioTab = phaId;
-    ['A', 'B', 'C'].forEach(id => {
-        const wrapper = document.getElementById(`ratio_tab_content_${id}`);
-        if (wrapper) wrapper.style.display = (id === phaId) ? 'block' : 'none';
-        
-        const btn = document.getElementById(`btn_tab_ratio_${id}`);
-        if (btn) {
-            btn.style.background = (id === phaId) ? '#0288d1' : '#e0e0e0';
-            btn.style.color = (id === phaId) ? '#fff' : '#000';
-        }
-    });
-}
-
+// ============================================================
+// fun/common.js - FUNCTION DÙNG CHUNG CHO TẤT CẢ MODULE
+// ============================================================
 
 // ============================================================
-// LƯU / KHÔI PHỤC GIÁ TRỊ BẢNG TỈ SỐ BIẾN
+// [SỬA] KHAI BÁO BIẾN TOÀN CỤC
 // ============================================================
-function saveRatioValues() {
-    const saved = {};
-    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
+let globalHistoryData = [];
+let prefix = 'ti_'; // Mặc định
 
-    ['A', 'B', 'C'].forEach(pha => {
-        for (let i = 1; i <= num; i++) {
-            const ids = [
-                `ti_ratio_dm_w${i}_${pha}`,
-                `ti_i2_dm_w${i}_${pha}`,
-                `ti_acc_w${i}_${pha}`,
-                `ti_err_w${i}_${pha}`
-            ];
-            ids.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) saved[id] = el.value;
-            });
+// ============================================================
+// [SỬA] HÀM LẤY PREFIX TỪ MODULE HIỆN TẠI
+// ============================================================
+function initPrefix() {
+    if (typeof prefix !== 'undefined' && prefix) {
+        return prefix;
+    }
+    if (typeof getCurrentModule === 'function') {
+        const config = getCurrentModule();
+        if (config && config.MODULE_PREFIX) {
+            prefix = config.MODULE_PREFIX;
+            return prefix;
         }
-    });
-
-    window.__savedRatioValues = saved;
+    }
+    prefix = 'ti_';
+    return prefix;
 }
 
-function restoreRatioValues() {
-    const saved = window.__savedRatioValues;
-    if (!saved) return;
+// ============================================================
+// [SỬA] LẤY GOOGLE_WEB_APP_URL
+// ============================================================
+// const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxr-8Y25S607UYytRjKutvw4Zhx69W05XOc3Qs5gsSBQNxAZ8S16mmt7Nj8xUV1nNIn/exec";
 
-    Object.keys(saved).forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.value = saved[id];
-            if (id.startsWith('ti_err_')) {
-                el.classList.add('new-data');
-                el.style.color = '#1565c0';
-                el.style.fontWeight = 'bold';
+// ============================================================
+// 1. HÀM KHỞI TẠO
+// ============================================================
+
+function setTodayDate() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    let mm = today.getMonth() + 1;
+    let dd = today.getDate();
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    document.getElementById('info_ngay').value = yyyy + '-' + mm + '-' + dd;
+}
+
+function fetchSubstations() {
+    const cachedTrams = localStorage.getItem('CACHE_TRAMS');
+    const select = document.getElementById('info_tram');
+    if (cachedTrams) {
+        populateSelect(JSON.parse(cachedTrams));
+    } else {
+        select.innerHTML = '<option value="" disabled selected>Đang tải danh sách trạm...</option>';
+    }
+    fetch(GOOGLE_WEB_APP_URL + "?action=getSubstations")
+        .then(res => res.json())
+        .then(data => {
+            if(data.error) {
+                if (!cachedTrams) select.innerHTML = `<option value="">⚠️ Lỗi: ${data.error}</option>`;
+                console.error("Lỗi từ GAS:", data.error);
+                return;
             }
-        }
-    });
-
-    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-    for (let i = 1; i <= num; i++) {
-        ['A', 'B', 'C'].forEach(p => calculateRatio(i, p));
-    }
-}
-
-
-
-// Render giao diện Tab và Bảng Tỉ số biến
-function renderRatioTable() {
-    const container = document.getElementById('table_ratio_main_container');
-    if (!container) return;
-
-saveRatioValues();   
-
-    const num = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-    
-    const phases = [
-        { id: 'A', name: 'Pha A', color: '#fff9c4000', border: '#fbc02d', class: 'phase-a' },
-        { id: 'B', name: 'Pha B', color: '#ffebee000', border: '#ef5350', class: 'phase-b' },
-        { id: 'C', name: 'Pha C', color: '#e3f2fd000', border: '#42a5f5', class: 'phase-c' }
-    ];
-
-    // Vẽ thanh nút bấm Tab
-    let html = `<div style="display:flex; gap:8px; margin-bottom:12px;">`;
-    phases.forEach(pha => {
-        const isActive = (pha.id === currentRatioTab);
-        const bg = isActive ? '#0288d1' : '#e0e0e0';
-        const color = isActive ? '#fff' : '#000';
-        html += `<button id="btn_tab_ratio_${pha.id}" onclick="switchRatioTab('${pha.id}')" 
-                    style="padding:6px 16px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; background:${bg}; color:${color}; transition:0.3s;">
-                    ${pha.name}
-                 </button>`;
-    });
-    html += `</div>`;
-
-    // Vẽ nội dung 3 Tab tương ứng
-    phases.forEach(pha => {
-        const isVisible = (pha.id === currentRatioTab) ? 'block' : 'none';
-        html += `<div id="ratio_tab_content_${pha.id}" style="display:${isVisible};">`;
-        
-        // Tiêu đề tab kèm nút "+" nạp XML riêng cho từng pha
-        html += `
-            <div style="display:flex; align-items:center; margin-bottom:6px;">
-                <b style="color:#1565c0; font-size:14px; margin-right:8px;">Bảng Tỉ số biến - ${pha.name}</b>
-                <button type="button" title="Nạp file XML cho ${pha.name}" onclick="openRatioXml('${pha.id}')"
-                     style="width:160px; height:24px; line-height:22px; padding:0; border:none; border-radius:10%;  font-size:12px; cursor:pointer;">
-                    import XML
-                </button>
-
-
-
-
-
-            </div>
-            <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc; width:120px;">Cuộn dây</th>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc; width:180px;">Tỉ số biến</th>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Sai số đo (%)</th>
-                </tr>
-            </thead>
-            <tbody>`;
-            
-        for (let i = 1; i <= num; i++) {
-            html += `<tr>
-                <td style="background:${pha.color}; border:1px solid #ccc; text-align:center; padding:6px;">
-                    <b style="font-size:12px; color:#d84315000;">Cuộn ${i}</b>
-                    <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:11px; padding:2px; text-align:center; width:90%; box-sizing:border-box;">
-                </td>
-                <td style="background:${pha.color}; border:1px solid #ccc; padding:4px;">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <select id="ti_ratio_dm_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
-                            <option value="200">200 A</option>
-                            <option value="400" selected>400 A</option>
-                            <option value="600">600 A</option>
-                            <option value="800">800 A</option>
-                            <option value="1000">1.000 A</option>
-                            <option value="1200">1.200 A</option>
-                            <option value="1500">1.500 A</option>
-                            <option value="2000">2.000 A</option>
-                            <option value="3000">3.000 A</option>
-                        </select>
-                        <!--//CU-->
-<select id="ti_i2_dm_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
-    <option value="1" selected>Thứ cấp: 1A</option>
-    <option value="5">Thứ cấp: 5A</option>
-</select>
-<select id="ti_acc_w${i}_${pha.id}" onchange="calculateRatio(${i}, '${pha.id}')" style="font-size:11px; padding:3px; border-radius:3px; border:1px solid #ccc;">
-    <option value="0.2">Class: 0.2</option>
-    <option value="0.5" selected>Class: 0.5</option>
-    <option value="5P">Class: 5P</option>
-    <option value="10P">Class: 10P</option>
-    <option value="X">Class: X</option>
-</select>
-                    </div>
-                </td>
-                <td style="border:1px solid #ccc; padding:6px;">
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                        <input type="number" step="0.01" 
-                            id="ti_err_w${i}_${pha.id}" 
-                            class="${pha.class}"
-                            placeholder="± %"
-                            oninput="handleNewInput(event); calculateRatio(${i}, '${pha.id}', 'err')" 
-                            style="font-size:12px; background:#fff; width:100%; padding:4px; box-sizing:border-box;"
-                        >
-                        <div class="ratio-info" style="font-size:11px; color:#333;">
-                            <span class="kdo" id="ti_kdo_w${i}_${pha.id}">Ratio: </span>
-                        </div>
-                    </div>
-                </td>
-            </tr>`;
-        }
-        html += `</tbody></table></div>`;
-    });
-    
-    container.innerHTML = html;
-    
-    // Tính toán lại giá trị ban đầu sau khi render
-    setTimeout(() => {
-        restoreRatioValues();   // ← THÊM DÒNG NÀY
-
-        for (let i = 1; i <= num; i++) {
-            calculateRatio(i);
-        }
-    }, 100);
-}
-
-// 3. Hàm mở cửa sổ chọn file XML cho Tỉ số biến theo từng Pha
-// 1. Mở cửa sổ chọn file XML Tỉ số biến đúng chuẩn theo từng Pha (A, B, C)
-function openRatioXml(phaId) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.xml,application/xml,text/xml';
-    input.style.display = 'none';
-    input.onchange = (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                processRatioXml(ev.target.result, phaId);
-            } catch (err) {
-                alert('❌ Lỗi đọc file XML Tỉ số biến: ' + err.message);
-            }
-        };
-        reader.readAsText(file, 'UTF-8');
-    };
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(() => document.body.removeChild(input), 1000);
-}
-
-// 2. Xử lý bóc tách chuẩn xác file XML Tỉ số biến====================================================================
-function processRatioXml(xmlText, phaId) {
-    
-	const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, 'application/xml');
-    
-    if (xml.querySelector('parsererror')) throw new Error('File XML bị hỏng cấu trúc');
-    
-    // Lấy tất cả Cards_Item (dùng getElementsByTagName để bỏ qua namespace)
-    const cards = xml.getElementsByTagName('Cards_Item');
-    if (!cards.length) throw new Error('Không tìm thấy dữ liệu Cards_Item trong file XML');
-
-    let maxWinding = 0;
-    const ratioMap = {};
-
-    for (const card of cards) {
-        // Chỉ xử lý card CTRatio (clsid BD6C0297...)
-        const clsid = card.getAttribute('clsid') || '';
-        if (!clsid.includes('BD6C0297')) continue;
-
-        const nameEl = card.getElementsByTagName('bstrName')[0];
-        const name = nameEl ? nameEl.textContent.trim() : '';
-        
-        // Lấy số thứ tự cuộn từ tên "CTRatio 1", "CTRatio 2"...
-        const m = name.match(/(\d+)/);
-        if (!m) continue;
-        const w = parseInt(m[1]);
-        if (w < 1 || w > 20) continue;
-        if (w > maxWinding) maxWinding = w;
-
-        // --- A. LẤY DÒNG ĐỊNH MỨC SƠ CẤP & THỨ CẤP ---
-        let primaryVal = null;
-        let secondaryVal = null;
-
-        const primNomNode = card.getElementsByTagName('IPrimNom')[0];
-        if (primNomNode) {
-            const v = primNomNode.getElementsByTagName('dValue')[0];
-            if (v) primaryVal = parseFloat(v.textContent);
-        }
-        const secNomNode = card.getElementsByTagName('ISecNom')[0];
-        if (secNomNode) {
-            const v = secNomNode.getElementsByTagName('dValue')[0];
-            if (v) secondaryVal = parseFloat(v.textContent);
-        }
-
-        // --- B. LẤY SAI SỐ % TỪ <Deviation> ---
-        let errorVal = null;
-        const devNodes = card.getElementsByTagName('Deviation');
-        for (const devNode of devNodes) {
-            const unitNode = devNode.getElementsByTagName('bstrUnit')[0];
-            const valNode  = devNode.getElementsByTagName('dValue')[0];
-            if (unitNode && unitNode.textContent.trim() === '%' && valNode) {
-                const val = parseFloat(valNode.textContent);
-                if (!isNaN(val)) { errorVal = val; break; }
-            }
-        }
-
-        ratioMap[w] = { primaryVal, secondaryVal, errorVal };
-    }
-
-
-    // --- C. CẬP NHẬT GIAO DIỆN ---
-const numWindingsEl = document.getElementById('ti_num_windings');
-let needRender = false;
-
-if (numWindingsEl && maxWinding > 0) {
-    const currentW = parseInt(numWindingsEl.value) || 0;
-    if (maxWinding !== currentW) {
-        numWindingsEl.value = maxWinding;
-        needRender = true;
-    }
-}
-
-if (needRender && typeof renderRatioTable === 'function') {
-    renderRatioTable();
-}
-
-    setTimeout(() => {
-        Object.keys(ratioMap).forEach(wStr => {
-            const w = parseInt(wStr);
-            const data = ratioMap[w];
-            if (!data) return;
-
-            if (data.primaryVal !== null) {
-    const primSelect = document.getElementById(`ti_ratio_dm_w${w}_${phaId}`);
-    if (primSelect) {
-        primSelect.value = data.primaryVal;
-        primSelect.dispatchEvent(new Event('change'));
-    }
-}
-            if (data.secondaryVal !== null) {
-    const secSelect = document.getElementById(`ti_i2_dm_w${w}_${phaId}`);
-    if (secSelect) {
-        secSelect.value = data.secondaryVal;
-        secSelect.dispatchEvent(new Event('change'));
-    }
-}
-            if (data.errorVal !== null) {
-                const errInput = document.getElementById(`ti_err_w${w}_${phaId}`);
-                if (errInput) {
-                    errInput.value = data.errorVal;
-                    errInput.style.color = '#1565c0';
-                    errInput.style.fontWeight = 'bold';
-                    errInput.classList.add('new-data');
-                    errInput.dispatchEvent(new Event('input'));
-                }
-            }
+            localStorage.setItem('CACHE_TRAMS', JSON.stringify(data));
+            if (!cachedTrams) populateSelect(data);
+        })
+        .catch(err => {
+            if (!cachedTrams) select.innerHTML = '<option value="">❌ Lỗi kết nối!</option>';
+            console.error("Lỗi Fetch:", err);
         });
-
-        if (typeof calculateRatio === 'function') {
-            for (let i = 1; i <= maxWinding; i++) calculateRatio(i, phaId);
-        }
-        
-console.log('✅ Đã nạp xong. Kiểm tra:');
-console.log('  ti_ratio_dm_w1_' + phaId + ' =', document.getElementById(`ti_ratio_dm_w1_${phaId}`)?.value);
-console.log('  ti_i2_dm_w1_' + phaId + ' =', document.getElementById(`ti_i2_dm_w1_${phaId}`)?.value);
-console.log('  ti_err_w1_' + phaId + ' =', document.getElementById(`ti_err_w1_${phaId}`)?.value);
-alert(`✅ Nạp dữ liệu Tỉ số biến thành công cho ${phaId} (${maxWinding} cuộn)!`);
-    }, 100);
 }
 
-
-    // ============================================================
-    // TÍNH TỈ SỐ BIẾN
-    // ============================================================
-function calculateRatio(winding, pha, source = null) {
-        // 💡 Thuật toán gộp: Nếu truyền pha cụ thể thì tính 1 pha, không truyền thì tự động tính cả 3 pha
-        const phases = pha ? [pha] : ['A', 'B', 'C'];
-
-        phases.forEach(p => {
-            // Lấy thông số định mức độc lập theo TỪNG PHA
-            const ratioDmStr = document.getElementById(`ti_ratio_dm_w${winding}_${p}`)?.value || "400";
-            const i2DmStr = document.getElementById(`ti_i2_dm_w${winding}_${p}`)?.value || "1";
-            const ratio_dm = parseFloat(ratioDmStr) || 400;
-            const accStr = document.getElementById(`ti_acc_w${winding}_${p}`)?.value || "0.5";
-
-            let accLimit = parseFloat(accStr) || 0.5;
-            if (accStr === "5P") accLimit = 5;
-            else if (accStr === "10P") accLimit = 10;
-
-            const K_dm = ratio_dm / parseFloat(i2DmStr);
-
-            const kdmEl = document.getElementById(`ti_kdm_w${winding}_${p}`);
-            if (kdmEl) kdmEl.textContent = K_dm.toFixed(2);
-
-            const errEl = document.getElementById(`ti_err_w${winding}_${p}`);
-            const kdoEl = document.getElementById(`ti_kdo_w${winding}_${p}`);
-            if (!errEl || !kdoEl) return;
-
-            // 💡 CHÌA KHÓA: Ưu tiên lấy value thật, nếu rỗng thì vét số mờ ở placeholder lên
-            let errValStr = errEl.value;
-            if (errValStr === "" && errEl.placeholder && errEl.placeholder !== "± %") {
-                errValStr = errEl.placeholder;
-            }
-
-            const error = parseFloat(errValStr);
-            if (!isNaN(error)) {
-                const K_do = K_dm * (1 + error / 100);
-                kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
-                
-                const isPass = Math.abs(error) <= accLimit;
-                // Tô màu xanh/đỏ cho cả số mới nhập và số mờ lịch sử
-                if (errEl.classList.contains('new-data') || errEl.dataset.dataType) {
-                    errEl.style.color = isPass ? '#1565c0' : '#c62828';
-                    errEl.style.fontWeight = 'bold';
-                }
-                errEl.dataset.source = 'err';
-            } else {
-                kdoEl.textContent = 'TSB: -';
-                if (!errEl.classList.contains('new-data')) {
-                    errEl.style.color = '';
-                    errEl.style.fontWeight = '';
-                }
-                delete errEl.dataset.source;
-            }
-        });
+function populateSelect(data) {
+    const select = document.getElementById('info_tram');
+    select.innerHTML = '<option value="" disabled selected>-- Chọn Trạm --</option>';
+    data.forEach(tram => {
+        let option = document.createElement("option");
+        option.value = tram;
+        option.text = tram;
+        select.appendChild(option);
+    });
+    if (localStorage.getItem(prefix + 'DRAFT')) {
+        loadDraftData();
+        checkUnlockForm();
     }
+}
+function checkUnlockForm() {
+    const tram = document.getElementById('info_tram').value;
+    const nganLo = document.getElementById('info_nganlo').value.trim();
+    const zone = document.getElementById('locked_zone');
+    const msg = document.getElementById('unlock_message');
+    if (tram && tram !== "" && nganLo && nganLo !== "") {
+        zone.classList.remove('form-locked');
+        if (msg) msg.style.display = 'none';
+    } else {
+        zone.classList.add('form-locked');
+        if (msg) msg.style.display = 'block';
+    }
+}
 
-    // ============================================================
-    // TỪ HÓA
-    // ============================================================
-    let currentTuHoaTab = 'a'; // Mặc định mở Tab Pha A
+// ============================================================
+// 2. HÀM XỬ LÝ DỮ LIỆU CŨ
+// ============================================================
 
-// Hàm chuyển Tab an toàn (CSS hiển thị, không xóa DOM)
-function switchTuHoaTab(phaId) {
-    currentTuHoaTab = phaId;
-    ['a', 'b', 'c'].forEach(id => {
-        const wrapper = document.getElementById(`tuhoa_tab_content_${id}`);
-        if (wrapper) wrapper.style.display = (id === phaId) ? 'block' : 'none';
-        
-        const btn = document.getElementById(`btn_tab_tuhoa_${id}`);
-        if (btn) {
-            btn.style.background = (id === phaId) ? '#0288d1' : '#e0e0e0';
-            btn.style.color = (id === phaId) ? '#fff' : '#000';
+function loadOldDataSection() {
+    const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
+    const tram = encodeURIComponent(document.getElementById('info_tram').value);
+    if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Ngăn Lộ!"); return; }
+    showLoading("Đang tải dữ liệu ...");
+    const modName = prefix.replace('_', '').toUpperCase();
+    const fetchUrl = `${GOOGLE_WEB_APP_URL}?nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
+    fetch(fetchUrl).then(res => res.json()).then(data => {
+        hideLoading();
+        if (!data || data.length === 0 || data.error) { alert("ℹ️ Không tìm thấy dữ liệu cũ!"); return; }
+        globalHistoryData = data;
+        showHistoryModal(data);
+    }).catch(err => { hideLoading(); alert("❌ Lỗi tải data: " + err); });
+}
+
+function loadLatestData() {
+    const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
+    const tram = encodeURIComponent(document.getElementById('info_tram').value);
+    if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Ngăn Lộ!"); return; }
+    showLoading("Đang tải thông số gần nhất...");
+    const modName = prefix.replace('_', '').toUpperCase();
+    const fetchUrl = `${GOOGLE_WEB_APP_URL}?action=getLatest&nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
+    fetch(fetchUrl).then(res => res.json()).then(data => {
+        hideLoading();
+        if (!data || Object.keys(data).length === 0 || data.error) {
+            alert("ℹ️ Không tìm thấy dữ liệu cũ của thiết bị này trên hệ thống!");
+            return;
         }
-    });
+        applyLatestData(data);
+    }).catch(err => { hideLoading(); alert("❌ Lỗi mạng: " + err); });
 }
 
-// Render giao diện Tab và Bảng
-function renderTuHoaTables() {
-    const container = document.getElementById('table_tuhoa_main_container');
-    if (!container) return;
-    
-    const prefix = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
-    const numWindingsEl = document.getElementById(prefix + 'num_windings');
-    const num = numWindingsEl ? parseInt(numWindingsEl.value) || 4 : 4;
-    
-    const phases = [
-        { id: 'a', name: 'Pha A', color: '#fff9c4000' },
-        { id: 'b', name: 'Pha B', color: '#ffebee000' },
-        { id: 'c', name: 'Pha C', color: '#e3f2fd000' }
-    ];
+function applyLatestData(data) {
+    const numWindingsId = prefix + 'num_windings';
 
-    // Vẽ thanh nút bấm Tab
-    let html = `<div style="display:flex; gap:8px; margin-bottom:12px;">`;
-    phases.forEach(pha => {
-        const isActive = (pha.id === currentTuHoaTab);
-        const bg = isActive ? '#0288d1' : '#e0e0e0';
-        const color = isActive ? '#fff' : '#000';
-        html += `<button id="btn_tab_tuhoa_${pha.id}" onclick="switchTuHoaTab('${pha.id}')" 
-                    style="padding:6px 16px; border:none; border-radius:4px; font-weight:bold; cursor:pointer; background:${bg}; color:${color}; transition:0.3s;">
-                    ${pha.name}
-                 </button>`;
-    });
-    html += `</div>`;
-
-    // Vẽ nội dung 3 Tab
-    phases.forEach(pha => {
-        const isVisible = (pha.id === currentTuHoaTab) ? 'block' : 'none';
-        html += `<div id="tuhoa_tab_content_${pha.id}" style="display:${isVisible};">`;
-        html += `
-            <div style="display:flex; align-items:center; margin-bottom:6px;">
-                <b style="color:#1565c0; font-size:14px; margin-right:8px;">Bảng đo ${pha.name}</b>
-                <button type="button" title="Nạp file XML cho ${pha.name}" onclick="openTuHoaXml('${pha.id}', '${prefix}')"
-		style="width:160px; height:24px; line-height:22px; padding:0; border:none; border-radius:10%;  font-size:12px; cursor:pointer;">
-                    import XML
-
-                </button>
-            </div>
-            <table style="width:100%; border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Cuộn / Đầu dây</th>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Điện áp (V) </th>
-                    <th style="font-size:11px; padding:6px; background:#eeeeee; border:1px solid #ccc;">Dòng điện (µA)</th>
-                </tr>
-            </thead>
-            <tbody>`;
-            
-        for (let i = 1; i <= num; i++) {
-            html += `<tr>
-                <td style="background:${pha.color}; text-align:center; border:1px solid #ccc; padding:4px;">
-                    <b style="font-size:11px;">Cuộn ${i}</b><br>
-                    <input type="text" id="${prefix}th_${pha.id}_term_${i}" value="${i}S1-${i}S" style="font-size:11px; padding:2px; text-align:center; width:90%; box-sizing:border-box;">
-                </td>
-                <td style="padding:8px; border:1px solid #ccc;">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u1_${i}" placeholder="U1 (50%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u2_${i}" placeholder="U2 (75%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                        <input type="number" step="0.01" id="${prefix}th_${pha.id}_u3_${i}" placeholder="U3 (95%)" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                    </div>
-                </td>
-                <td style="padding:8px; border:1px solid #ccc;">
-                    <div style="display:flex; flex-direction:column; gap:4px;">
-                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i1_${i}" placeholder="I1" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i2_${i}" placeholder="I2" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                        <input type="number" step="0.0001" id="${prefix}th_${pha.id}_i3_${i}" placeholder="I3" oninput="handleNewInput(event); calculateAll()" style="font-size:11px; padding:8px; width:100%; box-sizing:border-box;">
-                    </div>
-                </td>
-            </tr>`;
-        }
-        html += `</tbody></table></div>`;
-    });
-    
-    container.innerHTML = html;
-}
-
-// Hàm mở cửa sổ chọn file XML
-function openTuHoaXml(phaId, prefix) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.xml,application/xml,text/xml';
-    input.style.display = 'none';
-    input.onchange = (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                processTuHoaXml(ev.target.result, phaId, prefix);
-            } catch (err) {
-                alert('❌ Lỗi đọc file XML: ' + err.message);
-            }
-        };
-        reader.readAsText(file, 'UTF-8');
-    };
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(() => document.body.removeChild(input), 1000);
-}
-
-// Xử lý nạp dữ liệu thẳng vào các thẻ Input
-function processTuHoaXml(xmlText, phaId, prefix) {
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText, 'application/xml');
-    
-    if (xml.querySelector('parsererror')) throw new Error('File XML bị hỏng cấu trúc');
-    
-    const cards = xml.querySelectorAll('Cards_Item');
-    if (!cards.length) throw new Error('Không tìm thấy dữ liệu đo trong file XML');
-
-    let maxWinding = 0;
-    const cardMap = {};
-
-    cards.forEach(card => {
-        const nameEl = card.querySelector('bstrName');
-        const name = nameEl ? nameEl.textContent.trim() : '';
-        const m = name.match(/^(\d+)/); 
-        if (!m) return;
-        
-        const w = parseInt(m[1]);
-        if (w < 1 || w > 20) return;
-        if (w > maxWinding) maxWinding = w;
-
-        let vknee = null;
-        const vkneeEl = card.querySelector('Vknee > dValue');
-        if (vkneeEl) vknee = parseFloat(vkneeEl.textContent);
-
-        const points = [];
-        card.querySelectorAll('Results > Results_Item').forEach(item => {
-            const vEl = item.querySelector('V > dValue');
-            const iEl = item.querySelector('I > dValue');
-            if (!vEl || !iEl) return;
-
-            let v = parseFloat(vEl.textContent);
-            let i = parseFloat(iEl.textContent);
-            
-            const vMulti = item.querySelector('V > bstrMulti')?.textContent.trim().toLowerCase() || '';
-            const iMulti = item.querySelector('I > bstrMulti')?.textContent.trim().toLowerCase() || '';
-
-            if (vMulti === 'k') v *= 1000;
-            else if (vMulti === 'm') v /= 1000;
-
-            if (iMulti === 'u' || iMulti === 'µ' || iMulti === 'ua') i *= 1000; 
-            else if (iMulti === 'n' || iMulti === 'na') i *= 1;  
-            else if (iMulti !== 'm' && iMulti !== 'ma') i *= 0.001;  
-
-            if (isFinite(v) && isFinite(i)) points.push({ v, i });
-        });
-
-        points.sort((a, b) => a.v - b.v);
-        cardMap[w] = { points, vknee };
-    });
-
-    // 1. Kiểm tra số cuộn và cập nhật tự động nếu thiếu
-    const numWindingsEl = document.getElementById(prefix + 'num_windings');
-    if (numWindingsEl) {
-        const currentW = parseInt(numWindingsEl.value) || 0;
-        if (maxWinding > currentW) {
-            numWindingsEl.value = maxWinding;
-            if (typeof changeWindingCount === 'function') {
-                changeWindingCount(); // Render lại HTML để tạo đủ các hàng input mới
+    if (data[numWindingsId] !== undefined) {
+        const el = document.getElementById(numWindingsId);
+        if(el) {
+            const oldVal = el.value;
+            el.value = data[numWindingsId];
+            if (oldVal !== data[numWindingsId]) {
+                changeWindingCount();
             }
         }
     }
 
-    // 2. Trích xuất 3 điểm theo mốc 50%, 75%, 95% và BẮN THẲNG vào giao diện
-    setTimeout(() => { // Đợi DOM cập nhật xong nếu changeWindingCount vừa chạy
-        Object.keys(cardMap).forEach(wStr => {
-            const w = parseInt(wStr);
-            const card = cardMap[w];
-            
-            const three = pickThreePointsTuHoa(card.points, card.vknee);
-            if (!three) return;
-
-            // Bắn trực tiếp dữ liệu vào ô
-            const setVal = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.value = val;
-                    el.dispatchEvent(new Event('input')); // Kích hoạt sự kiện để tính toán lại
-                }
-            };
-
-            setVal(`${prefix}th_${phaId}_u1_${w}`, round(three[0].v, 2));
-            setVal(`${prefix}th_${phaId}_i1_${w}`, round(three[0].i, 4));
-            
-            setVal(`${prefix}th_${phaId}_u2_${w}`, round(three[1].v, 2));
-            setVal(`${prefix}th_${phaId}_i2_${w}`, round(three[1].i, 4));
-            
-            setVal(`${prefix}th_${phaId}_u3_${w}`, round(three[2].v, 2));
-            setVal(`${prefix}th_${phaId}_i3_${w}`, round(three[2].i, 4));
-        });
-    }, 50);
-}
-
-// Chọn 3 điểm với tỷ lệ: 50%, 75%, 95%
-function pickThreePointsTuHoa(points, vknee) {
-    if (!points || points.length < 3) return null;
-
-    let vref = vknee;
-    if (!vref || !isFinite(vref) || vref <= 0) {
-        vref = points[points.length - 1].v;
-    }
-
-    const targets = [0.50, 0.75, 0.95].map(r => r * vref); // <-- Đã sửa mốc tỷ lệ
-    const used = new Set();
-    const result = [];
-
-    targets.forEach(t => {
-        let best = null, bestDiff = Infinity;
-        points.forEach((p, idx) => {
-            if (used.has(idx)) return;
-            const diff = Math.abs(p.v - t);
-            if (diff < bestDiff) { bestDiff = diff; best = { p, idx }; }
-        });
-        if (best) {
-            used.add(best.idx);
-            result.push(best.p);
-        }
-    });
-
-    result.sort((a, b) => a.v - b.v);
-    return result.length === 3 ? result : null;
-}
-
-function round(x, digits) {
-    const f = Math.pow(10, digits);
-    return Math.round(x * f) / f;
-}
-
-    // ============================================================
-    // Tgδ
-    // ============================================================
-    function renderTgTable() {
-        const container = document.getElementById('table_tg_container');
-        if (!container) return;
-        let html = `
-        <table>
-            <thead>
-                <tr>
-                    <th rowspan="2">Pha</th>
-                    <th colspan="2">UST</th>
-                    <th colspan="2">GST</th>
-                </tr>
-                <tr>
-                    <th>Tgδ (%)</th>
-                    <th>C (pF)</th>
-                    <th>Tgδ (%)</th>
-                    <th>C (pF)</th>
-                </tr>
-            </thead>
-            <tbody>
-        `;
-        ['A', 'B', 'C'].forEach(pha => {
-            let phaseClass = '';
-            if (pha === 'A') phaseClass = 'phase-a';
-            else if (pha === 'B') phaseClass = 'phase-b';
-            else if (pha === 'C') phaseClass = 'phase-c';
-            let displayName = '';
-            if (pha === 'A') displayName = '🟡 Pha A';
-            else if (pha === 'B') displayName = '🔴 Pha B';
-            else if (pha === 'C') displayName = '🔵 Pha C';
-            html += `
-            <tr>
-                <td><b>${displayName}</b></td>
-                <td><input type="number" id="ti_tg_ust_${pha}" class="${phaseClass}" step="0.001" placeholder="Tgδ" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'ust_tg')" style="width:100%;"></td>
-                <td><input type="number" id="ti_c_ust_${pha}" class="${phaseClass}" step="0.01" placeholder="C (pF)" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'ust_c')" style="width:100%;"></td>
-                <td><input type="number" id="ti_tg_gst_${pha}" class="${phaseClass}" step="0.001" placeholder="Tgδ" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'gst_tg')" style="width:100%;"></td>
-                <td><input type="number" id="ti_c_gst_${pha}" class="${phaseClass}" step="0.01" placeholder="C (pF)" oninput="handleNewInput(event); calculateAll()" onkeydown="handleTgTab(event, '${pha}', 'gst_c')" style="width:100%;"></td>
-            </tr>`;
-        });
-        html += `</tbody></table>`;
-        container.innerHTML = html;
-    }
-
-    // ============================================================
-    // TÍNH TOÁN
-    // ============================================================
-    function calculateAll() {
-        const temp = parseFloat(document.getElementById('ti_temp').value) || 23;
-        const i1_dm_str = document.getElementById('ti_udm').value;
-        const mfg = document.getElementById('ti_mfg').value;
-        const num = parseInt(document.getElementById('ti_num_windings').value);
-
-        // RCD Sơ cấp
-        const stdPriRcd = getInterpolatedPriRcd(temp, i1_dm_str);
-        const stdPriEl = document.getElementById('ti_std_rcd_pri');
-        if(stdPriEl) stdPriEl.innerText = `≥ ${stdPriRcd.toFixed(0)} MΩ (${temp}°C)`;
-
-        ['a', 'b', 'c'].forEach(p => {
-            const el = document.getElementById(`ti_rcd_pri_${p}`);
-            if (el) {
-                const val = parseFloat(el.value) || 0;
-                if (val > 0 && el.classList.contains('new-data')) {
-                    const pass = val >= stdPriRcd;
-                    el.style.color = pass ? '#1565c0' : '#c62828';
-                    el.style.fontWeight = 'bold';
-                } else if (!el.classList.contains('new-data')) {
+    for (let key in data) {
+        const el = document.getElementById(key);
+        if (el && data[key] !== undefined && data[key] !== '') {
+            if (el.tagName === 'INPUT') {
+                if (isConfigField(key)) {
+                    el.value = data[key];
+                } else {
+                    el.value = "";
+                    el.placeholder = data[key];
+                    el.classList.remove('old-data-history', 'old-data', 'new-data', 'pass-color', 'fail-color');
+                    el.classList.add('old-data-latest');
+                    el.dataset.oldval = data[key];
+                    el.dataset.dataType = 'latest';
                     el.style.color = '';
                     el.style.fontWeight = '';
                 }
+            } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
+                el.value = data[key];
             }
-        });
-
-        // RCD Nhị thứ
-        let stdSecRcd = 200;
-        if (mfg === 'ABB') stdSecRcd = 5;
-        else if (mfg === 'Sieyun') stdSecRcd = 1000;
-        else if (mfg === 'Areva' || mfg === 'GE') stdSecRcd = 50;
-        else if (mfg === 'Alstom') stdSecRcd = 25;
-
-        for(let i=1; i<=num; i++) {
-            const stdEl = document.getElementById(`ti_std_rcd_sec${i}`);
-            if(stdEl) stdEl.innerText = `≥ ${stdSecRcd} MΩ`;
-            ['a', 'b', 'c'].forEach(p => {
-                const el = document.getElementById(`ti_rcd_sec${i}_${p}`);
-                if (el) {
-                    const val = parseFloat(el.value) || 0;
-                    if (val > 0 && el.classList.contains('new-data')) {
-                        const pass = val >= stdSecRcd;
-                        el.style.color = pass ? '#1565c0' : '#c62828';
-                        el.style.fontWeight = 'bold';
-                    } else if (!el.classList.contains('new-data')) {
-                        el.style.color = '';
-                        el.style.fontWeight = '';
-                    }
-                }
-            });
         }
-
-// RDC
-        for(let i=1; i<=num; i++) {
-            ['a', 'b', 'c'].forEach(p => {
-                const el = document.getElementById(`ti_rdc_m_${i}_${p}`);
-                
-                // 💡 CHÌA KHÓA: Nếu value trống, lấy từ placeholder (bỏ chữ mặc định 'Ω')
-                let mValStr = el ? el.value : "";
-                if (mValStr === "" && el && el.placeholder && el.placeholder !== "Ω") {
-                    mValStr = el.placeholder;
-                }
-                
-                const mVal = parseFloat(mValStr) || 0;
-                const el75 = document.getElementById(`ti_rdc_75_${i}_${p}`);
-                
-                if(mVal > 0) {
-                    const r75 = mVal * ((235 + 75) / (235 + temp));
-                    if(el75) el75.innerText = `75°C: ${r75.toFixed(4)} Ω`;
-                } else {
-                    if(el75) el75.innerText = `75°C: -`;
-                }
-            });
-        }
-
-        // Tỉ số biến
-        const numWindings = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-for (let i = 1; i <= numWindings; i++) {
-    ['A', 'B', 'C'].forEach(p => calculateRatio(i, p));
-}
-
-        // Tgδ
-        const insulation = document.getElementById('ti_insulation').value;
-        const mode = document.getElementById('ti_mode').value;
-        const isNew = (mode === 'new');
-        let tgLimit = 0.5;
-        switch(insulation) {
-            case 'paper': tgLimit = isNew ? 0.5 : 0.8; break;
-            case 'paper_film_paper':
-            case 'film_paper_film': tgLimit = isNew ? 0.2 : 0.3; break;
-            case 'film': tgLimit = isNew ? 0.1 : 0.15; break;
-            default: tgLimit = isNew ? 0.5 : 0.8;
-        }
-        const cStandard = parseFloat(document.getElementById('ti_ddung')?.value);
-
-        ['A', 'B', 'C'].forEach(pha => {
-            const tgUstEl = document.getElementById(`ti_tg_ust_${pha}`);
-            if (tgUstEl) {
-                const val = parseFloat(tgUstEl.value) || 0;
-                if (val > 0) {
-                    const pass = val <= tgLimit;
-                    tgUstEl.style.color = pass ? '#1565c0' : '#c62828';
-                    tgUstEl.style.fontWeight = 'bold';
-                } else {
-                    tgUstEl.style.color = '';
-                    tgUstEl.style.fontWeight = '';
-                }
-            }
-            const cUstEl = document.getElementById(`ti_c_ust_${pha}`);
-            if (cUstEl && cStandard > 0) {
-                const val = parseFloat(cUstEl.value) || 0;
-                if (val > 0) {
-                    const err = ((val - cStandard) / cStandard) * 100;
-                    const pass = (err >= -5 && err <= 10);
-                    cUstEl.style.color = pass ? '#1565c0' : '#c62828';
-                    cUstEl.style.fontWeight = 'bold';
-                } else {
-                    cUstEl.style.color = '';
-                    cUstEl.style.fontWeight = '';
-                }
-            }
-            const tgGstEl = document.getElementById(`ti_tg_gst_${pha}`);
-            if (tgGstEl) {
-                const val = parseFloat(tgGstEl.value) || 0;
-                if (val > 0) {
-                    const pass = val <= tgLimit;
-                    tgGstEl.style.color = pass ? '#1565c0' : '#c62828';
-                    tgGstEl.style.fontWeight = 'bold';
-                } else {
-                    tgGstEl.style.color = '';
-                    tgGstEl.style.fontWeight = '';
-                }
-            }
-            const cGstEl = document.getElementById(`ti_c_gst_${pha}`);
-            if (cGstEl && cStandard > 0) {
-                const val = parseFloat(cGstEl.value) || 0;
-                if (val > 0) {
-                    const err = ((val - cStandard) / cStandard) * 100;
-                    const pass = (err >= -5 && err <= 10);
-                    cGstEl.style.color = pass ? '#1565c0' : '#c62828';
-                    cGstEl.style.fontWeight = 'bold';
-                } else {
-                    cGstEl.style.color = '';
-                    cGstEl.style.fontWeight = '';
-                }
-            }
-        });
     }
 
-    // ============================================================
-    // ĐIỀU HƯỚNG TAB
-    // ============================================================
-    function handleRatioTab(event, currentWinding, pha, fieldType) {
-        if (event.key !== 'Tab' && event.key !== 'Enter') return;
-        event.preventDefault();
-        const numWindings = parseInt(document.getElementById('ti_num_windings')?.value) || 4;
-        const phases = ['A', 'B', 'C'];
-        let phaIndex = phases.indexOf(pha);
-        let nextWinding = currentWinding;
-        let nextPha = pha;
+    ['chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5'].forEach(id => {
+        const chk = document.getElementById(id);
+        if(chk) {
+            chk.checked = true;
+            if (typeof toggleSection === 'function') {
+                toggleSection(id.replace('chk', 'body'), chk);
+            }
+        }
+    });
 
-        if (!event.shiftKey) {
-            if (currentWinding < numWindings) {
-                nextWinding = currentWinding + 1;
-            } else {
-                if (phaIndex < phases.length - 1) {
-                    nextPha = phases[phaIndex + 1];
-                    nextWinding = 1;
+    if (typeof calculateAll === 'function') calculateAll();
+    alert(`⚡ Đã nhập các số liệu mới nhất!`);
+}
+
+function showHistoryModal(dataArray) {
+    const listDiv = document.getElementById('historyList');
+    listDiv.innerHTML = '';
+    dataArray.forEach((row, index) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        const modeMap = { "new": "Mới", "1yr": "Sau 1 năm", "3yr": "Sau 3 năm", "6yr": "Sau 6 năm", "boost": "Tăng cường" };
+        const modeText = modeMap[row[prefix + 'mode']] || row[prefix + 'mode'] || 'Không ghi nhận';
+<!--thêm1.1     -->
+const ghichuBs = row[prefix + 'ghichubs'] || '';
+        div.innerHTML = `<div class="history-date">📅 Ngày: ${row.ngayTN || '?'}</div>
+	<div class="history-person" style="color: #0288d1; font-weight: bold;">⚙️ Chế độ: ${modeText}</div>
+<!--thêm1.2     -->
+${ghichuBs ? `<div class="history-person" style="color: #666; font-style: italic;">📝 Ghi chú: ${ghichuBs}</div>` : ''}
+`;
+        div.onclick = () => applyHistoryData(index);
+        listDiv.appendChild(div);
+    });
+    document.getElementById('historyModal').style.display = 'flex';
+}
+
+function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
+
+function applyHistoryData(index) {
+    if (typeof closeHistoryModal === 'function') closeHistoryModal();
+    const data = globalHistoryData[index];
+    let warnCount = 0;
+
+    const numWindingsId = prefix + 'num_windings';
+    if (data[numWindingsId] !== undefined) {
+        const el = document.getElementById(numWindingsId);
+        if(el) {
+            const oldVal = el.value;
+            el.value = data[numWindingsId];
+            if (oldVal !== data[numWindingsId]) {
+                renderAllTables();
+            }
+        }
+    }
+
+    for (let key in data) {
+        const el = document.getElementById(key);
+        if (el && data[key] !== undefined && data[key] !== '') {
+            if (el.tagName === 'INPUT') {
+                if (isConfigField(key)) {
+                    el.value = data[key];
                 } else {
-                    event.target.blur();
-                    return;
+                    el.classList.remove('old-data-latest', 'old-data', 'new-data', 'pass-color', 'fail-color');
+                    el.classList.add('old-data-history');
+                    el.placeholder = data[key];
+                    el.dataset.oldval = data[key];
+                    el.dataset.dataType = 'history';
+                    el.style.color = '';
+                    el.style.fontWeight = '';
                 }
+            } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
+                el.value = data[key];
+            }
+        }
+    }
+
+    if (typeof calculateAll === 'function') calculateAll();
+    let msg = `⚡ Đã tải xong kết quả ngày ${data.ngayTN || ''} để đối chiếu!`;
+    if (warnCount > 0) msg += `\n⚠️ CẢNH BÁO: Phát hiện ${warnCount} vị trí có sự thay đổi bất thường!`;
+    alert(msg);
+}
+
+// ============================================================
+// 3. HÀM XỬ LÝ NHẬP LIỆU
+// ============================================================
+
+function handleNewInput(event) {
+    const el = event.target;
+    if (el.value && el.value.trim() !== '') {
+        el.classList.remove('old-data-latest', 'old-data-history', 'old-data', 'pass-color', 'fail-color');
+        el.classList.add('new-data');
+        el.style.color = '';
+        el.style.fontWeight = '';
+        if (el.placeholder) {
+            el.placeholder = '';
+        }
+        delete el.dataset.dataType;
+        el.classList.remove('warning-degradation', 'warning-increase');
+        el.title = '';
+    } else {
+        el.classList.remove('new-data');
+        el.style.color = '';
+        el.style.fontWeight = '';
+    }
+    if (typeof calculateAll === 'function') calculateAll();
+}
+
+function captureInputs() {
+    const data = {};
+    document.querySelectorAll('input, select').forEach(el => { if(el.id && el.value) data[el.id] = el.value; });
+    return data;
+}
+
+function saveDraftManually() {
+    localStorage.setItem(prefix + 'DRAFT', JSON.stringify(captureInputs()));
+    alert("💾 Đã lưu nháp!");
+}
+
+function loadDraftData() {
+    const str = localStorage.getItem(prefix + 'DRAFT');
+    if (!str) return;
+    const data = JSON.parse(str);
+    if (data['info_tram']) document.getElementById('info_tram').value = data['info_tram'];
+    if (data['info_nganlo']) document.getElementById('info_nganlo').value = data['info_nganlo'];
+    if (data[prefix + 'num_windings']) {
+        document.getElementById(prefix + 'num_windings').value = data[prefix + 'num_windings'];
+        renderAllTables();
+    }
+    for (let key in data) {
+        const el = document.getElementById(key);
+        if (el && data[key] !== "") {
+            el.value = data[key];
+        }
+    }
+    if (typeof calculateAll === 'function') calculateAll();
+}
+
+function clearDraft() {
+    if(confirm("⚠️ Xóa sạch bản nháp mới?")) {
+        localStorage.removeItem(prefix + 'DRAFT');
+        location.reload();
+    }
+}
+
+// ============================================================
+// 4. HÀM XỬ LÝ LOADING
+// ============================================================
+
+function showLoading(text) { 
+    const overlay = document.getElementById('loadingOverlay');
+    const textEl = document.getElementById('loadingText');
+    if (textEl) textEl.innerText = text;
+    if (overlay) overlay.style.display = 'flex';
+}
+
+function hideLoading() { 
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function toggleSection(sectionId, chk) { 
+    const section = document.getElementById(sectionId);
+    if (section) section.classList.toggle('hidden-section', !chk.checked);
+}
+
+// ============================================================
+// 5. HÀM LƯU LÊN GOOGLE SHEET
+// ============================================================
+
+function syncOneDrive() {
+    showLoading("Đang up dữ liệu ...");
+    const nguoiDo = prompt("Nhập tên người thực hiện (để trống nếu không cần):", "");
+    const tram = document.getElementById('info_tram').value || "";
+    const nganLo = document.getElementById('info_nganlo').value || "";
+    const maPhienGop = tram + "_" + nganLo;
+    const modName = prefix.replace('_', '').toUpperCase();
+    const payload = {
+        module_name: modName,
+        timestamp: new Date().toLocaleString('vi-VN'),
+        maPhien: maPhienGop,
+        ngayTN: document.getElementById('info_ngay').value,
+        tram: tram,
+        nganLo: nganLo,
+        nguoiTN: nguoiDo || ""
+    };
+
+document.querySelectorAll(
+    `input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"], span[id^="${prefix}"]`
+).forEach(el => {
+    let value = "";
+    if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        value = el.value.trim();
+    } else if (el.tagName === "SELECT") {
+        value = el.value;
+    } else if (el.tagName === "SPAN") {
+        value = el.textContent.trim();
+    }
+    value = value
+        ? value
+            .replace("75°C:", "")
+            .replace("TSB:", "")
+            .replace("Ratio:", "")
+            .replace("Ω", "")
+            .replace("ms", "")
+            .trim()
+        : "";
+    if (value && value !== '-' && value !== 'NaN' && value !== '0') payload[el.id] = value;
+});
+
+    const formData = new FormData();
+    formData.append('payload', JSON.stringify(payload));
+    fetch(GOOGLE_WEB_APP_URL, { method: 'POST', body: formData })
+        .then(res => res.text()).then(text => {
+            hideLoading();
+            if(text === "OK") alert("🚀 ĐÃ LƯU!");
+            else alert("⚠️ Lỗi Server: " + text);
+        }).catch(err => { hideLoading(); alert("❌ Lỗi gửi: " + err); });
+}
+
+// ============================================================
+// 6. HÀM XUẤT WORD
+// ============================================================
+
+async function exportWordFromDrive(customPayload = {}) {
+    if (!TEMPLATE_DRIVE_ID) {
+        alert("⚠️ Chưa cấu hình TEMPLATE_DRIVE_ID!");
+        return;
+    }
+    showLoading("Đang soạn file...");
+    try {
+        const res = await fetch(`${GOOGLE_WEB_APP_URL}?action=getTemplate&fileId=${TEMPLATE_DRIVE_ID}`);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        const binaryString = window.atob(data.base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+
+        // 🔑 Lấy cờ includeOld ra khỏi customPayload (không gửi vào template)
+        const includeOld = customPayload._includeOld === true;
+        delete customPayload._includeOld;
+
+        const payload = {};
+        payload[prefix + 'tram'] = document.getElementById('info_tram').value || "";
+        payload[prefix + 'nganlo'] = document.getElementById('info_nganlo').value || "";
+        payload["ngayTN"] = document.getElementById('info_ngay').value || "";
+        payload["nguoiTN"] = "";
+
+        // 🔑 Dùng getValSmart thay vì getVal
+        document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], span[id^="${prefix}"]`).forEach(el => {
+            let val = getValSmart(el.id, includeOld);
+            payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").replace("TSB:", "").replace("Ω", "").trim() : "";
+        });
+
+        // Gộp customPayload (is_2wind, is_3wind, is_sec1, ...)
+        Object.assign(payload, customPayload);
+
+        if (payload["ngayTN"]) {
+            const m = payload["ngayTN"].match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (m) payload["ngayTN"] = `${m[3]}/${m[2]}/${m[1]}`;
+        }
+
+        const zip = new PizZip(bytes.buffer);
+        const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+        doc.render(payload);
+
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            compression: "DEFLATE"
+        });
+
+        const dateStr = payload["ngayTN"] ? payload["ngayTN"].replace(/\//g, '-') : "New";
+        const tramStr = payload[prefix + 'tram'] ? payload[prefix + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
+        const nganLoStr = payload[prefix + 'nganlo'] ? payload[prefix + 'nganlo'].replace(/[\/\\]/g, '-') : "NL";
+        const wordPrefix = prefix.replace('_', '').toUpperCase();
+        saveAs(out, `Bien ban thi nghiem ${wordPrefix}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
+
+        hideLoading();
+    } catch (e) {
+        hideLoading();
+        alert("❌ Lỗi xuất Word: " + e.message);
+    }
+}
+
+
+
+// ============================================================
+// 7. HÀM ĐIỀU HƯỚNG TAB
+// ============================================================
+
+// Tab cho bảng RDC
+function handleRdcTab(event, currentWinding, colType) {
+    if (event.key === 'Enter' || event.key === 'Tab') {
+        event.preventDefault();
+        const numWindings = parseInt(document.getElementById(prefix + 'num_windings')?.value) || 2;
+        const cols = ['terminal', 'ref', 'a', 'b', 'c'];
+        let colIndex = cols.indexOf(colType);
+        let nextWinding = currentWinding;
+        let nextCol = colType;
+
+        if (event.key === 'Enter' || !event.shiftKey) {
+            if (currentWinding < numWindings) {
+                nextWinding++;
+            } else {
+                nextWinding = 1;
+                colIndex = (colIndex + 1) % cols.length;
+                nextCol = cols[colIndex];
+                if (colIndex === 0) { event.target.blur(); return; }
             }
         } else {
             if (currentWinding > 1) {
-                nextWinding = currentWinding - 1;
+                nextWinding--;
             } else {
-                if (phaIndex > 0) {
-                    nextPha = phases[phaIndex - 1];
-                    nextWinding = numWindings;
-                } else {
-                    event.target.blur();
-                    return;
-                }
+                nextWinding = numWindings;
+                colIndex = (colIndex - 1 + cols.length) % cols.length;
+                nextCol = cols[colIndex];
+                if (colIndex === cols.length - 1) { event.target.blur(); return; }
             }
         }
-        const nextId = `ti_err_w${nextWinding}_${nextPha}`;
+
+        let nextId = '';
+        if (nextCol === 'terminal') {
+            nextId = `${prefix}rdc_terminal_${nextWinding}`;
+        } else if (nextCol === 'ref') {
+            nextId = `${prefix}rdc_ref_${nextWinding}`;
+        } else {
+            nextId = `${prefix}rdc_m_${nextWinding}_${nextCol}`;
+        }
         const nextEl = document.getElementById(nextId);
-        if (nextEl) {
-            nextEl.focus();
-            nextEl.select();
-        }
+        if (nextEl) { nextEl.focus(); nextEl.select(); }
     }
-
-    function handleTgTab(event, pha, fieldType) {
-        if (event.key === 'Enter' || event.key === 'Tab') {
-            event.preventDefault();
-            const phas = ['A', 'B', 'C'];
-            const fields = ['ust_tg', 'ust_c', 'gst_tg', 'gst_c'];
-            let nextPha = pha;
-            let nextField = fieldType;
-            let currentFieldIndex = fields.indexOf(fieldType);
-            if (event.key === 'Enter' || !event.shiftKey) {
-                if (currentFieldIndex < 3) {
-                    nextField = fields[currentFieldIndex + 1];
-                } else {
-                    const phaIndex = phas.indexOf(pha);
-                    if (phaIndex < 2) {
-                        nextPha = phas[phaIndex + 1];
-                        nextField = fields[0];
-                    } else {
-                        event.target.blur();
-                        return;
-                    }
-                }
-            } else {
-                if (currentFieldIndex > 0) {
-                    nextField = fields[currentFieldIndex - 1];
-                } else {
-                    const phaIndex = phas.indexOf(pha);
-                    if (phaIndex > 0) {
-                        nextPha = phas[phaIndex - 1];
-                        nextField = fields[3];
-                    } else {
-                        event.target.blur();
-                        return;
-                    }
-                }
-            }
-            const nextId = `ti_${nextField === 'ust_tg' ? 'tg_ust' : nextField === 'ust_c' ? 'c_ust' : nextField === 'gst_tg' ? 'tg_gst' : 'c_gst'}_${nextPha}`;
-            const nextEl = document.getElementById(nextId);
-            if (nextEl) {
-                nextEl.focus();
-                nextEl.select();
-            }
-        }
-    }
-
-
-
-function exportWordTI(includeOldData = false) {
-    const prefixLocal = typeof MODULE_PREFIX !== 'undefined' ? MODULE_PREFIX : 'ti_';
-    
-    // 🔑 Truyền cờ includeOld qua customPayload
-    const customPayload = { _includeOld: includeOldData };
-
-    // --- Định danh ---
-    const tramSelect = document.getElementById('info_tram');
-    if (tramSelect && tramSelect.selectedIndex > -1) {
-        const tramText = tramSelect.options[tramSelect.selectedIndex].text;
-        customPayload["info_tram"] = tramText;
-        customPayload["tram"] = tramText;
-    }
-    const nganLoVal = document.getElementById('info_nganlo')?.value || '';
-    customPayload["info_nganlo"] = nganLoVal;
-    customPayload["nganlo"] = nganLoVal;
-    customPayload["ngay"] = document.getElementById('info_ngay')?.value || '';
-
-    // --- Cấu hình số cuộn (nếu module có) ---
-    const numWindingsEl = document.getElementById(prefixLocal + 'num_windings');
-    const num_windings = numWindingsEl ? numWindingsEl.value : "";
-    customPayload["is_2wind"] = (num_windings === "2");
-    customPayload["is_3wind"] = (num_windings === "3");
-    customPayload["is_4wind"] = (num_windings === "4");
-    customPayload["is_5wind"] = (num_windings === "5");
-    customPayload["is_6wind"] = (num_windings === "6");
-    customPayload["is_7wind"] = (num_windings === "7");
-    customPayload["is_8wind"] = (num_windings === "8");
-
-    exportWordFromDrive(customPayload);
 }
-</script>
-</body>
-</html>
+
+// Tab cho bảng RCD
+function handleRcdTab(event, currentWinding, colType, isPri) {
+    if (event.key !== 'Tab' && event.key !== 'Enter') return;
+    event.preventDefault();
+
+    const numWindings = parseInt(document.getElementById(prefix + 'num_windings')?.value) || 2;
+    const cols = ['a', 'b', 'c'];
+    let colIndex = cols.indexOf(colType);
+    let nextWinding = currentWinding;
+    let nextIsPri = isPri;
+    let nextCol = colType;
+
+    if (event.key === 'Enter' || !event.shiftKey) {
+        if (isPri) {
+            nextWinding = 1;
+            nextIsPri = false;
+        } else if (currentWinding < numWindings) {
+            nextWinding++;
+        } else {
+            colIndex = (colIndex + 1) % cols.length;
+            if (colIndex === 0) {
+                event.target.blur();
+                return;
+            }
+            nextCol = cols[colIndex];
+            nextWinding = 0;
+            nextIsPri = true;
+        }
+    } else {
+        if (isPri) {
+            if (colIndex <= 0) {
+                event.target.blur();
+                return;
+            }
+            colIndex--;
+            nextCol = cols[colIndex];
+            nextWinding = numWindings;
+            nextIsPri = false;
+        } else if (currentWinding > 1) {
+            nextWinding--;
+        } else {
+            if (colIndex > 0) {
+                colIndex--;
+                nextCol = cols[colIndex];
+                nextWinding = 0;
+                nextIsPri = true;
+            } else {
+                event.target.blur();
+                return;
+            }
+        }
+    }
+
+    const nextId = nextIsPri
+        ? `${prefix}rcd_pri_${nextCol}`
+        : `${prefix}rcd_sec${nextWinding}_${nextCol}`;
+
+    const nextEl = document.getElementById(nextId);
+    if (nextEl) {
+        nextEl.focus();
+        nextEl.select();
+    }
+}
+
+function handleEnterToNext(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const inputs = document.querySelectorAll('input[type="number"], input[type="text"]');
+        const currentIndex = Array.from(inputs).indexOf(event.target);
+        if (currentIndex < inputs.length - 1) {
+            inputs[currentIndex + 1].focus();
+            inputs[currentIndex + 1].select();
+        }
+    }
+}
+
+// ============================================================
+// 8. HÀM TIỆN ÍCH
+// ============================================================
+
+function isConfigField(id) {
+    const commonSuffixes = [
+        '_nsx', '_no', '_namsx', '_udm', '_idm', '_inm', '_kieu', '_ghichu', 
+        '_temp', '_humidity', '_csuat', '_ddung', '_kieu',
+        '_terminal_', '_term'
+    ];
+    const systemIds = ['info_ngay', 'info_tram', 'info_nganlo'];
+    if (systemIds.includes(id)) return true;
+    return commonSuffixes.some(suffix => id.includes(suffix));
+}
+
+function getVal(id) {
+    const el = document.getElementById(id);
+    if (!el) return "";
+    if (el.tagName === "SPAN" || el.tagName === "DIV") return el.innerText.trim();
+    if (isConfigField(id)) {
+        return (el.value && el.value.trim() !== "") ? el.value : (el.placeholder || "");
+    }
+    return el.value || "";
+}
+
+// ============================================================
+// 9. 🎯 HÀM MỚI: getValSmart — PHÂN BIỆT 3 LOẠI DỮ LIỆU
+// ============================================================
+/**
+ * Lấy giá trị thông minh theo NGỮ CẢNH xuất Word:
+ * 
+ * @param {string} id - ID của input
+ * @param {boolean} includeOld - 
+ *     false = CHỈ LẤY loại 01 (người dùng nhập / tính toán ra)
+ *     true  = LẤY loại 01 + loại 02 (placeholder từ lịch sử), BỎ loại 03
+ * 
+ * @returns {string}
+ * 
+ * CƠ CHẾ:
+ *   - Loại 01: value có sẵn → luôn lấy (dù includeOld = true/false)
+ *   - Loại 02: value rỗng + placeholder có sẵn + có dataset.dataType ∈ {latest, history}
+ *              → chỉ lấy khi includeOld = true
+ *   - Loại 03: value rỗng + placeholder có sẵn + KHÔNG có dataset.dataType
+ *              → KHÔNG BAO GIỜ lấy
+ */
+function getValSmart(id, includeOld = false) {
+    const el = document.getElementById(id);
+    if (!el) return "";
+
+    // SPAN/DIV → lấy innerText (các ô tính toán tự động như R75, đánh giá ĐẠT/LỖI)
+    if (el.tagName === "SPAN" || el.tagName === "DIV") {
+        const txt = (el.innerText || "").trim();
+        return (txt === "-" || txt === "NaN") ? "" : txt;
+    }
+
+    // 1️⃣ Ưu tiên value (loại 01 — người dùng nhập)
+    const val = (el.value || "").trim();
+    if (val !== "" && val !== "-" && val !== "NaN" && val !== "0") {
+        return val;
+    }
+
+    // 2️⃣ Nếu KHÔNG includeOld → dừng, trả rỗng (bỏ hết placeholder)
+    if (!includeOld) return "";
+
+    // 3️⃣ includeOld = true: chỉ lấy placeholder KHI có cờ dataset.dataType
+    //    Đây là dấu hiệu chắc chắn placeholder đến từ lịch sử (loại 02)
+    const dt = el.dataset ? el.dataset.dataType : null;
+    if (dt === "latest" || dt === "history") {
+        const ph = (el.placeholder || "").trim();
+        return (ph === "-" || ph === "NaN" || ph === "0") ? "" : ph;
+    }
+
+    // 4️⃣ Mọi placeholder khác (loại 03 - form sinh ra) → BỎ QUA
+    return "";
+}

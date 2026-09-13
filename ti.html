@@ -845,7 +845,7 @@ function calculateRatio(winding, pha, source = null) {
 
             const error = parseFloat(errValStr);
             if (!isNaN(error)) {
-                const K_do = K_dm * (1 + error / 100);
+                const K_do = K_dm * (1 + error/100);
                 kdoEl.textContent = `TSB: ${K_do.toFixed(2)}`;
                 
                 const isPass = Math.abs(error) <= accLimit;

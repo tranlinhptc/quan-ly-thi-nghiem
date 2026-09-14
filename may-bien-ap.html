@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -1095,13 +1093,13 @@ function renderBushingTables() {
                                 </div>
                             </div>
                         </th>
-                        <th style="width:15%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">U đo (kV)</th>
+                        <th  class="hidden-col" style="width:15%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">U đo (kV)</th>
                         <th style="width:15%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">Sơ đồ</th>
                     </tr>
                     <tr>
                         <th style="width:25%; font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">Pha (Phase)</th>
                         ${loc.phases.map(p => `<th style="width:${colWidth}; font-size:11px; padding:6px 2px; background:#e3f2fd; border:1px solid #ddd;">${p}</th>`).join('')}
-                        <th style="font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">/</th>
+                        <th class="hidden-col" style="font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">/</th>
                         <th style="font-size:11px; padding:6px 2px; background:#f1f3f4; border:1px solid #ddd;">/</th>
                     </tr>
                 </thead>
@@ -1120,8 +1118,8 @@ function renderBushingTables() {
                                 </div>
                             </td>
                         `).join('')}
-                        <td style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
-                        <td style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
+                        <td  class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
+                        <td  class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
                     </tr>
 
                     <!-- Giữa lõi - ty sứ (CÓ ĐỦ THẺ HIỂN THỊ KẾT QUẢ QUY ĐỔI) -->
@@ -1134,7 +1132,7 @@ function renderBushingTables() {
                                 <div id="mba_bushing_tg1_20c_${loc.id}_${p}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:2px; min-height:12px;"></div>
                             </td>
                         `).join('')}
-                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_${loc.id}" value="10" style="${inputStyle} font-weight:bold;"></td>
+                        <td  class="hidden-col" rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_${loc.id}" value="10" style="${inputStyle} font-weight:bold;"></td>
                         <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_diag1_${loc.id}" value="UST" style="${inputStyle} font-weight:bold;"></td>
                     </tr>
                     <tr>
@@ -1152,8 +1150,8 @@ function renderBushingTables() {
                                 <input type="number" id="mba_bushing_rcd1_${loc.id}_${p}" style="${inputStyle}" oninput="handleNewInput(event)">
                             </td>
                         `).join('')}
-                        <td style="padding:2px; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_rcd_${loc.id}" value="1" style="${inputStyle}"></td>
-                        <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                        <td  class="hidden-col" style="padding:2px; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_rcd_${loc.id}" value="1" style="${inputStyle}"></td>
+                        <td  class="hidden-col" style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
                     </tr>
 
                     <!-- Ty sứ - Vỏ (CÓ ĐỦ THẺ HIỂN THỊ KẾT QUẢ QUY ĐỔI) -->
@@ -1166,7 +1164,7 @@ function renderBushingTables() {
                                 <div id="mba_bushing_tg2_20c_${loc.id}_${p}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:2px; min-height:12px;"></div>
                             </td>
                         `).join('')}
-                        <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u2_${loc.id}" value="1" style="${inputStyle} font-weight:bold;"></td>
+                        <td class="hidden-col" rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_u2_${loc.id}" value="1" style="${inputStyle} font-weight:bold;"></td>
                         <td rowspan="2" style="padding:2px; vertical-align:middle; border:1px solid #ddd;"><input type="text" id="mba_bushing_diag2_${loc.id}" value="GST" style="${inputStyle} font-weight:bold;"></td>
                     </tr>
                     <tr>
@@ -1184,7 +1182,7 @@ function renderBushingTables() {
                                 <input type="number" id="mba_bushing_rcd2_${loc.id}_${p}" style="${inputStyle}" oninput="handleNewInput(event)">
                             </td>
                         `).join('')}
-                        <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                        <td class="hidden-col" style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
                         <td style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
                     </tr>
                 </tbody>

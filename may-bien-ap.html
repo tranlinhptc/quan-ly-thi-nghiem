@@ -1,6 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="vi">
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -215,7 +216,9 @@
             <input type="file" id="pdfFileInput" class="file-input-hidden" accept=".pdf" onchange="handlePdfFile(event)">
             <div id="importStatus" style="margin-top:8px;font-size:12px;color:#666;"></div>
         </div>
-        <!-- 1. KIỂM TRA BÊN NGOÀI -->
+
+
+        <!-- 1. KIỂM TRA BÊN NGOÀI
         <div class="card">
             <div class="card-title">
                 <span>1. Kiểm Tra Bên Ngoài</span>
@@ -224,11 +227,13 @@
             <div id="body_sec1" class="table-responsive hidden-section">
                 <input type="text" id="mba_visual" value="Bình thường.">
             </div>
-        </div>
-        <!-- 2. ĐIỆN TRỞ CÁCH ĐIỆN MBA -->
+        </div> -->
+
+
+        <!-- 1. ĐIỆN TRỞ CÁCH ĐIỆN MBA -->
         <div class="card">
             <div class="card-title">
-                <span>2. Điện Trở Cách Điện [MΩ]</span>
+                <span>1. Điện Trở Cách Điện [MΩ]</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec2" class="table-responsive hidden-section">
@@ -236,7 +241,10 @@
                 <div class="table-responsive" id="table_rcd_container"></div>
             </div>
         </div>
-        <!-- 3. TỔ ĐẤU DÂY -->
+
+
+
+        <!-- 3. TỔ ĐẤU DÂY 
         <div class="card">
             <div class="card-title">
                 <span>3. Tổ Đấu Dây (Vector Group)</span>
@@ -245,7 +253,37 @@
             <div id="body_sec3" class="table-responsive hidden-section">
                 <div class="table-responsive" id="table_vector_container"></div>
             </div>
+        </div>-->
+
+
+
+       <!-- 2. ĐIỆN TRỞ MỘT CHIỀU MBA -->
+        <div class="card">
+            <div class="card-title">
+                <span>2. Điện Trở Một Chiều [mΩ]</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec5" class="table-responsive hidden-section">
+                <div class="note-text">* Quy đổi về 75°C</div>
+                <div class="table-responsive" id="table_rdc_container"></div>
+            </div>
         </div>
+
+
+
+  <!-- 3. TỶ SỐ BIẾN MBA -->
+        <div class="card">
+            <div class="card-title">
+                <span>3. Tỷ Số Biến</span>
+                <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
+            </div>
+            <div id="body_sec6" class="table-responsive hidden-section">
+                <div class="table-responsive" id="table_ratio_container"></div>
+            </div>
+        </div>
+
+
+
         <!-- 4. Tgδ CÁC CUỘN DÂY -->
         <div class="card">
             <div class="card-title">
@@ -260,8 +298,8 @@
 
 
 
-    
-<!-- BỔ SUNG: SỨ CÁCH ĐIỆN ĐẦU VÀO -->
+            
+<!-- 5. BỔ SUNG: SỨ CÁCH ĐIỆN ĐẦU VÀO -->
    
 
 <div class="card">
@@ -279,43 +317,30 @@
     </div>
 </div>
 
-        <!-- 5. ĐIỆN TRỞ MỘT CHIỀU MBA -->
+
+
+       <!-- 6. BỘ ĐIỀU ÁP DƯỚI TẢI -->
         <div class="card">
             <div class="card-title">
-                <span>6. Điện Trở Một Chiều [mΩ]</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec5" class="table-responsive hidden-section">
-                <div class="note-text">* Quy đổi về 75°C</div>
-                <div class="table-responsive" id="table_rdc_container"></div>
-            </div>
-        </div>
-        <!-- 6. TỶ SỐ BIẾN MBA -->
-        <div class="card">
-            <div class="card-title">
-                <span>7. Tỷ Số Biến</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
-            </div>
-            <div id="body_sec6" class="table-responsive hidden-section">
-                <div class="table-responsive" id="table_ratio_container"></div>
-            </div>
-        </div>
-        <!-- 7. BỘ ĐIỀU ÁP DƯỚI TẢI -->
-        <div class="card">
-            <div class="card-title">
-                <span>8. Bộ Điều Áp Dưới Tải (OLTC)</span>
+                <span>6. Bộ Điều Áp Dưới Tải (OLTC)</span>
                 <label class="chk-disable"><input type="checkbox" id="chk_sec7" onchange="toggleSection('body_sec7', this)"> ✏️ Nhập</label>
             </div>
             <div id="body_sec7" class="table-responsive hidden-section">
                 <div class="table-responsive" id="table_oltc_container"></div>
             </div>
         </div>
-<!-- 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
 
-        <!-- 9. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
+
+
+
+
+
+<!-- 7. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
+
+        <!-- 7. BIẾN DÒNG CHÂN SỨ (Bushing CT) -->
 <div class="card">
     <div class="card-title">
-        <span>9. Biến Dòng Chân Sứ (Bushing CT)</span>
+        <span>7. Biến Dòng Chân Sứ (Bushing CT)</span>
         <label class="chk-disable"><input type="checkbox" id="chk_sec8" onchange="toggleSection('body_sec8', this)"> ✏️ Nhập</label>
     </div>
     <div id="body_sec8" class="table-responsive hidden-section">
@@ -359,7 +384,7 @@
         </div>
     </div>
 </div>
-        <!-- KẾT LUẬN -->
+        <!-- KẾT LUẬN 
         <div class="card">
             <div class="card-title">
                 <span>9. Kết Luận</span>
@@ -368,7 +393,7 @@
             <div id="body_sec9" class="table-responsive hidden-section">
                 <textarea id="mba_conclusion" rows="3" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:4px;font-size:12px;">Các hạng mục đã kiểm định, thí nghiệm đạt yêu cầu kỹ thuật.</textarea>
             </div>
-        </div>
+        </div>-->
         <!-- ĐIỀU KHIỂN -->
         <div class="card">
             <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
@@ -2005,7 +2030,7 @@ function renderCtRdc(numWindings, locations, phases, phaseColors, inputStyle) {
 function renderCtRatio(numWindings, locations, phases, phaseColors, inputStyle) {
     const container = document.getElementById('ct_ratio_container');
     if (!container) return;
-    const ratedRatios = ["200:1", "400:1", "600:1", "800:1", "1000:1", "1200:1"];
+    const ratedRatios = ["200:1", "400:1", "600:1", "800:1", "1000:1", "1200:1", "200:5", "400:5", "600:5", "800:5", "1000:5", "1200:5"];
 
     let html = `<table style="width:100%; table-layout:fixed; border-collapse:collapse; background:#fff;">
         <thead>
@@ -2197,7 +2222,7 @@ function renderCtExcitation(numWindings, locations, phases, phaseColors) {
 
     html += `</table>
         <div style="font-size:9px;color:#666;margin-top:3px;">
-            * U(V) / I(mA) tại 3 điểm: 15% - 55% - 95% Vknee. Nút <b style="color:#d32f2f;">+</b> nạp file XML Omicron CPC 100 cho cả 6 cuộn của 1 pha.
+            * U(V) / I(µA) tại 3 điểm: 50% - 75% - 95% Vknee.
         </div>`;
 
     container.innerHTML = html;
@@ -2286,18 +2311,18 @@ function processCtExcitationXml(xmlText, locId, pha, fileName) {
 
             // --- QUY ĐỔI DÒNG ĐIỆN VỀ mA (SỬA LỖI I = 0) ---
             // Nếu bstrMulti trống hoặc không có, mặc định đơn vị gốc là Ampere (A) -> Nhân 1000 để ra mA
-            if (iMulti === 'm' || iMulti === 'ma') { 
-                // Đã là mA, giữ nguyên 
+	if (iMulti === 'm' || iMulti === 'ma') { 
+                i *= 1000;     // mA -> uA
             } 
             else if (iMulti === 'u' || iMulti === 'µ' || iMulti === 'ua') { 
-                i *= 0.001; // µA -> mA 
+                // Đã là uA, giữ nguyên
             } 
             else if (iMulti === 'n' || iMulti === 'na') { 
-                i *= 1e-6;  // nA -> mA 
+                i *= 0.001;    // nA -> uA
             }
             else { 
-                // Trường hợp file XML trả về đơn vị Ampere (A) hoặc không có nhãn nhân
-                i *= 1000;  // A -> mA 
+                // Trường hợp mặc định là Ampere (A) hoặc không có nhãn
+                i *= 1000000;  // A -> uA
             }
 
             if (isFinite(v) && isFinite(i)) points.push({ v, i });
@@ -2357,7 +2382,7 @@ function pickThreePoints(points, vknee) {
         vref = points[points.length - 1].v; // Vmax
     }
 
-    const targets = [0.15, 0.55, 0.95].map(r => r * vref);
+    const targets = [0.5, 0.75, 0.95].map(r => r * vref);
     const used = new Set();
     const result = [];
 

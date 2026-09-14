@@ -889,7 +889,7 @@ function applyHistoryData(index) {
         <table>
             <thead>
                 <tr>
-                    <th>Đối tượng đo</th>
+                    <th>Đối tượng</th>
                     <th>Tgδ (%)</th>
                     <th>C (pF)</th>
                     <th class="hidden-col">Điện áp đo (kV)</th>
@@ -989,7 +989,7 @@ function getBushingKFactor(temp, type) {
         if (t >= 43 && t <= 48) return 1.33;
         if (t >= 49 && t <= 50) return 1.37;
     }
-else if (type === 'RIPP') 
+else if (type === 'KHAC') 
 {
         if (t === 17) return 0.93;
         if (t >= 18 && t <= 22) return 21.0;
@@ -1024,10 +1024,6 @@ function updateBushingKFactor(locId) {
         kInput.classList.add('new-data');
     }
 }
-
-// ============================================================
-// HÀM RENDER BẢNG SỨ ĐẦU VÀO (ĐÃ TÍCH HỢP GỌI HÀM UPDATE K)
-// ============================================================
 // ============================================================
 // HÀM RENDER BẢNG SỨ ĐẦU VÀO - ĐÃ FIX HIỂN THỊ VÀ CẬP NHẬT K
 // ============================================================
@@ -1036,10 +1032,10 @@ function renderBushingTables() {
     if (!container) return;
 
     const locations = [
-        { id: 'HV', label: 'Sứ phía 220kV (Cao áp)', phases: ['A', 'B', 'C'] },
-        { id: 'MV', label: 'Sứ phía 110kV (Trung áp)', phases: ['Am', 'Bm', 'Cm'] },
-        { id: 'LV', label: 'Sứ phía 22kV (Hạ áp)', phases: ['a', 'b', 'c'] },
-        { id: 'NEUTRAL', label: 'Sứ phía Trung tính', phases: ['N'] }
+        { id: 'HV', label: 'Sứ Cao áp', phases: ['A', 'B', 'C'] },
+        { id: 'MV', label: 'Sứ Trung áp', phases: ['Am', 'Bm', 'Cm'] },
+        { id: 'LV', label: 'Sứ Hạ áp', phases: ['a', 'b', 'c'] },
+        { id: 'NEUTRAL', label: 'Sứ Trung tính', phases: ['N'] }
     ];
 
     const inputStyle = "width:100%; box-sizing:border-box; font-size:10px; text-align:center; padding:3px 2px; border:1px solid #ccc; border-radius:3px; outline:none; background:#fff;";
@@ -1112,14 +1108,14 @@ function renderBushingTables() {
                         ${loc.phases.map((p, idx) => `
                             <td style="padding:2px; vertical-align:middle; border:1px solid #ddd;">
                                 <div style="display:flex; flex-direction:column; gap:2px;">
-                                    <input type="text" id="mba_bushing_type_${loc.id}_${p}" placeholder="Kiểu loại" style="${inputStyle}" oninput="autoFillBushingInfo(this, '${loc.id}', 'type', '${p}', ${idx}); handleNewInput(event);">
+                                    <input type="text" id="mba_bushing_type_${loc.id}_${p}" placeholder="Kiểu" style="${inputStyle}" oninput="autoFillBushingInfo(this, '${loc.id}', 'type', '${p}', ${idx}); handleNewInput(event);">
                                     <input type="text" id="mba_bushing_mfg_${loc.id}_${p}" placeholder="Hãng SX" style="${inputStyle}" oninput="autoFillBushingInfo(this, '${loc.id}', 'mfg', '${p}', ${idx}); handleNewInput(event);">
-                                    <input type="text" id="mba_bushing_sn_${loc.id}_${p}" placeholder="Số chế tạo" style="${inputStyle}" oninput="handleNewInput(event)">
+                                    <input type="text" id="mba_bushing_sn_${loc.id}_${p}" placeholder="Số seri" style="${inputStyle}" oninput="autoFillBushingInfo(this, '${loc.id}', 'sn', '${p}', ${idx}); handleNewInput(event);">
                                 </div>
                             </td>
                         `).join('')}
-                        <td  class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
-                        <td  class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;">/</td>
+                        <td class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;"></td>
+                        <td class="hidden-col" style="text-align:center; color:#666; border:1px solid #ddd;"></td>
                     </tr>
 
                     <!-- Giữa lõi - ty sứ (CÓ ĐỦ THẺ HIỂN THỊ KẾT QUẢ QUY ĐỔI) -->
@@ -1150,8 +1146,8 @@ function renderBushingTables() {
                                 <input type="number" id="mba_bushing_rcd1_${loc.id}_${p}" style="${inputStyle}" oninput="handleNewInput(event)">
                             </td>
                         `).join('')}
-                        <td  class="hidden-col" style="padding:2px; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_rcd_${loc.id}" value="1" style="${inputStyle}"></td>
-                        <td  class="hidden-col" style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
+                        <td class="hidden-col" style="padding:2px; border:1px solid #ddd;"><input type="text" id="mba_bushing_u1_rcd_${loc.id}" value="1" style="${inputStyle}"></td>
+                        <td class="hidden-col" style="text-align:center; color:#666; background:#f9f9f9; border:1px solid #ddd;">/</td>
                     </tr>
 
                     <!-- Ty sứ - Vỏ (CÓ ĐỦ THẺ HIỂN THỊ KẾT QUẢ QUY ĐỔI) -->
@@ -1261,7 +1257,7 @@ function calculateBushings() {
                 let tg2 = parseFloat(tg2Input.value);
                 if (!isNaN(tg2) && !isNaN(kFactor) && kFactor > 0) {
                     // Logic quy đổi: tg_20°C = tg_đo * K
-                    tg2Display.textContent = `QĐ 20°C: ${(tg2 * kFactor).toFixed(3)} %`;
+                    tg2Display.textContent = `20°C: ${(tg2 * kFactor).toFixed(3)} %`;
                 } else {
                     tg2Display.textContent = "";
                 }
@@ -1287,15 +1283,15 @@ function renderRdcWindingTable() {
         <div style="margin-bottom:8px;">
             <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
                 <div class="form-group">
-                    <label>Cuộn HV - Nhiệt độ đo (°C):</label>
+                    <label>Cuộn HV (°C):</label>
                     <input type="number" id="mba_rdc_hv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:100%;">
                 </div>
                 <div class="form-group">
-                    <label>Cuộn MV - Nhiệt độ đo (°C):</label>
+                    <label>Cuộn MV (°C):</label>
                     <input type="number" id="mba_rdc_mv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:100%;">
                 </div>
                 <div class="form-group">
-                    <label>Cuộn LV - Nhiệt độ đo (°C):</label>
+                    <label>Cuộn LV (°C):</label>
                     <input type="number" id="mba_rdc_lv_temp" placeholder="75" oninput="handleNewInput(event); calculateAll()" style="width:100%;">
                 </div>
             </div>
@@ -1855,9 +1851,7 @@ function processImportFile() {
         `;
     }
 
-// ============================================================
-// 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 BẢNG RIÊNG (TỐI ƯU MOBILE)
-// ============================================================
+
 // ============================================================
 // 8. BIẾN DÒNG CHÂN SỨ (Bushing CT) - 4 TAB (HV, MV, LV, NEUTRAL)
 // ============================================================

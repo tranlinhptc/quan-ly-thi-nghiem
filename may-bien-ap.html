@@ -2062,7 +2062,7 @@ function calculateCtRdcTo75() {
         if (!isNaN(rdcValue) && rdcValue > 0) {
             // Quy đổi về 75°C
             const rdc75 = rdcValue * kFactor75;
-            displayEl.textContent = `QĐ 75°C: ${rdc75.toFixed(4)} Ω`;
+            displayEl.textContent = `75°: ${rdc75.toFixed(3)}`;
             displayEl.style.color = '#d84315';
         } else {
             displayEl.textContent = '';

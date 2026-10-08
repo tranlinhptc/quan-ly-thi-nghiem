@@ -1889,6 +1889,9 @@ function renderCtTables() {
 
     // Kích hoạt bộ lọc hiển thị theo tab hiện tại
     filterCtTablesByMainTab();
+    
+    // BỔ SUNG: Tính toán quy đổi 75°C sau khi render
+    calculateCtRdcTo75();
 }
 
 // ============================================================
@@ -1983,6 +1986,9 @@ function renderCtRcd(numWindings, locations, phases, phaseColors, inputStyle) {
 // ============================================================
 // 8.2 CT - RDC (Ω)
 // ============================================================
+// ============================================================
+// 8.2 CT - RDC (Ω) - BỔ SUNG QUY ĐỔI VỀ 75°C
+// ============================================================
 function renderCtRdc(numWindings, locations, phases, phaseColors, inputStyle) {
     const container = document.getElementById('ct_rdc_container');
     if (!container) return;
@@ -2003,18 +2009,66 @@ function renderCtRdc(numWindings, locations, phases, phaseColors, inputStyle) {
                     <input type="text" id="mba_ct_rdc_terminal_${loc.id}_w${w}" value="${w}S1-${w}S" style="${inputStyle} font-weight:bold; background:#f9f9f9;">
                 </td>
                 ${phases.map(pha => `
-                    <td style="padding:2px;">
+                    <td style="padding:2px; vertical-align:top;">
                         <input type="number" id="mba_ct_rdc_${loc.id}_${pha}_w${w}" step="0.001" placeholder="Rdc" style="${inputStyle}" oninput="handleNewInput(event); calculateAll()">
+                        <div id="mba_ct_rdc_75c_${loc.id}_${pha}_w${w}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:3px; min-height:12px;"></div>
                     </td>
                 `).join('')}
             </tr>`;
         }
     });
 
-    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* RDC - Điện trở một chiều các cuộn dây (Ω)</div>`;
+    html += `</tbody></table><div style="font-size:9px;color:#666;margin-top:3px;">* RDC - Điện trở một chiều các cuộn dây (Ω), quy đổi về 75°C</div>`;
     container.innerHTML = html;
 }
+	// ============================================================
+// TÍNH TOÁN QUY ĐỔI ĐIỆN TRỞ MỘT CHIỀU CT VỀ 75°C
+// Công thức: R75 = R_đo × (235 + 75) / (235 + t_đo)
+// Với đồng (Cu): hệ số 235
+// ============================================================
+function calculateCtRdcTo75() {
+    const tempInput = document.getElementById('mba_temp');
+    const tempDo = parseFloat(tempInput?.value);
+    
+    // Nếu chưa nhập nhiệt độ đo, không tính toán
+    if (isNaN(tempDo)) {
+        // Xóa tất cả các hiển thị
+        document.querySelectorAll('[id^="mba_ct_rdc_75c_"]').forEach(el => {
+            el.textContent = '';
+        });
+        return;
+    }
 
+    // Hệ số nhiệt độ cho đồng: α = 1/235
+    const CONST_235 = 235;
+    const targetTemp = 75;
+    
+    // Hệ số quy đổi K75 = (235 + 75) / (235 + t_đo)
+    const kFactor75 = (CONST_235 + targetTemp) / (CONST_235 + tempDo);
+
+    // Quét tất cả các ô nhập RDC của CT
+    const rdcInputs = document.querySelectorAll('input[id^="mba_ct_rdc_"]');
+    
+    rdcInputs.forEach(input => {
+        const id = input.id;
+        // Bỏ qua các ô terminal (đầu dây)
+        if (id.includes('terminal')) return;
+        
+        const rdcValue = parseFloat(input.value);
+        const displayEl = document.getElementById(id.replace('mba_ct_rdc_', 'mba_ct_rdc_75c_'));
+        
+        if (!displayEl) return;
+        
+        if (!isNaN(rdcValue) && rdcValue > 0) {
+            // Quy đổi về 75°C
+            const rdc75 = rdcValue * kFactor75;
+            displayEl.textContent = `QĐ 75°C: ${rdc75.toFixed(4)} Ω`;
+            displayEl.style.color = '#d84315';
+        } else {
+            displayEl.textContent = '';
+        }
+    });
+}
 
 // ============================================================
 // 8.3 CT - Tỉ số biến (Kđo)
@@ -2492,6 +2546,7 @@ function initCtTables() {
     // --- TÍNH TỈ SỐ BIẾN---
 	calculateRatioDelta ();
 calculateCtRatioError();
+		calculateCtRdcTo75();
 
 
     // --- ĐÁNH GIÁ Tgδ ---

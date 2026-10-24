@@ -2484,10 +2484,12 @@ function calculateRdcDelta() {
             let values = [an, bn, cn].filter(v => !isNaN(v) && v > 0);
 
             if (values.length === 3) {
-                let avg = (an + bn + cn) / 3;
-                let max = Math.max(an, bn, cn);
-                // Công thức: (Max - Trung bình) / Trung bình * 100
-                let delta = ((max - avg) / avg) * 100;
+                let avg = (an + bn + cn) / 3; // Rtb
+                let max = Math.max(an, bn, cn); // Rmax
+                let min = Math.min(an, bn, cn); // Rmin
+                
+                // Công thức mới: (Rmax - Rmin) / Rtb * 100
+                let delta = ((max - min) / avg) * 100;
                 targetInput.value = delta.toFixed(4); // Lấy 4 chữ số thập phân
             } else {
                 targetInput.value = '';
@@ -2506,7 +2508,10 @@ function calculateRdcDelta() {
         if (values.length === 3) {
             let avg = (amn + bmn + cmn) / 3;
             let max = Math.max(amn, bmn, cmn);
-            let delta = ((max - avg) / avg) * 100;
+            let min = Math.min(amn, bmn, cmn);
+            
+            // Công thức mới
+            let delta = ((max - min) / avg) * 100;
             targetMv.value = delta.toFixed(4);
         } else {
             targetMv.value = '';
@@ -2524,7 +2529,10 @@ function calculateRdcDelta() {
         if (values.length === 3) {
             let avg = (ab + bc + ca) / 3;
             let max = Math.max(ab, bc, ca);
-            let delta = ((max - avg) / avg) * 100;
+            let min = Math.min(ab, bc, ca);
+            
+            // Công thức mới
+            let delta = ((max - min) / avg) * 100;
             targetLv.value = delta.toFixed(4);
         } else {
             targetLv.value = '';

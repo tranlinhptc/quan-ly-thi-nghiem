@@ -2465,7 +2465,72 @@ function initCtTables() {
     renderCtTables();
 }
 
+// ============================================================
+// TÍNH TOÁN ĐỘ LỆCH RDC (So với trung bình 3 pha)
+// ============================================================
+function calculateRdcDelta() {
+    const tapCount = parseInt(document.getElementById('mba_tap_count')?.value) || 19;
 
+    // 1. Tính cho bảng HV (Có nhiều nấc)
+    for (let tap = 1; tap <= tapCount; tap++) {
+        let an = parseFloat(document.getElementById(`mba_rdc_hv_an_${tap}`)?.value);
+        let bn = parseFloat(document.getElementById(`mba_rdc_hv_bn_${tap}`)?.value);
+        let cn = parseFloat(document.getElementById(`mba_rdc_hv_cn_${tap}`)?.value);
+        
+        let targetInput = document.getElementById(`mba_rdc_hv_dabc_${tap}`);
+
+        if (targetInput) {
+            // Lọc các giá trị hợp lệ (> 0)
+            let values = [an, bn, cn].filter(v => !isNaN(v) && v > 0);
+
+            if (values.length === 3) {
+                let avg = (an + bn + cn) / 3;
+                let max = Math.max(an, bn, cn);
+                // Công thức: (Max - Trung bình) / Trung bình * 100
+                let delta = ((max - avg) / avg) * 100;
+                targetInput.value = delta.toFixed(4); // Lấy 4 chữ số thập phân
+            } else {
+                targetInput.value = '';
+            }
+        }
+    }
+
+    // 2. Tính cho bảng MV (Chỉ 1 nấc)
+    let amn = parseFloat(document.getElementById('mba_rdc_mv_amn')?.value);
+    let bmn = parseFloat(document.getElementById('mba_rdc_mv_bmn')?.value);
+    let cmn = parseFloat(document.getElementById('mba_rdc_mv_cmn')?.value);
+    let targetMv = document.getElementById('mba_rdc_mv_dabc');
+
+    if (targetMv) {
+        let values = [amn, bmn, cmn].filter(v => !isNaN(v) && v > 0);
+        if (values.length === 3) {
+            let avg = (amn + bmn + cmn) / 3;
+            let max = Math.max(amn, bmn, cmn);
+            let delta = ((max - avg) / avg) * 100;
+            targetMv.value = delta.toFixed(4);
+        } else {
+            targetMv.value = '';
+        }
+    }
+
+    // 3. Tính cho bảng LV (Chỉ 1 nấc)
+    let ab = parseFloat(document.getElementById('mba_rdc_lv_ab')?.value);
+    let bc = parseFloat(document.getElementById('mba_rdc_lv_bc')?.value);
+    let ca = parseFloat(document.getElementById('mba_rdc_lv_ca')?.value);
+    let targetLv = document.getElementById('mba_rdc_lv_dabc');
+
+    if (targetLv) {
+        let values = [ab, bc, ca].filter(v => !isNaN(v) && v > 0);
+        if (values.length === 3) {
+            let avg = (ab + bc + ca) / 3;
+            let max = Math.max(ab, bc, ca);
+            let delta = ((max - avg) / avg) * 100;
+            targetLv.value = delta.toFixed(4);
+        } else {
+            targetLv.value = '';
+        }
+    }
+}
 
 // ============================================================
     // TÍNH TOÁN (Đánh giá qua màu sắc)
@@ -2546,6 +2611,7 @@ function initCtTables() {
 	calculateRatioDelta ();
 calculateCtRatioError();
 		calculateCtRdcTo75();
+		calculateCtRdcDeltal();
 
 
     // --- ĐÁNH GIÁ Tgδ ---

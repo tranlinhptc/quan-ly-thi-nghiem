@@ -545,16 +545,16 @@ U₂ TB: <span id="tu_u2_avg_w${i}_${pha}">-</span> V
 </div>
 <!-- Ô Sai số -->
 <div class="input-row">
-<input type="number" step="any"
-id="tu_err_w${i}_${pha}"
-class="${phaseClass}"
-placeholder="± %"
-oninput="handleNewInput(event); calculateRatio(${i}, '${pha}', 'err')"
-onfocus="this.select()"
-onkeydown="handleRatioTab(event, ${i}, '${pha}', 'err')"
-style="font-size:12px;background:#fff;width:100%;"
->
-<--!span class="unit">%</span-->
+    <input type="text" inputmode="decimal"
+        id="tu_err_w${i}_${pha}"
+        class="${phaseClass}"
+        placeholder="± %"
+        onfocus="onErrFocus(${i}, '${pha}')"
+        oninput="handleNewInput(event); onErrInput(${i}, '${pha}')"
+        onblur="onErrBlur(${i}, '${pha}')"
+        onkeydown="handleRatioTab(event, ${i}, '${pha}', 'err')"
+        style="font-size:12px;background:#fff;width:100%;"
+    >
 </div>
 </div>
 <div class="ratio-info">

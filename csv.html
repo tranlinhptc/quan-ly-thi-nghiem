@@ -1,467 +1,828 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>THỬ NGHIỆM CHỐNG SÉT VAN (CSA)</title>
-<style>
-:root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-background: url('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed;
-background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
-.container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
-.header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.header-bar h2 { font-size: 15px; margin: 0; }
-.btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
-.card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-.card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-.form-group { display: flex; flex-direction: column; }
-label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
-input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
-input:focus, select:focus { outline: none; border-color: var(--primary); }
-.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
-th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
-th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
-.chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
-.btn-action { background: var(--primary); color: white; border: none; padding: 10px 15px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 4px 0; width: 100%; }
-.btn-cloud { background: #2e7d32; }
-.btn-draft { background: #0288d1; }
-.btn-clear { background: #757575; font-size:11px; margin-top:4px; }
-.note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
-.hidden-section { display: none !important; }
-.form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
-#unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
-.bg-warning { background-color: #fff9c4 !important; border-color: #fbc02d !important; color: #c62828 !important; font-weight: bold; }
-.new-data { color: #1565c0 !important; font-weight: bold; }
-/* Modal & Loader */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
-.modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-.modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
-.btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-.loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CHỐNG SÉT VAN</title>
+    
+    <!-- Thư viện xuất Word -->
+    <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root { --primary: #d84315; --bg: #f4f6f9; --card: rgba(255, 255, 255, 0.96); --border: #dadce0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: url('https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?auto=format&fit=crop&w=1200&q=80') no-repeat center center fixed; background-size: cover; padding: 8px; color: #212529; min-height: 100vh; }
+        .container { max-width: 100%; margin: 0 auto; backdrop-filter: blur(2px); }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .header-bar h2 { font-size: 15px; margin: 0; }
+        .btn-back { background: rgba(255,255,255,0.2); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; }
+        .card { background: var(--card); border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+        .card-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #fbe9e7; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: #424242; }
+        input, select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 12px; width: 100%; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 11px; background: #fff; }
+        th, td { border: 1px solid var(--border); padding: 5px 4px; text-align: center; }
+        th { background-color: #f1f3f4; font-weight: 700; color: #3c4043; white-space: nowrap; }
+        .sub-val { font-size: 10px; color: #1565c0; font-weight: 600; margin-top: 2px; display: block; }
+        .chk-disable { font-size: 12px; font-weight: bold; color: #d84315; cursor: pointer; background: #fbe9e7; padding: 2px 8px; border-radius: 4px; }
+        .btn-view-old { background: #0288d1; color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
+        .btn-action { background: var(--primary); color: white; border: none; padding: 10px 15px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: pointer; margin: 4px 0; width: 100%; }
+        .btn-cloud { background: #2e7d32; }
+        .btn-draft { background: #0288d1; }
+        .btn-clear { background: #757575; font-size:11px; margin-top:4px; }
+        .note-text { font-size: 10px; color: #666; font-style: italic; margin-top: 3px; }
+        .hidden-section { display: none !important; }
+        .hidden-col { display: none !important; }
+        
+        /* Modal & Loading */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid #fbe9e7; padding-bottom: 8px; text-align: center; }
+        .history-item { padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+        .history-item:hover { background: #fbe9e7; border-color: var(--primary); transform: scale(1.02); }
+        .history-date { font-weight: bold; color: #d84315; font-size: 14px; }
+        .history-person { font-size: 12px; color: #666; margin-top: 4px; }
+        .btn-close-modal { background: #d32f2f; color: white; border: none; padding: 10px; border-radius: 6px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .form-locked { opacity: 0.4; pointer-events: none; filter: grayscale(0.8); transition: all 0.3s ease; }
+        #unlock_message { color: #d32f2f; font-size: 12px; font-weight: bold; text-align: center; margin-top: 8px; font-style: italic; }
+        .phase-a { background-color: #fff9c4 !important; } .phase-b { background-color: #ffebee !important; } .phase-c { background-color: #e3f2fd !important; }
+        
+        .old-data-latest { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
+        .old-data-latest::placeholder { color: #2e7d32 !important; opacity: 0.6 !important; font-weight: bold !important; }
+        .old-data-history { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; font-style: italic !important; }
+        .old-data-history::placeholder { color: #333333 !important; opacity: 0.6 !important; font-weight: bold !important; }
+        .new-data { color: #000000; font-weight: bold !important; }
+        .pass-color { color: #1565c0 !important; font-weight: bold !important; }
+        .fail-color { color: #c62828 !important; font-weight: bold !important; }
+    </style>
 </head>
 <body>
 
-<div id="historyModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-title">⏱ LỊCH SỬ THÍ NGHIỆM</div>
-        <div id="historyList" style="font-size:12px; text-align:center; color:#666;">Chưa có dữ liệu</div>
-        <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
-    </div>
-</div>
-
-<div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
-    <div class="loader"></div>
-    <div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...</div>
-</div>
-
-<div class="container">
-    <div class="header-bar">
-        <h2>⚡ THỬ NGHIỆM CHỐNG SÉT VAN (CSA / LA)</h2>
-        <a href="index.html" class="btn-back">← Trang Chủ</a>
-    </div>
-
-    <!-- 0. THÔNG TIN ĐỊNH DANH -->
-    <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
-        <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
-        <div class="grid">
-            <div class="form-group">
-                <label>Trạm (Lấy từ hệ thống): <span style="color:red">*</span></label>
-                <select id="info_tram" onchange="checkUnlockForm()">
-                    <option value="" disabled selected>Đang tải ...</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Ngăn Lộ / Chỉ danh: <span style="color:red">*</span></label>
-                <input type="text" id="info_nganlo" placeholder="Ví dụ: 271, 131..." oninput="checkUnlockForm()">
-            </div>
-            <div class="form-group">
-                <label>Ngày Thí Nghiệm:</label>
-                <input type="date" id="info_ngay" onchange="checkUnlockForm()">
-            </div>
+    <!-- POPUP LỊCH SỬ -->
+    <div id="historyModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">⏱ LỊCH SỬ THÍ NGHIỆM</div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 10px; text-align:center;">Chọn để điền mờ (Placeholder) số liệu cũ đối chiếu</div>
+            <div id="historyList"></div>
+            <button class="btn-close-modal" onclick="closeHistoryModal()">Đóng</button>
         </div>
-        <div id="unlock_message">⚠️ Vui lòng chọn Trạm và gõ Ngăn lộ để mở khóa Form nhập liệu!</div>
     </div>
 
-    <!-- KHU VỰC BỊ KHÓA -->
-    <div id="locked_zone" class="form-locked">
+    <!-- LOADING -->
+    <div id="loadingOverlay" class="modal-overlay" style="z-index: 2000; flex-direction: column;">
+        <div class="loader"></div>
+        <div id="loadingText" style="color: white; margin-top: 15px; font-weight: bold; font-size:14px;">Đang xử lý...</div>
+    </div>
 
-        <!-- CẤU HÌNH THIẾT BỊ -->
-        <div class="card">
-            <div class="card-title">
-                <span>CẤU HÌNH THIẾT BỊ</span>
-                <div>
-                    <button class="btn-back" style="background:#f57c00;" onclick="loadLatestData()">⚡Lấy kết quả mới</button>
-                    <button class="btn-back" onclick="loadOldDataSection()">👁️ Lịch sử</button>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header-bar">
+            <h2>⚡CHỐNG SÉT VAN</h2>
+            <a href="index.html" class="btn-back">← Trang Chủ</a>
+        </div>
+
+        <!-- 0. THÔNG TIN ĐỊNH DANH -->
+        <div class="card" style="border: 2px solid var(--primary); box-shadow: 0 4px 10px rgba(216, 67, 21, 0.2);">
+            <div class="card-title"><span>THÔNG TIN ĐỊNH DANH (BẮT BUỘC)</span></div>
             <div class="grid">
-                <div class="form-group"><label>Hãng sản xuất:</label><input type="text" id="csa_mfg" placeholder="TRIDELTA"></div>
-                <div class="form-group"><label>Kiểu loại (Type):</label><input type="text" id="csa_kieu" placeholder="SBKC 96/SM-II"></div>
-                <div class="form-group"><label>Năm sản xuất:</label><input type="number" id="csa_namsx" placeholder="2024"></div>
-                <div class="form-group"><label>Điện áp định mức (kV):</label><input type="number" id="csa_udm" placeholder="36" value="36"></div>
-                <div class="form-group"><label>Dòng phóng định mức (kA):</label><input type="number" id="csa_in" placeholder="10" value="10"></div>
-                <div class="form-group"><label>Điện áp vận hành (kV):</label><input type="number" id="csa_uc" placeholder="29" value="29"></div>
-                <div class="form-group"><label>Số chế tạo (Serial):</label><input type="text" id="csa_serial" placeholder="384886/384887/384888"></div>
-                <div class="form-group"><label>Lý do kiểm định:</label><input type="text" id="csa_reason" placeholder="1 năm sau lắp đặt"></div>
-                <div class="form-group"><label>Nhiệt độ MT (°C):</label><input type="number" id="csa_temp" placeholder="30"></div>
-                <div class="form-group"><label>Độ ẩm (%):</label><input type="number" id="csa_humidity" placeholder="65"></div>
                 <div class="form-group">
-                    <label>Số phần tử (Elements):</label>
-                    <select id="csa_num_elements" onchange="renderAllTables()">
-                        <option value="1">1 Phần tử</option>
-                        <option value="2">2 Phần tử</option>
-                        <option value="3" selected>3 Phần tử</option>
-                        <option value="4">4 Phần tử</option>
+                    <label>Trạm (Lấy từ hệ thống): <span style="color:red">*</span></label>
+                    <select id="info_tram" onchange="checkUnlockForm()">
+                        <option value="" disabled selected>Đang tải ...</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Ghi chú:</label><input type="text" id="csa_ghichu" placeholder="Nhập ghi chú nếu cần"></div>
+                <div class="form-group">
+                    <label>Vị trí lắp đặt / Ngăn Lộ: <span style="color:red">*</span></label>
+                    <input type="text" id="info_nganlo" placeholder="VD: CS1T4..." oninput="checkUnlockForm()">
+                </div>
+                <div class="form-group">
+                    <label>Ngày Thí Nghiệm:</label>
+                    <input type="date" id="info_ngay" onchange="checkUnlockForm()">
+                </div>
             </div>
+            <div id="unlock_message">⚠️ Vui lòng chọn Trạm và nhập Vị trí để mở khóa Form!</div>
         </div>
 
-        <!-- 1. KIỂM TRA BÊN NGOÀI -->
-        <div class="card">
-            <div class="card-title">
-                <span>1. Kiểm Tra Bên Ngoài</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
+        <!-- KHU VỰC FORM -->
+        <div id="locked_zone" class="form-locked">
+            
+            <!-- THÔNG SỐ THIẾT BỊ -->
+            <div class="card">
+                <div class="card-title">
+                    <span>THÔNG SỐ THIẾT BỊ</span>
+                    <div>
+                        <button class="btn-view-old" style="background:#f57c00; margin-right: 5px;" onclick="loadLatestData()">⚡Kết quả mới nhất</button>
+                        <button class="btn-view-old" onclick="loadOldDataSection()">👁️ Lịch sử</button>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="form-group"><label>Hãng sản xuất:</label><input type="text" id="csa_mfg" placeholder="TRIDELTA"></div>
+                    <div class="form-group"><label>Kiểu loại (Type):</label><input type="text" id="csa_type" placeholder="SBKC 96/SM-II"></div>
+                    <div class="form-group"><label>Số chế tạo (S/N):</label><input type="text" id="csa_sn" placeholder="384886..."></div>
+                    <div class="form-group"><label>Năm SX:</label><input type="number" id="csa_year" placeholder="2024"></div>
+                    <div class="form-group"><label>Điện áp định mức (kV):</label><input type="number" id="csa_udm" placeholder="36" value="36"></div>
+                    <div class="form-group"><label>Dòng phóng định mức (kA):</label><input type="number" id="csa_in" placeholder="10" value="10"></div>
+                    <div class="form-group"><label>Điện áp vận hành (kV):</label><input type="number" id="csa_uc" placeholder="29" value="29"></div>
+                    <div class="form-group">
+                        <label>Lý do kiểm định:</label>
+                        <select id="csa_reason">
+                            <option value="1 năm sau lắp đặt">1 năm sau lắp đặt</option>
+                            <option value="Định kỳ">Định kỳ</option>
+                            <option value="Sau sửa chữa">Sau sửa chữa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Số phần tử (Elements):</label>
+                        <select id="csa_num_elements" onchange="renderAllTables()">
+                            <option value="1">1 Phần tử</option>
+                            <option value="2">2 Phần tử</option>
+                            <option value="3" selected>3 Phần tử</option>
+                            <option value="4">4 Phần tử</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Nhiệt độ MT (°C):</label><input type="number" id="csa_temp" value="30" oninput="calculateAll()"></div>
+                    <div class="form-group"><label>Độ ẩm (%):</label><input type="number" id="csa_humidity" value="65" oninput="calculateAll()"></div>
+                    <div class="form-group"><label>Ghi chú:</label><input type="text" id="csa_ghichu" placeholder="Nhập ghi chú nếu cần"></div>
+                </div>
             </div>
-            <div id="body_sec1" class="table-responsive hidden-section">
-                <input type="text" id="csa_visual" value="Bình thường, sứ không nứt vỡ, không rò rỉ.">
-            </div>
-        </div>
 
-        <!-- 2. ĐO ĐIỆN TRỞ CÁCH ĐIỆN -->
-        <div class="card">
-            <div class="card-title">
-                <span>2. Đo Điện Trở Cách Điện [MΩ]</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
+            <!-- 1. KIỂM TRA BÊN NGOÀI -->
+            <div class="card" style="display:none">
+                <div class="card-title">
+                    <span>1. Kiểm Tra Bên Ngoài</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec1" onchange="toggleSection('body_sec1', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec1" class="table-responsive hidden-section">
+                    <input type="text" id="csa_visual" value="Bình thường, sứ không nứt vỡ, không rò rỉ.">
+                </div>
             </div>
-            <div id="body_sec2" class="table-responsive hidden-section">
-                <div class="table-responsive" id="table_rcd_container"></div>
-            </div>
-        </div>
 
-        <!-- 3. ĐO DÒNG RÒ TỔNG -->
-        <div class="card">
-            <div class="card-title">
-                <span>3. Đo Dòng Rò Tổng (Ở Điện Áp Vận Hành)</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
+            <!-- 2. ĐO ĐIỆN TRỞ CÁCH ĐIỆN -->
+            <div class="card">
+                <div class="card-title">
+                    <span>2. Đo Điện Trở Cách Điện [MΩ]</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec2" onchange="toggleSection('body_sec2', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec2" class="table-responsive hidden-section">
+                    <div class="table-responsive" id="table_rcd_container"></div>
+                </div>
             </div>
-            <div id="body_sec3" class="table-responsive hidden-section">
-                <div class="note-text">* 3.1 Đo trên toàn bộ chống sét van:</div>
-                <div class="table-responsive" id="table_leak_whole_container"></div>
-                <div class="note-text" style="margin-top:10px;">* 3.2 Đo trên từng phần tử:</div>
-                <div class="table-responsive" id="table_leak_el_container"></div>
-            </div>
-        </div>
 
-        <!-- 4. ĐO ĐIỆN ÁP TẠI DÒNG ĐIỆN THAM CHIẾU -->
-        <div class="card">
-            <div class="card-title">
-                <span>4. Đo Điện Áp AC/DC Tại Dòng Tham Chiếu</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec4" onchange="toggleSection('body_sec4', this)"> ✏️ Nhập</label>
+            <!-- 3. ĐO DÒNG RÒ TỔNG -->
+            <div class="card">
+                <div class="card-title">
+                    <span>3. Đo Dòng Rò Tổng (Ở Điện Áp Vận Hành)</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec3" onchange="toggleSection('body_sec3', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec3" class="table-responsive hidden-section">
+                    <div class="note-text">* 3.1 Đo trên toàn bộ chống sét van:</div>
+                    <div class="table-responsive" id="table_leak_whole_container"></div>
+                    <div class="note-text" style="margin-top:10px;">* 3.2 Đo trên từng phần tử:</div>
+                    <div class="table-responsive" id="table_leak_el_container"></div>
+                </div>
             </div>
-            <div id="body_sec4" class="table-responsive hidden-section">
-                <div class="note-text">* 4.1 Đo trên toàn bộ:</div>
-                <div class="table-responsive" id="table_ref_whole_container"></div>
-                <div class="note-text" style="margin-top:10px;">* 4.2 Đo trên từng phần tử:</div>
-                <div class="table-responsive" id="table_ref_el_container"></div>
-            </div>
-        </div>
 
-        <!-- 5. KIỂM TRA THIẾT BỊ ĐẾM SÉT & ĐỒNG HỒ ĐO DÒNG RÒ -->
-        <div class="card">
-            <div class="card-title">
-                <span>5. Thiết Bị Đếm Sét & Đo Dòng Rò</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
+            <!-- 4. ĐO ĐIỆN ÁP TẠI DÒNG ĐIỆN THAM CHIẾU -->
+            <div class="card">
+                <div class="card-title">
+                    <span>4. Đo Điện Áp AC/DC Tại Dòng Tham Chiếu</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec4" onchange="toggleSection('body_sec4', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec4" class="table-responsive hidden-section">
+                    <div class="note-text">* 4.1 Đo trên toàn bộ:</div>
+                    <div class="table-responsive" id="table_ref_whole_container"></div>
+                    <div class="note-text" style="margin-top:10px;">* 4.2 Đo trên từng phần tử:</div>
+                    <div class="table-responsive" id="table_ref_el_container"></div>
+                </div>
             </div>
-            <div id="body_sec5" class="table-responsive hidden-section">
-                <div class="note-text">* 5a. Kiểm tra đồng hồ đo dòng rò:</div>
-                <div class="table-responsive" id="table_earth_container"></div>
-                <div class="note-text" style="margin-top:10px;">* 5b. Kiểm tra bộ đếm sét:</div>
-                <div class="table-responsive" id="table_counter_container"></div>
-            </div>
-        </div>
 
-        <!-- 6. ĐO TỔN HAO CÔNG SUẤT -->
-        <div class="card">
-            <div class="card-title">
-                <span>6. Đo Tổn Hao Công Suất</span>
-                <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
+            <!-- 5. KIỂM TRA THIẾT BỊ ĐẾM SÉT & ĐỒNG HỒ ĐO DÒNG RÒ -->
+            <div class="card">
+                <div class="card-title">
+                    <span>5. Thiết Bị Đếm Sét & Đo Dòng Rò</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec5" onchange="toggleSection('body_sec5', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec5" class="table-responsive hidden-section">
+                    <div class="note-text">* 5a. Kiểm tra đồng hồ đo dòng rò:</div>
+                    <div class="table-responsive" id="table_earth_container"></div>
+                    <div class="note-text" style="margin-top:10px;">* 5b. Kiểm tra bộ đếm sét:</div>
+                    <div class="table-responsive" id="table_counter_container"></div>
+                </div>
             </div>
-            <div id="body_sec6" class="table-responsive hidden-section">
-                <div class="table-responsive" id="table_power_container"></div>
+
+            <!-- 6. ĐO TỔN HAO CÔNG SUẤT -->
+            <div class="card">
+                <div class="card-title">
+                    <span>6. Đo Tổn Hao Công Suất</span>
+                    <label class="chk-disable"><input type="checkbox" id="chk_sec6" onchange="toggleSection('body_sec6', this)"> ✏️ Nhập</label>
+                </div>
+                <div id="body_sec6" class="table-responsive hidden-section">
+                    <div class="table-responsive" id="table_power_container"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- ĐIỀU KHIỂN -->
-        <div class="card">
-            <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
-            <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản Word</button>
-            <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ Google Sheet</button>
-            <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp làm lại</button>
-        </div>
+            <!-- ĐIỀU KHIỂN -->
+            <div class="card">
+                <button class="btn-action btn-draft" onclick="saveDraftManually()">💾 Tạm Lưu (Nháp)</button>
+                <button class="btn-action" onclick="exportWordFromDrive()" style="background:#0288d1; margin-top:8px;">📝 Xuất Biên Bản Word</button>
+                <button class="btn-action btn-cloud" onclick="syncOneDrive()" style="margin-top:8px;">☁️ Lưu & Đồng Bộ Google Sheet</button>
+                <button class="btn-action btn-clear" onclick="clearDraft()">🗑️ Xóa bản nháp làm lại</button>
+            </div>
 
+        </div>
     </div>
-</div>
 
-<script>
-// ============================================================
-// CẤU HÌNH CHUNG
-// ============================================================
-const MODULE_PREFIX = "csa_";
+    <script>
+        // ============================================================
+        // CẤU HÌNH MODULE CSA
+        // ============================================================
+        const GOOGLE_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxr-8Y25S607UYytRjKutvw4Zhx69W05XOc3Qs5gsSBQNxAZ8S16mmt7Nj8xUV1nNIn/exec";
+        // LƯU Ý: Bạn cần tạo 1 file Word Template cho Chống Sét Van, up lên Drive và thay ID vào đây
+        const TEMPLATE_DRIVE_ID = "ĐIỀN_ID_FILE_WORD_TEMPLATE_CSA_VÀO_ĐÂY"; 
+        const MODULE_PREFIX = "csa_";
+        const prefix = MODULE_PREFIX;
 
-// ============================================================
-// HÀM TIỆN ÍCH (MOCK CHO CÁC HÀM TỪ FILE COMMON)
-// ============================================================
-function toggleSection(sectionId, chk) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-        if (chk && chk.checked) section.classList.remove('hidden-section');
-        else section.classList.add('hidden-section');
-    }
-}
+        let globalHistoryData = [];
 
-function handleNewInput(event) {
-    if (event && event.target) {
-        event.target.classList.add('new-data');
-    }
-}
+        // ============================================================
+        // KHỞI TẠO & TIỆN ÍCH CHUNG
+        // ============================================================
+        function setTodayDate() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            let mm = today.getMonth() + 1;
+            let dd = today.getDate();
+            if (dd < 10) dd = '0' + dd;
+            if (mm < 10) mm = '0' + mm;
+            document.getElementById('info_ngay').value = yyyy + '-' + mm + '-' + dd;
+        }
 
-function setTodayDate() {
-    const el = document.getElementById('info_ngay');
-    if (el && !el.value) {
-        const today = new Date().toISOString().split('T')[0];
-        el.value = today;
-    }
-}
-
-function fetchSubstations() {
-    const sel = document.getElementById('info_tram');
-    if (sel) {
-        sel.innerHTML = `
-            <option value="" disabled selected>Chọn trạm...</option>
-            <option value="Tram1">Trạm 220kV Krông Búk</option>
-            <option value="Tram2">Trạm 500kV Pleiku</option>
-            <option value="Tram3">Trạm 220kV Nha Trang</option>
-        `;
-    }
-}
-
-function checkUnlockForm() {
-    const tram = document.getElementById('info_tram').value;
-    const nganlo = document.getElementById('info_nganlo').value.trim();
-    const lockedZone = document.getElementById('locked_zone');
-    const msg = document.getElementById('unlock_message');
-    
-    if (tram && nganlo) {
-        if (lockedZone) lockedZone.classList.remove('form-locked');
-        if (msg) msg.style.display = 'none';
-    } else {
-        if (lockedZone) lockedZone.classList.add('form-locked');
-        if (msg) msg.style.display = 'block';
-    }
-}
-
-function loadLatestData() { alert("Tính năng tự động lấy dữ liệu mới nhất đang được phát triển."); }
-function loadOldDataSection() { alert("Tính năng lịch sử đang được phát triển."); }
-function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
-function exportWordFromDrive() { alert("Tính năng xuất Word đang được phát triển."); }
-function syncOneDrive() { alert("Tính năng đồng bộ Google Sheet đang được phát triển."); }
-
-// ============================================================
-// XỬ LÝ LƯU NHÁP (LOCAL STORAGE)
-// ============================================================
-function saveDraftManually() {
-    const data = {};
-    const inputs = document.querySelectorAll('input, select');
-    inputs.forEach(el => {
-        if (el.id) data[el.id] = el.value;
-    });
-    localStorage.setItem(MODULE_PREFIX + 'DRAFT', JSON.stringify(data));
-    alert('Đã lưu bản nháp thành công!');
-}
-
-function clearDraft() {
-    if (confirm('Bạn có chắc chắn muốn xóa toàn bộ bản nháp và làm lại từ đầu?')) {
-        localStorage.removeItem(MODULE_PREFIX + 'DRAFT');
-        location.reload();
-    }
-}
-
-function restoreDraft() {
-    const draft = localStorage.getItem(MODULE_PREFIX + 'DRAFT');
-    if (draft) {
-        try {
-            const data = JSON.parse(draft);
-            for (let id in data) {
-                const el = document.getElementById(id);
-                if (el) el.value = data[id];
+        function toggleSection(sectionId, chk) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                if (chk && chk.checked) section.classList.remove('hidden-section');
+                else section.classList.add('hidden-section');
             }
-            checkUnlockForm();
-        } catch(e) { console.error("Lỗi khôi phục bản nháp", e); }
-    }
-}
-
-// ============================================================
-// RENDER GIAO DIỆN BẢNG
-// ============================================================
-window.onload = function() {
-    setTodayDate();
-    fetchSubstations();
-    renderAllTables();
-    restoreDraft();
-};
-
-function renderAllTables() {
-    renderRcdTable();
-    renderLeakTable();
-    renderRefVoltTable();
-    renderCounterTable();
-    renderPowerLossTable();
-}
-
-// Bảng 2: Đo điện trở cách điện
-function renderRcdTable() {
-    const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
-    let html = `<table><thead><tr><th>Phép Đo</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
-    html += `
-        <tr><td><b>Thân (Toàn bộ)</b></td>
-        <td><input type="number" id="csa_rcd_body_A" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_body_B" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_body_C" oninput="handleNewInput(event)"></td></tr>
-        <tr><td><b>Đế (Toàn bộ)</b></td>
-        <td><input type="number" id="csa_rcd_base_A" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_base_B" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_base_C" oninput="handleNewInput(event)"></td></tr>
-    `;
-    for(let i=1; i<=num; i++) {
-        html += `<tr><td>Phần tử ${i}</td>
-        <td><input type="number" id="csa_rcd_el${i}_A" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_el${i}_B" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_rcd_el${i}_C" oninput="handleNewInput(event)"></td></tr>`;
-    }
-    html += `</tbody></table>`;
-    document.getElementById('table_rcd_container').innerHTML = html;
-}
-
-// Bảng 3: Đo dòng rò tổng
-function renderLeakTable() {
-    const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
-    
-    // 3.1 Toàn bộ
-    let html1 = `<table><thead><tr><th>Pha</th><th>Điện áp đo<br>(kVAC)</th><th>Dòng rò tổng<br>(mA)</th><th>Dòng rò TP điện trở<br>(μA)</th><th>Sóng hài bậc 3<br>(μA)</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        html1 += `<tr><td><b>Pha ${pha}</b></td>
-        <td><input type="number" step="any" id="csa_leak_whole_U_${pha}" oninput="handleNewInput(event)"></td>
-        <td><input type="number" step="any" id="csa_leak_whole_I_${pha}" oninput="handleNewInput(event)"></td>
-        <td><input type="number" step="any" id="csa_leak_whole_Ir_${pha}" oninput="handleNewInput(event)"></td>
-        <td><input type="number" step="any" id="csa_leak_whole_I3_${pha}" oninput="handleNewInput(event)"></td></tr>`;
-    });
-    html1 += `</tbody></table>`;
-    document.getElementById('table_leak_whole_container').innerHTML = html1;
-
-    // 3.2 Từng phần tử
-    let html2 = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>Điện áp đo<br>(kVAC)</th><th>Dòng rò tổng<br>(mA)</th><th>Dòng rò TP điện trở<br>(μA)</th><th>Sóng hài bậc 3<br>(μA)</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        for(let i=1; i<=num; i++) {
-            html2 += `<tr>
-            ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
-            <td>PT ${i}</td>
-            <td><input type="number" step="any" id="csa_leak_el${i}_U_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_leak_el${i}_I_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_leak_el${i}_Ir_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_leak_el${i}_I3_${pha}" oninput="handleNewInput(event)"></td>
-            </tr>`;
         }
-    });
-    html2 += `</tbody></table>`;
-    document.getElementById('table_leak_el_container').innerHTML = html2;
-}
 
-// Bảng 4: Đo điện áp tại dòng tham chiếu
-function renderRefVoltTable() {
-    const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
-    
-    // 4.1 Toàn bộ
-    let html1 = `<table><thead><tr><th>Pha</th><th>Điện áp AC (kV)</th><th>Điện áp DC (kV)</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        html1 += `<tr><td><b>Pha ${pha}</b></td>
-        <td><input type="number" step="any" id="csa_ref_whole_AC_${pha}" oninput="handleNewInput(event)"></td>
-        <td><input type="number" step="any" id="csa_ref_whole_DC_${pha}" oninput="handleNewInput(event)"></td></tr>`;
-    });
-    html1 += `</tbody></table>`;
-    document.getElementById('table_ref_whole_container').innerHTML = html1;
-
-    // 4.2 Từng phần tử
-    let html2 = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>Điện áp AC (kV)</th><th>Điện áp DC (kV)</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        for(let i=1; i<=num; i++) {
-            html2 += `<tr>
-            ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
-            <td>PT ${i}</td>
-            <td><input type="number" step="any" id="csa_ref_el${i}_AC_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_ref_el${i}_DC_${pha}" oninput="handleNewInput(event)"></td>
-            </tr>`;
+        function showLoading(text) {
+            document.getElementById('loadingText').innerText = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
         }
-    });
-    html2 += `</tbody></table>`;
-    document.getElementById('table_ref_el_container').innerHTML = html2;
-}
 
-// Bảng 5: Kiểm tra thiết bị đếm sét & đo dòng rò
-function renderCounterTable() {
-    // 5a. Đồng hồ đo dòng rò
-    let html1 = `<table><thead><tr><th>Dòng đưa vào (mA)</th><th colspan="3">Dòng hiển thị (mA)</th><th>Ghi chú</th></tr>
-    <tr><th></th><th>Pha A</th><th>Pha B</th><th>Pha C</th><th></th></tr></thead><tbody>`;
-    for(let i=0; i<3; i++) {
-        html1 += `<tr>
-            <td><input type="number" id="csa_earth_inj_${i}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_earth_A_${i}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_earth_B_${i}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_earth_C_${i}" oninput="handleNewInput(event)"></td>
-            <td><input type="text" id="csa_earth_note_${i}" oninput="handleNewInput(event)"></td>
-        </tr>`;
-    }
-    html1 += `</tbody></table>`;
-    document.getElementById('table_earth_container').innerHTML = html1;
-
-    // 5b. Bộ đếm sét
-    let html2 = `<table><thead><tr><th>Pha</th><th>Trước khi thử</th><th>Sau khi thử (DC)</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        html2 += `<tr><td><b>Pha ${pha}</b></td>
-        <td><input type="number" id="csa_counter_before_${pha}" oninput="handleNewInput(event)"></td>
-        <td><input type="number" id="csa_counter_after_${pha}" oninput="handleNewInput(event)"></td></tr>`;
-    });
-    html2 += `</tbody></table>`;
-    document.getElementById('table_counter_container').innerHTML = html2;
-}
-
-// Bảng 6: Đo tổn hao công suất
-function renderPowerLossTable() {
-    const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
-    let html = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>I (μA)</th><th>P (mW)</th><th>C (pF)</th><th>Điện áp đo (kVAC)</th><th>Sơ đồ đo</th></tr></thead><tbody>`;
-    ['A', 'B', 'C'].forEach(pha => {
-        for(let i=1; i<=num; i++) {
-            html += `<tr>
-            ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
-            <td>PT ${i}</td>
-            <td><input type="number" step="any" id="csa_pow_I_${i}_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_pow_P_${i}_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_pow_C_${i}_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="number" step="any" id="csa_pow_U_${i}_${pha}" oninput="handleNewInput(event)"></td>
-            <td><input type="text" id="csa_pow_diagram_${i}_${pha}" placeholder="UST" oninput="handleNewInput(event)"></td>
-            </tr>`;
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
         }
-    });
-    html += `</tbody></table>`;
-    document.getElementById('table_power_container').innerHTML = html;
-}
-</script>
+
+        function handleNewInput(event) {
+            const el = event.target;
+            if (el.value && el.value.trim() !== '') {
+                el.classList.remove('old-data-latest', 'old-data-history', 'pass-color', 'fail-color');
+                el.classList.add('new-data');
+                if (el.placeholder) el.placeholder = '';
+                delete el.dataset.dataType;
+            } else {
+                el.classList.remove('new-data');
+            }
+            calculateAll();
+        }
+
+        function getVal(id) {
+            const el = document.getElementById(id);
+            if (!el) return "";
+            if (el.tagName === "SPAN" || el.tagName === "DIV") return el.innerText.trim();
+            if (isConfigField(id)) {
+                return (el.value && el.value.trim() !== "") ? el.value : (el.placeholder || "");
+            }
+            return el.value || "";
+        }
+
+        function isConfigField(id) {
+            const commonSuffixes = [
+                '_nsx', '_no', '_namsx', '_udm', '_in', '_uc', '_type', '_ghichu',
+                '_temp', '_humidity', '_mfg', '_sn', '_year', '_reason'
+            ];
+            const systemIds = ['info_ngay', 'info_tram', 'info_nganlo'];
+            if (systemIds.includes(id)) return true;
+            return commonSuffixes.some(suffix => id.includes(suffix));
+        }
+
+        function checkUnlockForm() {
+            const tram = document.getElementById('info_tram').value;
+            const nganLo = document.getElementById('info_nganlo').value.trim();
+            const zone = document.getElementById('locked_zone');
+            const msg = document.getElementById('unlock_message');
+
+            if (tram && tram !== "" && nganLo && nganLo !== "") {
+                zone.classList.remove('form-locked');
+                if (msg) msg.style.display = 'none';
+            } else {
+                zone.classList.add('form-locked');
+                if (msg) msg.style.display = 'block';
+            }
+        }
+
+        // ============================================================
+        // API LẤY DANH SÁCH TRẠM
+        // ============================================================
+        function fetchSubstations() {
+            const cachedTrams = localStorage.getItem('CACHE_TRAMS');
+            const select = document.getElementById('info_tram');
+            if (cachedTrams) {
+                populateSelect(JSON.parse(cachedTrams));
+            } else {
+                select.innerHTML = '<option value="" disabled selected>Đang tải danh sách trạm...</option>';
+            }
+
+            fetch(GOOGLE_WEB_APP_URL + "?action=getSubstations")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        if (!cachedTrams) select.innerHTML = `<option value="">⚠️ Lỗi: ${data.error}</option>`;
+                        return;
+                    }
+                    localStorage.setItem('CACHE_TRAMS', JSON.stringify(data));
+                    if (!cachedTrams) populateSelect(data);
+                })
+                .catch(err => {
+                    if (!cachedTrams) select.innerHTML = '<option value="">❌ Lỗi kết nối!</option>';
+                    console.error("Lỗi Fetch:", err);
+                });
+        }
+
+        function populateSelect(data) {
+            const select = document.getElementById('info_tram');
+            select.innerHTML = '<option value="" disabled selected>-- Chọn Trạm --</option>';
+            data.forEach(tram => {
+                let option = document.createElement("option");
+                option.value = tram;
+                option.text = tram;
+                select.appendChild(option);
+            });
+            if (localStorage.getItem(prefix + 'DRAFT')) {
+                loadDraftData();
+                checkUnlockForm();
+            }
+        }
+
+        // ============================================================
+        // LỊCH SỬ & DỮ LIỆU CŨ
+        // ============================================================
+        function loadOldDataSection() {
+            const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
+            const tram = encodeURIComponent(document.getElementById('info_tram').value);
+            if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Vị trí!"); return; }
+
+            showLoading("Đang tải dữ liệu ...");
+            const modName = prefix.replace('_', '').toUpperCase();
+            const fetchUrl = `${GOOGLE_WEB_APP_URL}?nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
+
+            fetch(fetchUrl).then(res => res.json()).then(data => {
+                hideLoading();
+                if (!data || data.length === 0 || data.error) { alert("ℹ️ Không tìm thấy dữ liệu cũ!"); return; }
+                globalHistoryData = data;
+                showHistoryModal(data);
+            }).catch(err => { hideLoading(); alert("❌ Lỗi tải data: " + err); });
+        }
+
+        function loadLatestData() {
+            const nganLo = encodeURIComponent(document.getElementById('info_nganlo').value.trim());
+            const tram = encodeURIComponent(document.getElementById('info_tram').value);
+            if (!nganLo || !tram) { alert("⚠️ Chưa chọn Trạm và Vị trí!"); return; }
+
+            showLoading("Đang tải thông số gần nhất...");
+            const modName = prefix.replace('_', '').toUpperCase();
+            const fetchUrl = `${GOOGLE_WEB_APP_URL}?action=getLatest&nganLo=${nganLo}&tram=${tram}&module_name=${modName}`;
+
+            fetch(fetchUrl).then(res => res.json()).then(data => {
+                hideLoading();
+                if (!data || Object.keys(data).length === 0 || data.error) {
+                    alert("ℹ️ Không tìm thấy dữ liệu cũ của thiết bị này!");
+                    return;
+                }
+                applyLatestData(data);
+            }).catch(err => { hideLoading(); alert("❌ Lỗi mạng: " + err); });
+        }
+
+        function applyLatestData(data) {
+            const numElementsId = 'csa_num_elements';
+            if (data[numElementsId] !== undefined) {
+                const el = document.getElementById(numElementsId);
+                if(el) {
+                    const oldVal = el.value;
+                    el.value = data[numElementsId];
+                    if (oldVal !== data[numElementsId]) renderAllTables();
+                }
+            }
+            for (let key in data) {
+                const el = document.getElementById(key);
+                if (el && data[key] !== undefined && data[key] !== '') {
+                    if (el.tagName === 'INPUT') {
+                        if (isConfigField(key)) {
+                            el.value = data[key];
+                        } else {
+                            el.value = "";
+                            el.placeholder = data[key];
+                            el.classList.remove('old-data-history', 'new-data', 'pass-color', 'fail-color');
+                            el.classList.add('old-data-latest');
+                            el.dataset.oldval = data[key];
+                            el.dataset.dataType = 'latest';
+                        }
+                    } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
+                        el.value = data[key];
+                    }
+                }
+            }
+            ['chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6'].forEach(id => {
+                const chk = document.getElementById(id);
+                if(chk) {
+                    chk.checked = true;
+                    toggleSection(id.replace('chk', 'body'), chk);
+                }
+            });
+            calculateAll();
+            alert(`⚡ Đã nhập các số liệu mới nhất!`);
+        }
+
+        function showHistoryModal(dataArray) {
+            const listDiv = document.getElementById('historyList');
+            listDiv.innerHTML = '';
+            dataArray.forEach((row, index) => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                const modeMap = { "new": "Mới", "1yr": "Sau 1 năm" };
+                const modeText = modeMap[row[prefix + 'mode']] || row[prefix + 'mode'] || 'Không ghi nhận';
+                div.innerHTML = `<div class="history-date">📅 Ngày: ${row.ngayTN || '?'}</div>
+                                 <div class="history-person" style="color: #0288d1; font-weight: bold;">⚙️ Lý do: ${row[prefix+'reason'] || modeText}</div>`;
+                div.onclick = () => applyHistoryData(index);
+                listDiv.appendChild(div);
+            });
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
+
+        function applyHistoryData(index) {
+            closeHistoryModal();
+            const data = globalHistoryData[index];
+            const numElementsId = 'csa_num_elements';
+            if (data[numElementsId] !== undefined) {
+                const el = document.getElementById(numElementsId);
+                if(el) {
+                    const oldVal = el.value;
+                    el.value = data[numElementsId];
+                    if (oldVal !== data[numElementsId]) renderAllTables();
+                }
+            }
+            for (let key in data) {
+                const el = document.getElementById(key);
+                if (el && data[key] !== undefined && data[key] !== '') {
+                    if (el.tagName === 'INPUT') {
+                        if (isConfigField(key)) {
+                            el.value = data[key];
+                        } else {
+                            el.classList.remove('old-data-latest', 'new-data', 'pass-color', 'fail-color');
+                            el.classList.add('old-data-history');
+                            el.placeholder = data[key];
+                            el.dataset.oldval = data[key];
+                            el.dataset.dataType = 'history';
+                        }
+                    } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
+                        el.value = data[key];
+                    }
+                }
+            }
+            calculateAll();
+            alert(`⚡ Đã tải xong kết quả ngày ${data.ngayTN || ''} để đối chiếu!`);
+        }
+
+        // ============================================================
+        // LƯU NHÁP (LOCALSTORAGE)
+        // ============================================================
+        function captureInputs() {
+            const data = {};
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.id && el.value) data[el.id] = el.value;
+            });
+            return data;
+        }
+
+        function saveDraftManually() {
+            localStorage.setItem(prefix + 'DRAFT', JSON.stringify(captureInputs()));
+            alert("💾 Đã lưu nháp!");
+        }
+
+        function loadDraftData() {
+            const str = localStorage.getItem(prefix + 'DRAFT');
+            if (!str) return;
+            const data = JSON.parse(str);
+            if (data['info_tram']) document.getElementById('info_tram').value = data['info_tram'];
+            if (data['info_nganlo']) document.getElementById('info_nganlo').value = data['info_nganlo'];
+
+            for (let key in data) {
+                const el = document.getElementById(key);
+                if (el && data[key] !== "") el.value = data[key];
+            }
+            renderAllTables();
+        }
+
+        function clearDraft() {
+            if (confirm("⚠️ Xóa sạch bản nháp mới?")) {
+                localStorage.removeItem(prefix + 'DRAFT');
+                location.reload();
+            }
+        }
+
+        // ============================================================
+        // RENDER GIAO DIỆN BẢNG
+        // ============================================================
+        function renderAllTables() {
+            renderRcdTable();
+            renderLeakTable();
+            renderRefVoltTable();
+            renderCounterTable();
+            renderPowerLossTable();
+            calculateAll();
+        }
+
+        // 2. Bảng RCD
+        function renderRcdTable() {
+            const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
+            let html = `<table><thead><tr><th>Phép Đo</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+            html += `
+                <tr><td><b>Thân (Toàn bộ)</b></td>
+                <td class="phase-a"><input type="number" id="csa_rcd_body_A" oninput="handleNewInput(event)"></td>
+                <td class="phase-b"><input type="number" id="csa_rcd_body_B" oninput="handleNewInput(event)"></td>
+                <td class="phase-c"><input type="number" id="csa_rcd_body_C" oninput="handleNewInput(event)"></td></tr>
+                <tr><td><b>Đế (Toàn bộ)</b></td>
+                <td class="phase-a"><input type="number" id="csa_rcd_base_A" oninput="handleNewInput(event)"></td>
+                <td class="phase-b"><input type="number" id="csa_rcd_base_B" oninput="handleNewInput(event)"></td>
+                <td class="phase-c"><input type="number" id="csa_rcd_base_C" oninput="handleNewInput(event)"></td></tr>
+            `;
+            for(let i=1; i<=num; i++) {
+                html += `<tr><td>Phần tử ${i}</td>
+                <td class="phase-a"><input type="number" id="csa_rcd_el${i}_A" oninput="handleNewInput(event)"></td>
+                <td class="phase-b"><input type="number" id="csa_rcd_el${i}_B" oninput="handleNewInput(event)"></td>
+                <td class="phase-c"><input type="number" id="csa_rcd_el${i}_C" oninput="handleNewInput(event)"></td></tr>`;
+            }
+            html += `</tbody></table>`;
+            document.getElementById('table_rcd_container').innerHTML = html;
+        }
+
+        // 3. Bảng Dòng rò
+        function renderLeakTable() {
+            const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
+            
+            // 3.1 Toàn bộ
+            let html1 = `<table><thead><tr><th>Pha</th><th>Điện áp đo<br>(kVAC)</th><th>Dòng rò tổng<br>(mA)</th><th>Dòng rò TP điện trở<br>(μA)</th><th>Sóng hài bậc 3<br>(μA)</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                html1 += `<tr><td><b>Pha ${pha}</b></td>
+                <td><input type="number" step="any" id="csa_leak_whole_U_${pha}" oninput="handleNewInput(event)"></td>
+                <td><input type="number" step="any" id="csa_leak_whole_I_${pha}" oninput="handleNewInput(event)"></td>
+                <td><input type="number" step="any" id="csa_leak_whole_Ir_${pha}" oninput="handleNewInput(event)"></td>
+                <td><input type="number" step="any" id="csa_leak_whole_I3_${pha}" oninput="handleNewInput(event)"></td></tr>`;
+            });
+            html1 += `</tbody></table>`;
+            document.getElementById('table_leak_whole_container').innerHTML = html1;
+
+            // 3.2 Từng phần tử
+            let html2 = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>Điện áp đo<br>(kVAC)</th><th>Dòng rò tổng<br>(mA)</th><th>Dòng rò TP điện trở<br>(μA)</th><th>Sóng hài bậc 3<br>(μA)</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                for(let i=1; i<=num; i++) {
+                    html2 += `<tr>
+                    ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
+                    <td>PT ${i}</td>
+                    <td><input type="number" step="any" id="csa_leak_el${i}_U_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_leak_el${i}_I_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_leak_el${i}_Ir_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_leak_el${i}_I3_${pha}" oninput="handleNewInput(event)"></td>
+                    </tr>`;
+                }
+            });
+            html2 += `</tbody></table>`;
+            document.getElementById('table_leak_el_container').innerHTML = html2;
+        }
+
+        // 4. Bảng Điện áp tham chiếu
+        function renderRefVoltTable() {
+            const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
+            
+            let html1 = `<table><thead><tr><th>Pha</th><th>Điện áp AC (kV)</th><th>Điện áp DC (kV)</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                html1 += `<tr><td><b>Pha ${pha}</b></td>
+                <td><input type="number" step="any" id="csa_ref_whole_AC_${pha}" oninput="handleNewInput(event)"></td>
+                <td><input type="number" step="any" id="csa_ref_whole_DC_${pha}" oninput="handleNewInput(event)"></td></tr>`;
+            });
+            html1 += `</tbody></table>`;
+            document.getElementById('table_ref_whole_container').innerHTML = html1;
+
+            let html2 = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>Điện áp AC (kV)</th><th>Điện áp DC (kV)</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                for(let i=1; i<=num; i++) {
+                    html2 += `<tr>
+                    ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
+                    <td>PT ${i}</td>
+                    <td><input type="number" step="any" id="csa_ref_el${i}_AC_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_ref_el${i}_DC_${pha}" oninput="handleNewInput(event)"></td>
+                    </tr>`;
+                }
+            });
+            html2 += `</tbody></table>`;
+            document.getElementById('table_ref_el_container').innerHTML = html2;
+        }
+
+        // 5. Bảng Đếm sét & Đồng hồ đo dòng rò
+        function renderCounterTable() {
+            let html1 = `<table><thead><tr><th>Dòng đưa vào (mA)</th><th colspan="3">Dòng hiển thị (mA)</th><th>Ghi chú</th></tr>
+            <tr><th></th><th>Pha A</th><th>Pha B</th><th>Pha C</th><th></th></tr></thead><tbody>`;
+            for(let i=0; i<3; i++) {
+                html1 += `<tr>
+                    <td><input type="number" id="csa_earth_inj_${i}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_earth_A_${i}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_earth_B_${i}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_earth_C_${i}" oninput="handleNewInput(event)"></td>
+                    <td><input type="text" id="csa_earth_note_${i}" oninput="handleNewInput(event)"></td>
+                </tr>`;
+            }
+            html1 += `</tbody></table>`;
+            document.getElementById('table_earth_container').innerHTML = html1;
+
+            let html2 = `<table><thead><tr><th>Pha</th><th>Trước khi thử</th><th>Sau khi thử (DC)</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                html2 += `<tr><td><b>Pha ${pha}</b></td>
+                <td><input type="number" id="csa_counter_before_${pha}" oninput="handleNewInput(event)"></td>
+                <td><input type="number" id="csa_counter_after_${pha}" oninput="handleNewInput(event)"></td></tr>`;
+            });
+            html2 += `</tbody></table>`;
+            document.getElementById('table_counter_container').innerHTML = html2;
+        }
+
+        // 6. Bảng Tổn hao công suất
+        function renderPowerLossTable() {
+            const num = parseInt(document.getElementById('csa_num_elements').value) || 3;
+            let html = `<table><thead><tr><th>Pha</th><th>Phần tử</th><th>I (μA)</th><th>P (mW)</th><th>C (pF)</th><th>Điện áp đo (kVAC)</th><th>Sơ đồ đo</th></tr></thead><tbody>`;
+            ['A', 'B', 'C'].forEach(pha => {
+                for(let i=1; i<=num; i++) {
+                    html += `<tr>
+                    ${i===1 ? `<td rowspan="${num}"><b>Pha ${pha}</b></td>` : ''}
+                    <td>PT ${i}</td>
+                    <td><input type="number" step="any" id="csa_pow_I_${i}_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_pow_P_${i}_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_pow_C_${i}_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="number" step="any" id="csa_pow_U_${i}_${pha}" oninput="handleNewInput(event)"></td>
+                    <td><input type="text" id="csa_pow_diagram_${i}_${pha}" placeholder="UST" oninput="handleNewInput(event)"></td>
+                    </tr>`;
+                }
+            });
+            html += `</tbody></table>`;
+            document.getElementById('table_power_container').innerHTML = html;
+        }
+
+        // ============================================================
+        // TÍNH TOÁN
+        // ============================================================
+        function calculateAll() {
+            // Chống sét van không có nhiều công thức tính toán phức tạp như MBA
+            // Chủ yếu là đánh giá Đạt / Không đạt qua màu sắc (nếu cần)
+            // Ví dụ kiểm tra RCD (nếu nhập < 1000 MΩ thì báo đỏ)
+            const rcdInputs = document.querySelectorAll('input[id^="csa_rcd_"]');
+            rcdInputs.forEach(el => {
+                const val = parseFloat(el.value);
+                if(!isNaN(val) && val > 0) {
+                    // Ngưỡng tham khảo: > 1000 MΩ (tùy chỉnh theo tiêu chuẩn thực tế)
+                    if (val < 1000) {
+                        el.style.color = '#c62828';
+                        el.style.fontWeight = 'bold';
+                    } else {
+                        el.style.color = '#1565c0';
+                        el.style.fontWeight = 'bold';
+                    }
+                } else {
+                    el.style.color = '';
+                    el.style.fontWeight = '';
+                }
+            });
+        }
+
+        // ============================================================
+        // LƯU LÊN GOOGLE SHEET
+        // ============================================================
+        function syncOneDrive() {
+            showLoading("Đang up dữ liệu ...");
+            const nguoiDo = prompt("Nhập tên người thực hiện:", "");
+            const tram = document.getElementById('info_tram').value || "";
+            const nganLo = document.getElementById('info_nganlo').value || "";
+            const maPhienGop = tram + "_" + nganLo;
+            const modName = prefix.replace('_', '').toUpperCase();
+
+            const payload = {
+                module_name: modName,
+                timestamp: new Date().toLocaleString('vi-VN'),
+                maPhien: maPhienGop,
+                ngayTN: document.getElementById('info_ngay').value,
+                tram: tram,
+                nganLo: nganLo,
+                nguoiTN: nguoiDo || ""
+            };
+
+            document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"]`).forEach(el => {
+                let value = el.value.trim() || el.value.trim();
+                value = value ? value.replace("75°C:", "").replace("ms", "").trim() : "";
+                if (value && value !== '-' && value !== 'NaN' && value !== '0') payload[el.id] = value;
+            });
+
+            const formData = new FormData();
+            formData.append('payload', JSON.stringify(payload));
+
+            fetch(GOOGLE_WEB_APP_URL, { method: 'POST', body: formData })
+                .then(res => res.text()).then(text => {
+                    hideLoading();
+                    if (text === "OK") alert("🚀 ĐÃ LƯU!");
+                    else alert("⚠️ Lỗi Server: " + text);
+                }).catch(err => { 
+                    hideLoading();
+                    alert("❌ Lỗi gửi: " + err); 
+                });
+        }
+
+        // ============================================================
+        // XUẤT WORD
+        // ============================================================
+        async function exportWordFromDrive() {
+            if (!TEMPLATE_DRIVE_ID || TEMPLATE_DRIVE_ID.includes("ĐIỀN_ID")) {
+                alert("⚠️ Chưa cấu hình TEMPLATE_DRIVE_ID cho module Chống Sét Van!");
+                return;
+            }
+            showLoading("Đang soạn file...");
+            try {
+                const res = await fetch(`${GOOGLE_WEB_APP_URL}?action=getTemplate&fileId=${TEMPLATE_DRIVE_ID}`);
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+
+                const binaryString = window.atob(data.base64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+
+                const payload = {};
+                payload[prefix + 'tram'] = document.getElementById('info_tram').value || "";
+                payload[prefix + 'nganlo'] = document.getElementById('info_nganlo').value || "";
+                payload["ngayTN"] = document.getElementById('info_ngay').value || "";
+                payload["nguoiTN"] = "";
+
+                document.querySelectorAll(`input[id^="${prefix}"], select[id^="${prefix}"], textarea[id^="${prefix}"]`).forEach(el => {
+                    let val = getVal(el.id);
+                    payload[el.id] = val ? val.replace("75°C:", "").replace("ms", "").trim() : "";
+                });
+
+                const checkboxes = ['chk_sec1', 'chk_sec2', 'chk_sec3', 'chk_sec4', 'chk_sec5', 'chk_sec6'];
+                checkboxes.forEach(id => {
+                    const checked = document.getElementById(id)?.checked;
+                    if (checked) payload[`is_${id.replace('chk_', '')}`] = true;
+                });
+
+                if (payload["ngayTN"]) {
+                    const m = payload["ngayTN"].match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                    if (m) payload["ngayTN"] = `${m[3]}/${m[2]}/${m[1]}`;
+                }
+
+                const zip = new PizZip(bytes.buffer);
+                const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+                doc.render(payload);
+
+                const out = doc.getZip().generate({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", compression: "DEFLATE" });
+                
+                const dateStr = payload["ngayTN"] ? payload["ngayTN"].replace(/\//g, '-') : "New";
+                const tramStr = payload[prefix + 'tram'] ? payload[prefix + 'tram'].replace(/[\/\\]/g, '-') : "Tram";
+                const nganLoStr = payload[prefix + 'nganlo'] ? payload[prefix + 'nganlo'].replace(/[\/\\]/g, '-') : "ViTri";
+                const wordPrefix = prefix.replace('_', '').toUpperCase();
+                
+                saveAs(out, `Bien ban thi nghiem ${wordPrefix}_${nganLoStr}_${tramStr}_${dateStr}.docx`);
+                hideLoading();
+            } catch (e) {
+                hideLoading();
+                alert("❌ Lỗi xuất Word: " + e.message);
+            }
+        }
+
+        // ============================================================
+        // KHỞI TẠO TRANG
+        // ============================================================
+        window.onload = function() {
+            setTodayDate();
+            fetchSubstations();
+            renderAllTables();
+            if (localStorage.getItem(prefix + 'DRAFT')) {
+                loadDraftData();
+                checkUnlockForm();
+            }
+        };
+    </script>
 </body>
 </html>

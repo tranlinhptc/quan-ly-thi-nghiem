@@ -411,7 +411,7 @@
             }).catch(err => { hideLoading(); alert("❌ Lỗi mạng: " + err); });
         }
 
-        function applyLatestData(data) {
+function applyLatestData(data) {
             const numElementsId = 'csa_num_elements';
             if (data[numElementsId] !== undefined) {
                 const el = document.getElementById(numElementsId);
@@ -424,19 +424,31 @@
             for (let key in data) {
                 const el = document.getElementById(key);
                 if (el && data[key] !== undefined && data[key] !== '') {
+                    let val = data[key];
+
+                    // --- BẮT ĐẦU FIX LỖI NGÀY THÁNG ---
+                    if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        if (el.tagName === 'INPUT' && el.type === 'number') {
+                            val = ""; // Bỏ qua không điền nếu Google Sheet trả về ngày tháng
+                        }
+                    }
+                    if (typeof val === 'string') val = val.replace(/,/g, '.'); // Đổi phẩy thành chấm
+                    if (val === "") continue; 
+                    // --- KẾT THÚC FIX LỖI NGÀY THÁNG ---
+
                     if (el.tagName === 'INPUT') {
                         if (isConfigField(key)) {
-                            el.value = data[key];
+                            el.value = val;
                         } else {
                             el.value = "";
-                            el.placeholder = data[key];
+                            el.placeholder = val;
                             el.classList.remove('old-data-history', 'new-data', 'pass-color', 'fail-color');
                             el.classList.add('old-data-latest');
-                            el.dataset.oldval = data[key];
+                            el.dataset.oldval = val;
                             el.dataset.dataType = 'latest';
                         }
                     } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
-                        el.value = data[key];
+                        el.value = val;
                     }
                 }
             }
@@ -484,18 +496,30 @@
             for (let key in data) {
                 const el = document.getElementById(key);
                 if (el && data[key] !== undefined && data[key] !== '') {
+                    let val = data[key];
+
+                    // --- BẮT ĐẦU FIX LỖI NGÀY THÁNG ---
+                    if (typeof val === 'string' && val.match(/^\d{4}-\d{2}-\d{2}/)) {
+                        if (el.tagName === 'INPUT' && el.type === 'number') {
+                            val = ""; // Bỏ qua không điền nếu Google Sheet trả về ngày tháng
+                        }
+                    }
+                    if (typeof val === 'string') val = val.replace(/,/g, '.');
+                    if (val === "") continue;
+                    // --- KẾT THÚC FIX LỖI NGÀY THÁNG ---
+
                     if (el.tagName === 'INPUT') {
                         if (isConfigField(key)) {
-                            el.value = data[key];
+                            el.value = val;
                         } else {
                             el.classList.remove('old-data-latest', 'new-data', 'pass-color', 'fail-color');
                             el.classList.add('old-data-history');
-                            el.placeholder = data[key];
-                            el.dataset.oldval = data[key];
+                            el.placeholder = val;
+                            el.dataset.oldval = val;
                             el.dataset.dataType = 'history';
                         }
                     } else if (el.tagName === 'SELECT' && key !== 'info_tram') {
-                        el.value = data[key];
+                        el.value = val;
                     }
                 }
             }

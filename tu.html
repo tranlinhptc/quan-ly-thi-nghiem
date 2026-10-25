@@ -403,11 +403,11 @@ return 300;
 // ============================================================
 function renderRdcTable() {
 const num = parseInt(document.getElementById('tu_num_windings').value);
-let html = `<table><thead><tr><th>Stt Cuộn</th><th> class ="hidden-col" Số cũ (75°C)</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+let html = `<table><thead><tr><th>Stt Cuộn</th><th class ="hidden-col"> Số cũ (75°C)</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
 for(let i=1; i<=num; i++) {
 html += `<tr>
 <td><b>Cuộn ${i}</b></td>
-<td><input type="number" id="tu_rdc_ref_${i}" value="" oninput="calculateAll()" onkeydown="handleRdcTab(event, ${i}, 'ref')"></td>
+<td class ="hidden-col"><input type="number" id="tu_rdc_ref_${i}" value="" oninput="calculateAll()" onkeydown="handleRdcTab(event, ${i}, 'ref')"></td>
 <td>
 <input type="number" id="tu_rdc_m_${i}_a" class="phase-a" oninput="handleNewInput(event); calculateAll()" placeholder="Đo A" onkeydown="handleRdcTab(event, ${i}, 'a')">
 <span class="sub-val" id="tu_rdc_75_${i}_a">75°C: -</span>
@@ -938,7 +938,8 @@ function handleRdcTab(event, currentWinding, colType) {
 if (event.key === 'Enter' || event.key === 'Tab') {
 event.preventDefault();
 const numWindings = parseInt(document.getElementById('tu_num_windings')?.value) || 2;
-const cols = ['ref', 'a', 'b', 'c'];
+const cols = [ 'a', 'b', 'c'];
+  // cu co them 'ref' truoc a
 let colIndex = cols.indexOf(colType);
 let nextWinding = currentWinding;
 let nextCol = colType;

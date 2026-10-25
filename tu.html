@@ -403,7 +403,7 @@ return 300;
 // ============================================================
 function renderRdcTable() {
 const num = parseInt(document.getElementById('tu_num_windings').value);
-let html = `<table><thead><tr><th>Stt Cuộn</th><th>Số cũ (75°C)</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
+let html = `<table><thead><tr><th>Stt Cuộn</th><th> class ="hidden-col" Số cũ (75°C)</th><th>🟡Pha A</th><th>🔴Pha B</th><th>🔵Pha C</th></tr></thead><tbody>`;
 for(let i=1; i<=num; i++) {
 html += `<tr>
 <td><b>Cuộn ${i}</b></td>

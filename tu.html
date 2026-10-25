@@ -554,7 +554,7 @@ onfocus="this.select()"
 onkeydown="handleRatioTab(event, ${i}, '${pha}', 'err')"
 style="font-size:12px;background:#fff;width:100%;"
 >
-<span class="unit"></span>
+<--!span class="unit">%</span-->
 </div>
 </div>
 <div class="ratio-info">
@@ -614,7 +614,40 @@ if (errEl) errEl.value = '';
 if (kdoEl) kdoEl.textContent = 'Kđo: -';
 }
 }
+// Them moi de xoa u2 khi nhap err
+  // ============================================================
+// XỬ LÝ Ô SAI SỐ (ERR) - TEXT + %
+// ============================================================
+function onErrFocus(winding, pha) {
+    const el = document.getElementById(`tu_err_w${winding}_${pha}`);
+    if (el) el.value = el.value.replace('%', '').trim();
+}
 
+function onErrInput(winding, pha) {
+    // Xóa U2 L1, L2 nếu đã có số cũ
+    const l1 = document.getElementById(`tu_u2_w${winding}_${pha}_1`);
+    const l2 = document.getElementById(`tu_u2_w${winding}_${pha}_2`);
+    if (l1 && l1.value !== '') l1.value = '';
+    if (l2 && l2.value !== '') l2.value = '';
+    const hidden = document.getElementById(`tu_u2_avg_hidden_w${winding}_${pha}`);
+    if (hidden) hidden.value = '';
+    const kdo = document.getElementById(`tu_kdo_w${winding}_${pha}`);
+    if (kdo) kdo.textContent = 'Kđo: -';
+}
+
+function onErrBlur(winding, pha) {
+    const el = document.getElementById(`tu_err_w${winding}_${pha}`);
+    if (!el) return;
+    const raw = el.value.replace('%', '').trim();
+    if (raw === '' || isNaN(parseFloat(raw))) {
+        el.value = '';
+        return;
+    }
+    const error = parseFloat(raw);
+    // Format: 0.03 -> "0.030%"  (đổi toFixed(3) thành toFixed(2) nếu muốn "0.03%")
+    el.value = error.toFixed(3) + '%';
+    calculateRatio(winding, pha, 'err');
+}
 // ============================================================
 // TÍNH TOÁN TỈ SỐ BIẾN - 2 CHIỀU
 // ============================================================
@@ -665,7 +698,7 @@ if (!isNaN(u2_do) && u2_do > 0) {
 const K_do = u1_tn_val / u2_do;
 kdoEl.textContent = `Kđo: ${K_do.toFixed(3)}`;
 const error = ((K_dm - K_do) / K_dm) * 100;
-errEl.value = error.toFixed(3);
+errEl.value = error.toFixed(3) + '%';
 const isPass = Math.abs(error) <= accLimit;
 if (errEl.classList.contains('new-data')) {
 errEl.style.color = isPass ? '#1565c0' : '#c62828';

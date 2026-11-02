@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Thiết bị Thí nghiệm</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;color:#333;padding:16px}
+  .container{max-width:1400px;margin:0 auto}
+  h1{color:#1a5490;margin-bottom:16px;text-align:center;font-size:22px}
+
+  .sync-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;
+            background:#fff;border-radius:8px;margin-bottom:14px;font-size:13px;
+            box-shadow:0 2px 5px rgba(0,0,0,.08)}
+  .sync-bar .dot{width:10px;height:10px;border-radius:50%;background:#28a745}
+  .sync-bar.dirty .dot{background:#ffc107;animation:pulse 1s infinite}
+  .sync-bar.error .dot{background:#dc3545}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar input,.toolbar select{padding:8px 12px;border:1px solid #ccc;
+    border-radius:6px;font-size:14px}
+  .toolbar input[type=text]{flex:1;min-width:200px}
+  button{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;
+    font-size:13px;font-weight:600;transition:.2s}
+  .btn-primary{background:#1a5490;color:#fff}
+  .btn-primary:hover{background:#0f3a6a}
+  .btn-danger{background:#dc3545;color:#fff}
+  .btn-warning{background:#ffc107;color:#333}
+  .btn-success{background:#28a745;color:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:10px;margin-bottom:14px}
+  .stat-card{background:#fff;padding:12px;border-radius:8px;text-align:center;
+    box-shadow:0 2px 5px rgba(0,0,0,.08)}
+  .stat-card .num{font-size:24px;font-weight:bold;color:#1a5490}
+  .stat-card .label{font-size:12px;color:#666;margin-top:4px}
+
+  .table-wrap{overflow-x:auto}
+  table{width:100%;background:#fff;border-collapse:collapse;border-radius:8px;
+    overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);min-width:900px}
+  th{background:#1a5490;color:#fff;padding:10px 8px;text-align:left;font-size:12px}
+  td{padding:8px;border-bottom:1px solid #eee;font-size:12px;vertical-align:middle}
+  tr:hover{background:#f8f9ff}
+
+  .badge{display:inline-block;padding:3px 8px;border-radius:12px;
+    font-size:11px;font-weight:600}
+  .badge-red{background:#ffe0e0;color:#c00}
+  .badge-yellow{background:#fff4d0;color:#a67c00}
+  .badge-green{background:#d4f4dd;color:#1a6b2e}
+
+  .thumb{width:40px;height:40px;object-fit:cover;border-radius:4px;
+    cursor:pointer;border:1px solid #ddd;margin-right:2px}
+  .thumb-empty{width:40px;height:40px;border:1px dashed #ccc;border-radius:4px;
+    display:inline-flex;align-items:center;justify-content:center;
+    color:#aaa;font-size:10px}
+  .code-cell{font-family:monospace;font-weight:bold;color:#1a5490}
+
+  .row-actions button{padding:4px 8px;font-size:11px;margin-right:2px}
+
+  /* Modal */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
+    z-index:1000;align-items:center;justify-content:center;padding:15px}
+  .modal-bg.active{display:flex}
+  .modal{background:#fff;border-radius:10px;padding:22px;max-width:720px;
+    width:100%;max-height:90vh;overflow-y:auto}
+  .modal h2{color:#1a5490;margin-bottom:14px;font-size:18px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .form-group{display:flex;flex-direction:column}
+  .form-group.full{grid-column:1/-1}
+  .form-group label{font-size:12px;font-weight:600;margin-bottom:4px;color:#555}
+  .form-group label .req{color:#dc3545}
+  .form-group input,.form-group select,.form-group textarea{
+    padding:8px;border:1px solid #ccc;border-radius:6px;font-size:13px}
+  .form-group input.uppercase{text-transform:uppercase;font-family:monospace}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .img-preview .img-wrap{position:relative}
+  .img-preview img{width:70px;height:70px;object-fit:cover;
+    border-radius:6px;border:1px solid #ddd}
+  .img-preview .del-img{position:absolute;top:-6px;right:-6px;background:#dc3545;
+    color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;
+    line-height:1;cursor:pointer;border:none;padding:0}
+  .img-preview .uploading{opacity:.4}
+
+  .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
+    z-index:2000;align-items:center;justify-content:center}
+  .lightbox.active{display:flex}
+  .lightbox img{max-width:92%;max-height:92%;border-radius:6px}
+  .lightbox .close-lb{position:absolute;top:12px;right:22px;color:#fff;
+    font-size:38px;cursor:pointer;line-height:1}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+    background:#333;color:#fff;padding:12px 20px;border-radius:8px;
+    font-size:13px;z-index:3000;opacity:0;transition:opacity .3s;
+    max-width:90%;text-align:center}
+  .toast.show{opacity:1}
+  .toast.success{background:#28a745}
+  .toast.error{background:#dc3545}
+
+  @media(max-width:768px){
+    .form-grid{grid-template-columns:1fr}
+    body{padding:10px}
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔬 Quản lý Thiết bị Thí nghiệm</h1>
+
+  <!-- Thanh trạng thái sync -->
+  <div class="sync-bar" id="syncBar">
+    <span class="dot"></span>
+    <span id="syncText">Đang tải dữ liệu từ Google Sheets...</span>
+    <span style="flex:1"></span>
+    <button class="btn-primary" id="btnSync" onclick="syncNow()" disabled>☁️ Đồng bộ ngay</button>
+    <button class="btn-success" onclick="loadFromServer(true)" id="btnReload">🔄 Tải lại</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="text" id="searchBox" placeholder="🔍 Tìm theo tên / mã / trạm / serial...">
+    <select id="filterStation"><option value="">-- Tất cả trạm --</option></select>
+    <select id="filterReport">
+      <option value="">-- Biên bản --</option>
+      <option value="Chưa làm">Chưa làm</option>
+      <option value="Đang làm">Đang làm</option>
+      <option value="Đã xong">Đã xong</option>
+    </select>
+    <button class="btn-primary" onclick="openAddModal()">➕ Thêm thiết bị</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>STT</th><th>Trạm</th><th>Mã TB</th><th>Tên thiết bị</th>
+          <th>Ngày lấy mẫu</th><th>Ngày TN</th>
+          <th>Ảnh KQ</th><th>Nameplate</th><th>Biên bản</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">Thêm thiết bị</h2>
+    <form id="equipmentForm" onsubmit="saveEquipment(event)">
+      <input type="hidden" id="eqId">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Trạm <span class="req">*</span></label>
+          <input type="text" id="fStation" required list="stationList" placeholder="VD: Trạm 1">
+          <datalist id="stationList"></datalist>
+        </div>
+        <div class="form-group">
+          <label>Mã thiết bị <span class="req">*</span> (tự động IN HOA)</label>
+          <input type="text" id="fCode" required class="uppercase"
+                 placeholder="VD: TB-001"
+                 oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="form-group full">
+          <label>Tên thiết bị (không bắt buộc)</label>
+          <input type="text" id="fName" placeholder="VD: Máy đo điện trở đất">
+        </div>
+        <div class="form-group"><label>Model</label><input type="text" id="fModel"></div>
+        <div class="form-group"><label>Serial</label><input type="text" id="fSerial"></div>
+        <div class="form-group"><label>Hãng SX</label><input type="text" id="fBrand"></div>
+        <div class="form-group"><label>Vị trí</label><input type="text" id="fLocation"></div>
+        <div class="form-group"><label>Ngày lấy mẫu</label><input type="date" id="fSamplingDate"></div>
+        <div class="form-group"><label>Ngày thí nghiệm</label><input type="date" id="fTestDate"></div>
+        <div class="form-group">
+          <label>Trạng thái biên bản</label>
+          <select id="fReport">
+            <option value="Chưa làm">Chưa làm</option>
+            <option value="Đang làm">Đang làm</option>
+            <option value="Đã xong">Đã xong</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Ghi chú</label>
+          <textarea id="fNote" rows="2"></textarea></div>
+        <div class="form-group full">
+          <label>📷 Ảnh kết quả thí nghiệm (nén tự động trước khi upload)</label>
+          <input type="file" id="fResultImgs" accept="image/*" multiple
+                 onchange="handleImgPick(this,'result')">
+          <div class="img-preview" id="resultPreview"></div>
+        </div>
+        <div class="form-group full">
+          <label>🏷️ Ảnh nameplate (nén tự động)</label>
+          <input type="file" id="fNameplateImgs" accept="image/*" multiple
+                 onchange="handleImgPick(this,'nameplate')">
+          <div class="img-preview" id="nameplatePreview"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" onclick="closeModal()">Hủy</button>
+        <button type="submit" class="btn-primary" id="btnSave">💾 Lưu & Đồng bộ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="close-lb">&times;</span>
+  <img id="lightboxImg" src="">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   CẤU HÌNH – DÁN URL WEB APP SAU KHI DEPLOY
+   ============================================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzUm3S8moauD2tmRPo2O2toJoR2-tykL6lFv_5ZTb9xvv0YOIcJ-jpjfV_khHRAvIdJ/exec';
+// Ví dụ: https://script.google.com/macros/s/AKfycbx.../exec
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let equipmentList = [];     // {id, stationId, station, code, name, ..., images:[{fileId,...}]}
+let stations = [];
+let tempResultImgs = [];    // [{fileId, url, name, type, uploading}]
+let tempNameplateImgs = [];
+let dirty = false;          // có thay đổi chưa sync
+let syncTimer = null;
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(()=>t.className='toast', 3000);
+}
+
+function setSyncState(state, text){
+  const bar = document.getElementById('syncBar');
+  bar.className = 'sync-bar' + (state==='dirty'?' dirty':state==='error'?' error':'');
+  document.getElementById('syncText').textContent = text;
+  document.getElementById('btnSync').disabled = (state !== 'dirty');
+}
+
+function markDirty(){
+  dirty = true;
+  setSyncState('dirty', '⚠️ Có thay đổi chưa đồng bộ lên Sheet');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(()=>{ if(dirty) syncNow(); }, 60000); // autosync 60s
+}
+
+function uid(prefix='id'){
+  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+}
+
+function formatDate(d){
+  if(!d) return '';
+  const [y,m,dd] = String(d).split('T')[0].split('-');
+  return dd && m && y ? `${dd}/${m}/${y}` : d;
+}
+
+/* ============================================================
+   NÉN ẢNH (CLIENT-SIDE) – giảm ~80-90% dung lượng
+   ============================================================ */
+const MAX_DIM = 1280;       // cạnh dài tối đa
+const JPEG_QUALITY = 0.75;  // chất lượng nén
+
+function compressImage(file){
+  return new Promise((resolve, reject)=>{
+    if(!file.type.startsWith('image/')) return reject(new Error('Không phải ảnh'));
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      URL.revokeObjectURL(url);
+      let {width:w, height:h} = img;
+      const scale = Math.min(1, MAX_DIM / Math.max(w,h));
+      w = Math.round(w*scale); h = Math.round(h*scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob=>{
+        if(!blob) return reject(new Error('Nén thất bại'));
+        const reader = new FileReader();
+        reader.onload = e=>{
+          const dataUrl = e.target.result;
+          const base64 = dataUrl.split(',')[1];
+          resolve({
+            base64,
+            dataUrl,
+            type: 'image/jpeg',
+            name: (file.name || 'img').replace(/\.[^.]+$/, '') + '.jpg',
+            originalKB: Math.round(file.size/1024),
+            compressedKB: Math.round(blob.size/1024)
+          });
+        };
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', JPEG_QUALITY);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh')); };
+    img.src = url;
+  });
+}
+
+/* ============================================================
+   API CALLS
+   ============================================================ */
+async function apiPost(payload){
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'}, // tránh preflight
+    body: JSON.stringify(payload)
+  });
+  const json = await res.json();
+  if(!json.success) throw new Error(json.error || 'API error');
+  return json.data;
+}
+
+async function loadFromServer(showToast=false){
+  try{
+    setSyncState('', '⏳ Đang tải dữ liệu từ Google Sheets...');
+    const res = await fetch(API_URL + '?action=getAll&t=' + Date.now());
+    const json = await res.json();
+    if(!json.success) throw new Error(json.error);
+    const d = json.data;
+    stations = d.stations || [];
+    equipmentList = (d.devices || []).map(dev=>{
+      const st = stations.find(s=>s.id === dev.stationId);
+      return {
+        ...dev,
+        stationName: st ? st.name : (dev.location || ''),
+        stationCode: st ? st.code : ''
+      };
+    });
+    dirty = false;
+    render();
+    setSyncState('', '✅ Đã tải ' + equipmentList.length + ' thiết bị từ Sheet');
+    if(showToast) toast('Đã tải lại dữ liệu', 'success');
+  }catch(err){
+    setSyncState('error', '❌ Lỗi tải: ' + err.message);
+    toast('Lỗi tải: ' + err.message, 'error');
+  }
+}
+
+async function uploadImageToDrive(img){
+  // img: {base64, type, name}
+  const res = await apiPost({
+    action: 'uploadImage',
+    data: img.base64,
+    type: img.type,
+    name: img.name
+  });
+  return res; // {fileId, name, type, sizeKB}
+}
+
+function driveImageUrl(fileId, size=200){
+  // Dùng thumbnail public của Drive
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
+}
+
+/* ============================================================
+   SYNC (lưu tất cả thiết bị dirty lên Sheet)
+   ============================================================ */
+async function syncNow(){
+  if(!dirty) return;
+  const btn = document.getElementById('btnSync');
+  btn.disabled = true; btn.textContent = '⏳ Đang đồng bộ...';
+  try{
+    for(const dev of equipmentList){
+      if(dev._synced !== false) continue; // chỉ sync cái mới thay đổi
+      const station = stations.find(s=>s.name === dev.stationName);
+      const rec = {
+        id: dev.id,
+        stationId: station ? station.id : (dev.stationId || ''),
+        code: String(dev.code||'').toUpperCase(),
+        name: dev.name || '',
+        type: dev.type || '',
+        model: dev.model || '',
+        serial: dev.serial || '',
+        manufacturer: dev.brand || '',
+        year: dev.year || '',
+        installDate: dev.installDate || '',
+        location: dev.location || dev.stationName || '',
+        note: dev.note || '',
+        images: JSON.stringify({
+          result: dev.resultImages || [],
+          nameplate: dev.nameplateImages || []
+        })
+      };
+      await apiPost({action:'saveDevice', record: rec});
+      dev._synced = true;
+    }
+    // Lưu thêm Settings (cycle) nếu cần
+    dirty = false;
+    setSyncState('', '✅ Đã đồng bộ lên Sheet lúc ' + new Date().toLocaleTimeString('vi-VN'));
+    toast('Đồng bộ thành công', 'success');
+  }catch(err){
+    setSyncState('error', '❌ Lỗi sync: ' + err.message);
+    toast('Lỗi sync: ' + err.message, 'error');
+  }finally{
+    btn.textContent = '☁️ Đồng bộ ngay';
+    btn.disabled = !dirty;
+  }
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(){
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const fStation = document.getElementById('filterStation').value;
+  const fReport = document.getElementById('filterReport').value;
+
+  // Filter trạm
+  const stNames = [...new Set(equipmentList.map(e=>e.stationName).filter(Boolean))].sort();
+  const fs = document.getElementById('filterStation');
+  const cur = fs.value;
+  fs.innerHTML = '<option value="">-- Tất cả trạm --</option>' +
+    stNames.map(s=>`<option value="${s}">${s}</option>`).join('');
+  fs.value = cur;
+  document.getElementById('stationList').innerHTML =
+    stNames.map(s=>`<option value="${s}">`).join('');
+
+  const filtered = equipmentList.filter(e=>{
+    const okS = !search ||
+      (e.name||'').toLowerCase().includes(search) ||
+      (e.code||'').toLowerCase().includes(search) ||
+      (e.stationName||'').toLowerCase().includes(search) ||
+      (e.serial||'').toLowerCase().includes(search);
+    const okSt = !fStation || e.stationName === fStation;
+    const okR = !fReport || e.reportStatus === fReport;
+    return okS && okSt && okR;
+  });
+
+  const tbody = document.getElementById('tableBody');
+  if(filtered.length === 0){
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Chưa có dữ liệu. Nhấn "➕ Thêm thiết bị" để bắt đầu.</td></tr>';
+  }else{
+    tbody.innerHTML = filtered.map((e,i)=>{
+      const rc = e.reportStatus === 'Đã xong' ? 'badge-green' :
+                 e.reportStatus === 'Đang làm' ? 'badge-yellow' : 'badge-red';
+      const rImgs = (e.resultImages||[]).slice(0,2).map(img=>{
+        const src = img.fileId ? driveImageUrl(img.fileId, 80) : (img.dataUrl||'');
+        return src ? `<img class="thumb" src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">` : '';
+      }).join('') || '<div class="thumb-empty">Trống</div>';
+      const nImgs = (e.nameplateImages||[]).slice(0,2).map(img=>{
+        const src = img.fileId ? driveImageUrl(img.fileId, 80) : (img.dataUrl||'');
+        return src ? `<img class="thumb" src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">` : '';
+      }).join('') || '<div class="thumb-empty">Trống</div>';
+      return `<tr>
+        <td>${i+1}</td>
+        <td><strong>${e.stationName||'-'}</strong></td>
+        <td class="code-cell">${e.code||''}</td>
+        <td>${e.name||'<i style="color:#aaa">(chưa đặt tên)</i>'}</td>
+        <td>${e.samplingDate?formatDate(e.samplingDate):'-'}</td>
+        <td>${e.testDate?formatDate(e.testDate):'-'}</td>
+        <td>${rImgs}</td>
+        <td>${nImgs}</td>
+        <td><span class="badge ${rc}">${e.reportStatus||'Chưa làm'}</span></td>
+        <td class="row-actions">
+          <button class="btn-warning" onclick="editEquipment('${e.id}')">✏️</button>
+          <button class="btn-danger" onclick="deleteEquipment('${e.id}')">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Stats
+  const total = equipmentList.length;
+  const done = equipmentList.filter(e=>e.reportStatus==='Đã xong').length;
+  const doing = equipmentList.filter(e=>e.reportStatus==='Đang làm').length;
+  const noR = equipmentList.filter(e=>!e.reportStatus||e.reportStatus==='Chưa làm').length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="label">Tổng thiết bị</div></div>
+    <div class="stat-card"><div class="num">${stNames.length}</div><div class="label">Số trạm</div></div>
+    <div class="stat-card"><div class="num" style="color:#28a745">${done}</div><div class="label">BB đã xong</div></div>
+    <div class="stat-card"><div class="num" style="color:#ffc107">${doing}</div><div class="label">Đang làm BB</div></div>
+    <div class="stat-card"><div class="num" style="color:#dc3545">${noR}</div><div class="label">Chưa làm BB</div></div>
+  `;
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openAddModal(){
+  document.getElementById('modalTitle').textContent = 'Thêm thiết bị';
+  document.getElementById('equipmentForm').reset();
+  document.getElementById('eqId').value = '';
+  tempResultImgs = []; tempNameplateImgs = [];
+  renderPreviews();
+  document.getElementById('modalBg').classList.add('active');
+}
+
+function editEquipment(id){
+  const e = equipmentList.find(x=>x.id===id);
+  if(!e) return;
+  document.getElementById('modalTitle').textContent = 'Sửa thiết bị';
+  document.getElementById('eqId').value = e.id;
+  document.getElementById('fStation').value = e.stationName || '';
+  document.getElementById('fCode').value = e.code || '';
+  document.getElementById('fName').value = e.name || '';
+  document.getElementById('fModel').value = e.model || '';
+  document.getElementById('fSerial').value = e.serial || '';
+  document.getElementById('fBrand').value = e.brand || '';
+  document.getElementById('fLocation').value = e.location || '';
+  document.getElementById('fSamplingDate').value = (e.samplingDate||'').split('T')[0];
+  document.getElementById('fTestDate').value = (e.testDate||'').split('T')[0];
+  document.getElementById('fReport').value = e.reportStatus || 'Chưa làm';
+  document.getElementById('fNote').value = e.note || '';
+  tempResultImgs = [...(e.resultImages||[])];
+  tempNameplateImgs = [...(e.nameplateImages||[])];
+  renderPreviews();
+  document.getElementById('modalBg').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('active');
+  tempResultImgs = []; tempNameplateImgs = [];
+}
+
+/* ============================================================
+   ẢNH – PICK → NÉN → UPLOAD DRIVE
+   ============================================================ */
+async function handleImgPick(input, type){
+  const files = Array.from(input.files);
+  input.value = '';
+  for(const file of files){
+    const placeholder = {
+      fileId: null, dataUrl: null, name: file.name, uploading: true, type
+    };
+    const arr = type==='result' ? tempResultImgs : tempNameplateImgs;
+    arr.push(placeholder);
+    renderPreviews();
+    try{
+      // 1) Nén
+      const compressed = await compressImage(file);
+      // 2) Upload Drive
+      const up = await uploadImageToDrive(compressed);
+      // 3) Thay placeholder
+      placeholder.fileId = up.fileId;
+      placeholder.name = up.name;
+      placeholder.dataUrl = driveImageUrl(up.fileId, 200);
+      placeholder.uploading = false;
+      placeholder.originalKB = compressed.originalKB;
+      placeholder.compressedKB = compressed.compressedKB;
+      console.log(`Ảnh ${file.name}: ${compressed.originalKB}KB → ${compressed.compressedKB}KB (lưu Drive ${up.sizeKB}KB)`);
+      toast(`Đã nén ${compressed.originalKB}KB → ${compressed.compressedKB}KB và upload Drive`, 'success');
+    }catch(err){
+      // fallback: giữ dataUrl local (chưa upload)
+      console.warn('Upload Drive thất bại, giữ ảnh local:', err);
+      try{
+        const compressed = await compressImage(file);
+        placeholder.dataUrl = compressed.dataUrl;
+        placeholder.uploading = false;
+        toast('Upload Drive lỗi – ảnh giữ local, sẽ sync sau', 'error');
+      }catch(e2){
+        const idx = arr.indexOf(placeholder);
+        if(idx>=0) arr.splice(idx,1);
+        toast('Không xử lý được ảnh: ' + err.message, 'error');
+      }
+    }
+    renderPreviews();
+  }
+}
+
+function renderPreviews(){
+  const r = document.getElementById('resultPreview');
+  const n = document.getElementById('nameplatePreview');
+  r.innerHTML = tempResultImgs.map((img,i)=>{
+    const src = img.fileId ? driveImageUrl(img.fileId,150) : (img.dataUrl||'');
+    return `<div class="img-wrap ${img.uploading?'uploading':''}">
+      ${src?`<img src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">`:''}
+      ${img.uploading?'<div style="font-size:10px;text-align:center">Đang nén...</div>':''}
+      <button type="button" class="del-img" onclick="removeImg('result',${i})">&times;</button>
+    </div>`;
+  }).join('');
+  n.innerHTML = tempNameplateImgs.map((img,i)=>{
+    const src = img.fileId ? driveImageUrl(img.fileId,150) : (img.dataUrl||'');
+    return `<div class="img-wrap ${img.uploading?'uploading':''}">
+      ${src?`<img src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">`:''}
+      ${img.uploading?'<div style="font-size:10px;text-align:center">Đang nén...</div>':''}
+      <button type="button" class="del-img" onclick="removeImg('nameplate',${i})">&times;</button>
+    </div>`;
+  }).join('');
+}
+
+function removeImg(type, idx){
+  if(type==='result') tempResultImgs.splice(idx,1);
+  else tempNameplateImgs.splice(idx,1);
+  renderPreviews();
+}
+
+/* ============================================================
+   SAVE / DELETE
+   ============================================================ */
+function saveEquipment(ev){
+  ev.preventDefault();
+  const id = document.getElementById('eqId').value || uid('dev');
+  const stationName = document.getElementById('fStation').value.trim();
+  const code = document.getElementById('fCode').value.trim().toUpperCase();
+  if(!code){ toast('Mã thiết bị bắt buộc', 'error'); return; }
+
+  // check trùng code (local)
+  const dup = equipmentList.find(x=>x.id!==id && (x.code||'').toUpperCase()===code);
+  if(dup){ toast('Mã thiết bị đã tồn tại: ' + code, 'error'); return; }
+
+  const data = {
+    id,
+    stationName,
+    code,
+    name: document.getElementById('fName').value.trim(),
+    model: document.getElementById('fModel').value.trim(),
+    serial: document.getElementById('fSerial').value.trim(),
+    brand: document.getElementById('fBrand').value.trim(),
+    location: document.getElementById('fLocation').value.trim(),
+    samplingDate: document.getElementById('fSamplingDate').value,
+    testDate: document.getElementById('fTestDate').value,
+    reportStatus: document.getElementById('fReport').value,
+    note: document.getElementById('fNote').value.trim(),
+    resultImages: tempResultImgs.filter(i=>i.fileId||i.dataUrl),
+    nameplateImages: tempNameplateImgs.filter(i=>i.fileId||i.dataUrl),
+    _synced: false
+  };
+
+  const idx = equipmentList.findIndex(x=>x.id===id);
+  if(idx>=0) equipmentList[idx] = {...equipmentList[idx], ...data};
+  else equipmentList.push(data);
+
+  render();
+  closeModal();
+  markDirty();
+  toast('Đã lưu – đang chờ đồng bộ lên Sheet...', 'success');
+  // Tự sync ngay (không đợi 60s)
+  setTimeout(()=>syncNow(), 300);
+}
+
+function deleteEquipment(id){
+  if(!confirm('Xóa thiết bị này? (sẽ xóa cả trên Sheet)')) return;
+  (async()=>{
+    try{
+      await apiPost({action:'deleteDevice', id});
+      equipmentList = equipmentList.filter(x=>x.id!==id);
+      render();
+      toast('Đã xóa', 'success');
+    }catch(err){
+      toast('Lỗi xóa: ' + err.message, 'error');
+    }
+  })();
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+function openLightbox(src, kind){
+  let url = src;
+  if(kind==='drive') url = driveImageUrl(src, 1600);
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('active');
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.getElementById('searchBox').addEventListener('input', render);
+document.getElementById('filterStation').addEventListener('change', render);
+document.getElementById('filterReport').addEventListener('change', render);
+
+window.addEventListener('beforeunload', e=>{
+  if(dirty){ e.preventDefault(); e.returnValue=''; }
+});
+
+loadFromServer();
+</script>
+</body>
+</html>

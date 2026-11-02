@@ -10,18 +10,34 @@
   .container{max-width:1400px;margin:0 auto}
   h1{color:#1a5490;margin-bottom:16px;text-align:center;font-size:22px}
 
+  /* Sync bar */
   .sync-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;
-            background:#fff;border-radius:8px;margin-bottom:14px;font-size:13px;
-            box-shadow:0 2px 5px rgba(0,0,0,.08)}
+    background:#fff;border-radius:8px;margin-bottom:14px;font-size:13px;
+    box-shadow:0 2px 5px rgba(0,0,0,.08)}
   .sync-bar .dot{width:10px;height:10px;border-radius:50%;background:#28a745}
   .sync-bar.dirty .dot{background:#ffc107;animation:pulse 1s infinite}
   .sync-bar.error .dot{background:#dc3545}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-  .toolbar input,.toolbar select{padding:8px 12px;border:1px solid #ccc;
-    border-radius:6px;font-size:14px}
-  .toolbar input[type=text]{flex:1;min-width:200px}
+  /* Tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:14px}
+  .tab{padding:10px 18px;border:none;border-radius:8px 8px 0 0;
+    background:#e1e5ea;color:#555;cursor:pointer;font-weight:600;font-size:13px}
+  .tab.active{background:#1a5490;color:#fff}
+  .tab-content{display:none}
+  .tab-content.active{display:block}
+
+  /* Toolbar */
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;
+    background:#fff;padding:10px;border-radius:8px;
+    box-shadow:0 2px 5px rgba(0,0,0,.08)}
+  .toolbar input,.toolbar select{padding:7px 10px;border:1px solid #ccc;
+    border-radius:6px;font-size:13px}
+  .toolbar input[type=text]{flex:1;min-width:180px}
+  .date-group{display:flex;gap:6px;align-items:center;
+    padding:6px 10px;background:#f5f8ff;border-radius:6px;font-size:12px}
+  .date-group label{color:#555;font-weight:600}
+  .date-group input[type=date]{padding:5px 8px;font-size:12px}
   button{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;
     font-size:13px;font-weight:600;transition:.2s}
   .btn-primary{background:#1a5490;color:#fff}
@@ -29,18 +45,21 @@
   .btn-danger{background:#dc3545;color:#fff}
   .btn-warning{background:#ffc107;color:#333}
   .btn-success{background:#28a745;color:#fff}
+  .btn-secondary{background:#6c757d;color:#fff}
   button:disabled{opacity:.5;cursor:not-allowed}
 
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
     gap:10px;margin-bottom:14px}
   .stat-card{background:#fff;padding:12px;border-radius:8px;text-align:center;
     box-shadow:0 2px 5px rgba(0,0,0,.08)}
-  .stat-card .num{font-size:24px;font-weight:bold;color:#1a5490}
-  .stat-card .label{font-size:12px;color:#666;margin-top:4px}
+  .stat-card .num{font-size:22px;font-weight:bold;color:#1a5490}
+  .stat-card .label{font-size:11px;color:#666;margin-top:4px}
 
+  /* Table */
   .table-wrap{overflow-x:auto}
   table{width:100%;background:#fff;border-collapse:collapse;border-radius:8px;
-    overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);min-width:900px}
+    overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
   th{background:#1a5490;color:#fff;padding:10px 8px;text-align:left;font-size:12px}
   td{padding:8px;border-bottom:1px solid #eee;font-size:12px;vertical-align:middle}
   tr:hover{background:#f8f9ff}
@@ -50,13 +69,13 @@
   .badge-red{background:#ffe0e0;color:#c00}
   .badge-yellow{background:#fff4d0;color:#a67c00}
   .badge-green{background:#d4f4dd;color:#1a6b2e}
+  .code-cell{font-family:monospace;font-weight:bold;color:#1a5490;font-size:12px}
 
   .thumb{width:40px;height:40px;object-fit:cover;border-radius:4px;
     cursor:pointer;border:1px solid #ddd;margin-right:2px}
   .thumb-empty{width:40px;height:40px;border:1px dashed #ccc;border-radius:4px;
     display:inline-flex;align-items:center;justify-content:center;
     color:#aaa;font-size:10px}
-  .code-cell{font-family:monospace;font-weight:bold;color:#1a5490}
 
   .row-actions button{padding:4px 8px;font-size:11px;margin-right:2px}
 
@@ -64,8 +83,8 @@
   .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
     z-index:1000;align-items:center;justify-content:center;padding:15px}
   .modal-bg.active{display:flex}
-  .modal{background:#fff;border-radius:10px;padding:22px;max-width:720px;
-    width:100%;max-height:90vh;overflow-y:auto}
+  .modal{background:#fff;border-radius:10px;padding:22px;max-width:680px;
+    width:100%;max-height:92vh;overflow-y:auto}
   .modal h2{color:#1a5490;margin-bottom:14px;font-size:18px}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .form-group{display:flex;flex-direction:column}
@@ -75,6 +94,7 @@
   .form-group input,.form-group select,.form-group textarea{
     padding:8px;border:1px solid #ccc;border-radius:6px;font-size:13px}
   .form-group input.uppercase{text-transform:uppercase;font-family:monospace}
+  .hint{font-size:11px;color:#888;margin-top:3px}
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
   .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
   .img-preview .img-wrap{position:relative}
@@ -83,15 +103,39 @@
   .img-preview .del-img{position:absolute;top:-6px;right:-6px;background:#dc3545;
     color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;
     line-height:1;cursor:pointer;border:none;padding:0}
-  .img-preview .uploading{opacity:.4}
+  .img-preview .uploading{opacity:.5}
 
+  /* Dashboard */
+  .dash-grid{display:grid;grid-template-columns:1fr;gap:18px}
+  .dash-card{background:#fff;border-radius:10px;padding:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .dash-card h3{color:#1a5490;margin-bottom:12px;font-size:15px;
+    display:flex;align-items:center;gap:8px}
+  .dash-card h3 .hint{font-size:12px;color:#888;font-weight:normal}
+  .dash-table{width:100%;border-collapse:collapse}
+  .dash-table th{background:#eef4fb;color:#1a5490;padding:9px 8px;
+    text-align:center;font-size:12px;border-bottom:2px solid #1a5490}
+  .dash-table th:first-child{text-align:left}
+  .dash-table td{padding:8px;border-bottom:1px solid #eee;
+    font-size:12px;text-align:center}
+  .dash-table td:first-child{text-align:left;font-weight:600}
+  .dash-table .num-big{font-weight:bold;color:#1a5490;font-size:13px}
+  .dash-table .pct-good{color:#28a745;font-weight:bold}
+  .dash-table .pct-warn{color:#ffc107;font-weight:bold}
+  .dash-table .pct-bad{color:#dc3545;font-weight:bold}
+  .dash-table tr.total-row td{background:#f5f8ff;font-weight:bold;
+    border-top:2px solid #1a5490}
+  .progress{width:80px;height:6px;background:#e9ecef;border-radius:3px;
+    display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden}
+  .progress > div{height:100%;background:#28a745}
+
+  /* Lightbox / Toast */
   .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
     z-index:2000;align-items:center;justify-content:center}
   .lightbox.active{display:flex}
   .lightbox img{max-width:92%;max-height:92%;border-radius:6px}
   .lightbox .close-lb{position:absolute;top:12px;right:22px;color:#fff;
     font-size:38px;cursor:pointer;line-height:1}
-
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
     background:#333;color:#fff;padding:12px 20px;border-radius:8px;
     font-size:13px;z-index:3000;opacity:0;transition:opacity .3s;
@@ -99,10 +143,12 @@
   .toast.show{opacity:1}
   .toast.success{background:#28a745}
   .toast.error{background:#dc3545}
+  .toast.warn{background:#ffc107;color:#333}
 
   @media(max-width:768px){
     .form-grid{grid-template-columns:1fr}
     body{padding:10px}
+    .date-group{flex-wrap:wrap;width:100%}
   }
 </style>
 </head>
@@ -110,40 +156,77 @@
 <div class="container">
   <h1>🔬 Quản lý Thiết bị Thí nghiệm</h1>
 
-  <!-- Thanh trạng thái sync -->
   <div class="sync-bar" id="syncBar">
     <span class="dot"></span>
     <span id="syncText">Đang tải dữ liệu từ Google Sheets...</span>
     <span style="flex:1"></span>
     <button class="btn-primary" id="btnSync" onclick="syncNow()" disabled>☁️ Đồng bộ ngay</button>
-    <button class="btn-success" onclick="loadFromServer(true)" id="btnReload">🔄 Tải lại</button>
+    <button class="btn-success" onclick="loadFromServer(true)">🔄 Tải lại</button>
   </div>
 
-  <div class="stats" id="stats"></div>
-
-  <div class="toolbar">
-    <input type="text" id="searchBox" placeholder="🔍 Tìm theo tên / mã / trạm / serial...">
-    <select id="filterStation"><option value="">-- Tất cả trạm --</option></select>
-    <select id="filterReport">
-      <option value="">-- Biên bản --</option>
-      <option value="Chưa làm">Chưa làm</option>
-      <option value="Đang làm">Đang làm</option>
-      <option value="Đã xong">Đã xong</option>
-    </select>
-    <button class="btn-primary" onclick="openAddModal()">➕ Thêm thiết bị</button>
+  <div class="tabs">
+    <button class="tab active" data-tab="list" onclick="switchTab('list')">📋 Danh sách</button>
+    <button class="tab" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>STT</th><th>Trạm</th><th>Mã TB</th><th>Tên thiết bị</th>
-          <th>Ngày lấy mẫu</th><th>Ngày TN</th>
-          <th>Ảnh KQ</th><th>Nameplate</th><th>Biên bản</th><th></th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
+  <!-- TAB: DANH SÁCH -->
+  <div id="tabList" class="tab-content active">
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <input type="text" id="searchBox" placeholder="🔍 Tìm theo tên / mã / trạm...">
+      <select id="filterStation"><option value="">-- Tất cả trạm --</option></select>
+      <select id="filterReport">
+        <option value="">-- Biên bản --</option>
+        <option value="Chưa làm">Chưa làm</option>
+        <option value="Đang làm">Đang làm</option>
+        <option value="Đã xong">Đã xong</option>
+      </select>
+      <div class="date-group">
+        <label>📅</label>
+        <select id="filterDateField">
+          <option value="testDate">Ngày TN</option>
+          <option value="samplingDate">Ngày lấy mẫu</option>
+        </select>
+        <span>Từ</span>
+        <input type="date" id="filterDateFrom">
+        <span>→</span>
+        <input type="date" id="filterDateTo">
+        <button class="btn-secondary" onclick="clearDateFilter()" title="Xóa lọc ngày">✕</button>
+      </div>
+      <button class="btn-primary" onclick="openAddModal()">➕ Thêm thiết bị</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th><th>Trạm</th><th>Mã TB</th><th>Tên thiết bị</th>
+            <th>Ngày lấy mẫu</th><th>Ngày TN</th>
+            <th>Ảnh KQ</th><th>Nameplate</th><th>Biên bản</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: DASHBOARD -->
+  <div id="tabDashboard" class="tab-content">
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h3>🏢 Thống kê theo Trạm <span class="hint">(số thiết bị theo trạng thái biên bản)</span></h3>
+        <div id="dashByStation"></div>
+      </div>
+      <div class="dash-card">
+        <h3>📅 Thống kê theo Tháng <span class="hint">(dựa trên Ngày thí nghiệm, nếu trống dùng Ngày lấy mẫu)</span></h3>
+        <div id="dashByMonth"></div>
+      </div>
+      <div class="dash-card">
+        <h3>🎯 Ma trận Trạm × Tháng <span class="hint">(số thiết bị đã xong / tổng)</span></h3>
+        <div id="dashMatrix" style="overflow-x:auto"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -156,26 +239,31 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Trạm <span class="req">*</span></label>
-          <input type="text" id="fStation" required list="stationList" placeholder="VD: Trạm 1">
+          <input type="text" id="fStation" required list="stationList"
+                 placeholder="VD: Trạm 1">
           <datalist id="stationList"></datalist>
+          <div class="hint">Gõ tên trạm mới để tự tạo</div>
         </div>
         <div class="form-group">
-          <label>Mã thiết bị <span class="req">*</span> (tự động IN HOA)</label>
+          <label>Mã thiết bị <span class="req">*</span></label>
           <input type="text" id="fCode" required class="uppercase"
                  placeholder="VD: TB-001"
                  oninput="this.value=this.value.toUpperCase()">
+          <div class="hint">Tự động IN HOA. Trùng mã OK nếu khác trạm.</div>
         </div>
         <div class="form-group full">
-          <label>Tên thiết bị (không bắt buộc)</label>
+          <label>Tên thiết bị <span style="color:#888;font-weight:normal">(không bắt buộc)</span></label>
           <input type="text" id="fName" placeholder="VD: Máy đo điện trở đất">
         </div>
-        <div class="form-group"><label>Model</label><input type="text" id="fModel"></div>
-        <div class="form-group"><label>Serial</label><input type="text" id="fSerial"></div>
-        <div class="form-group"><label>Hãng SX</label><input type="text" id="fBrand"></div>
-        <div class="form-group"><label>Vị trí</label><input type="text" id="fLocation"></div>
-        <div class="form-group"><label>Ngày lấy mẫu</label><input type="date" id="fSamplingDate"></div>
-        <div class="form-group"><label>Ngày thí nghiệm</label><input type="date" id="fTestDate"></div>
         <div class="form-group">
+          <label>Ngày lấy mẫu</label>
+          <input type="date" id="fSamplingDate">
+        </div>
+        <div class="form-group">
+          <label>Ngày thí nghiệm</label>
+          <input type="date" id="fTestDate">
+        </div>
+        <div class="form-group full">
           <label>Trạng thái biên bản</label>
           <select id="fReport">
             <option value="Chưa làm">Chưa làm</option>
@@ -183,16 +271,19 @@
             <option value="Đã xong">Đã xong</option>
           </select>
         </div>
-        <div class="form-group full"><label>Ghi chú</label>
-          <textarea id="fNote" rows="2"></textarea></div>
         <div class="form-group full">
-          <label>📷 Ảnh kết quả thí nghiệm (nén tự động trước khi upload)</label>
+          <label>Ghi chú</label>
+          <textarea id="fNote" rows="2"
+                    placeholder="Model / Serial / Hãng SX / Vị trí / ghi chú khác..."></textarea>
+        </div>
+        <div class="form-group full">
+          <label>📷 Ảnh kết quả thí nghiệm</label>
           <input type="file" id="fResultImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'result')">
           <div class="img-preview" id="resultPreview"></div>
         </div>
         <div class="form-group full">
-          <label>🏷️ Ảnh nameplate (nén tự động)</label>
+          <label>🏷️ Ảnh nameplate</label>
           <input type="file" id="fNameplateImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'nameplate')">
           <div class="img-preview" id="nameplatePreview"></div>
@@ -210,24 +301,22 @@
   <span class="close-lb">&times;</span>
   <img id="lightboxImg" src="">
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 /* ============================================================
-   CẤU HÌNH – DÁN URL WEB APP SAU KHI DEPLOY
+   CẤU HÌNH
    ============================================================ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzUm3S8moauD2tmRPo2O2toJoR2-tykL6lFv_5ZTb9xvv0YOIcJ-jpjfV_khHRAvIdJ/exec';
-// Ví dụ: https://script.google.com/macros/s/AKfycbx.../exec
+const API_URL = 'https://script.google.com/macros/s/AKfycbzUm3S8moauD2tmRPo2O2toJoR2-tykL6lFv_5ZTb9xvv0YOIcJ-jpjfV_khHRAvIdJ/exec'; // ⬅ DÁN URL WEB APP
 
 /* ============================================================
    STATE
    ============================================================ */
-let equipmentList = [];     // {id, stationId, station, code, name, ..., images:[{fileId,...}]}
+let equipmentList = [];
 let stations = [];
-let tempResultImgs = [];    // [{fileId, url, name, type, uploading}]
+let tempResultImgs = [];
 let tempNameplateImgs = [];
-let dirty = false;          // có thay đổi chưa sync
+let dirty = false;
 let syncTimer = null;
 
 /* ============================================================
@@ -238,39 +327,41 @@ function toast(msg, type=''){
   t.textContent = msg;
   t.className = 'toast show ' + type;
   clearTimeout(t._t);
-  t._t = setTimeout(()=>t.className='toast', 3000);
+  t._t = setTimeout(()=>t.className='toast', 3200);
 }
-
 function setSyncState(state, text){
   const bar = document.getElementById('syncBar');
   bar.className = 'sync-bar' + (state==='dirty'?' dirty':state==='error'?' error':'');
   document.getElementById('syncText').textContent = text;
   document.getElementById('btnSync').disabled = (state !== 'dirty');
 }
-
 function markDirty(){
   dirty = true;
   setSyncState('dirty', '⚠️ Có thay đổi chưa đồng bộ lên Sheet');
   clearTimeout(syncTimer);
-  syncTimer = setTimeout(()=>{ if(dirty) syncNow(); }, 60000); // autosync 60s
+  syncTimer = setTimeout(()=>{ if(dirty) syncNow(); }, 60000);
 }
-
-function uid(prefix='id'){
-  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
-}
-
-function formatDate(d){
+function uid(p='id'){ return p + '_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function fmtDate(d){
   if(!d) return '';
-  const [y,m,dd] = String(d).split('T')[0].split('-');
-  return dd && m && y ? `${dd}/${m}/${y}` : d;
+  const s = String(d).split('T')[0];
+  const [y,m,dd] = s.split('-');
+  return dd && m && y ? `${dd}/${m}/${y}` : s;
+}
+function dateOnly(d){
+  if(!d) return '';
+  return String(d).split('T')[0]; // YYYY-MM-DD
+}
+function monthKey(d){
+  const s = dateOnly(d);
+  return s ? s.slice(0,7) : 'Chưa có';
 }
 
 /* ============================================================
-   NÉN ẢNH (CLIENT-SIDE) – giảm ~80-90% dung lượng
+   NÉN ẢNH
    ============================================================ */
-const MAX_DIM = 1280;       // cạnh dài tối đa
-const JPEG_QUALITY = 0.75;  // chất lượng nén
-
+const MAX_DIM = 1280;
+const JPEG_QUALITY = 0.75;
 function compressImage(file){
   return new Promise((resolve, reject)=>{
     if(!file.type.startsWith('image/')) return reject(new Error('Không phải ảnh'));
@@ -283,19 +374,16 @@ function compressImage(file){
       w = Math.round(w*scale); h = Math.round(h*scale);
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       canvas.toBlob(blob=>{
         if(!blob) return reject(new Error('Nén thất bại'));
         const reader = new FileReader();
         reader.onload = e=>{
-          const dataUrl = e.target.result;
-          const base64 = dataUrl.split(',')[1];
           resolve({
-            base64,
-            dataUrl,
+            base64: e.target.result.split(',')[1],
+            dataUrl: e.target.result,
             type: 'image/jpeg',
-            name: (file.name || 'img').replace(/\.[^.]+$/, '') + '.jpg',
+            name: (file.name||'img').replace(/\.[^.]+$/, '') + '.jpg',
             originalKB: Math.round(file.size/1024),
             compressedKB: Math.round(blob.size/1024)
           });
@@ -309,19 +397,29 @@ function compressImage(file){
 }
 
 /* ============================================================
-   API CALLS
+   API
    ============================================================ */
 async function apiPost(payload){
   const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: {'Content-Type':'text/plain;charset=utf-8'}, // tránh preflight
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify(payload)
   });
   const json = await res.json();
   if(!json.success) throw new Error(json.error || 'API error');
   return json.data;
 }
+async function uploadImageToDrive(img){
+  return await apiPost({action:'uploadImage', data: img.base64,
+                        type: img.type, name: img.name});
+}
+function driveImageUrl(fileId, size=200){
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
+}
 
+/* ============================================================
+   LOAD
+   ============================================================ */
 async function loadFromServer(showToast=false){
   try{
     setSyncState('', '⏳ Đang tải dữ liệu từ Google Sheets...');
@@ -332,14 +430,24 @@ async function loadFromServer(showToast=false){
     stations = d.stations || [];
     equipmentList = (d.devices || []).map(dev=>{
       const st = stations.find(s=>s.id === dev.stationId);
+      // Parse images JSON
+      let imgs = {result:[], nameplate:[]};
+      try{ imgs = typeof dev.images === 'string' ? JSON.parse(dev.images) : (dev.images || imgs); }
+      catch(e){}
       return {
         ...dev,
-        stationName: st ? st.name : (dev.location || ''),
-        stationCode: st ? st.code : ''
+        stationName: st ? st.name : '',
+        resultImages: Array.isArray(imgs.result) ? imgs.result : [],
+        nameplateImages: Array.isArray(imgs.nameplate) ? imgs.nameplate : [],
+        reportStatus: dev.hasBB ? 'Đã xong' : (dev.bbNo ? 'Đang làm' : 'Chưa làm'),
+        _synced: true
       };
     });
+    // Note: hasBB/bbNo có thể không có trên Devices sheet — bỏ qua fallback này
+    // Nếu có dùng Tests để tính reportStatus cần mapping riêng. Ở đây tạm để "Chưa làm".
     dirty = false;
     render();
+    renderDashboard();
     setSyncState('', '✅ Đã tải ' + equipmentList.length + ' thiết bị từ Sheet');
     if(showToast) toast('Đã tải lại dữ liệu', 'success');
   }catch(err){
@@ -348,46 +456,53 @@ async function loadFromServer(showToast=false){
   }
 }
 
-async function uploadImageToDrive(img){
-  // img: {base64, type, name}
-  const res = await apiPost({
-    action: 'uploadImage',
-    data: img.base64,
-    type: img.type,
-    name: img.name
-  });
-  return res; // {fileId, name, type, sizeKB}
-}
-
-function driveImageUrl(fileId, size=200){
-  // Dùng thumbnail public của Drive
-  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size}`;
+/* ============================================================
+   STATIONS: đảm bảo tồn tại (auto-create nếu gõ mới)
+   ============================================================ */
+async function ensureStation(name){
+  if(!name) return null;
+  const norm = name.trim();
+  if(!norm) return null;
+  const found = stations.find(s=>s.name === norm);
+  if(found) return found;
+  const newSt = {
+    id: uid('st'),
+    code: norm.toUpperCase().replace(/\s+/g,'_').slice(0,30),
+    name: norm,
+    address: '',
+    note: ''
+  };
+  await apiPost({action:'saveStation', record: newSt});
+  stations.push(newSt);
+  return newSt;
 }
 
 /* ============================================================
-   SYNC (lưu tất cả thiết bị dirty lên Sheet)
+   SYNC
    ============================================================ */
 async function syncNow(){
   if(!dirty) return;
   const btn = document.getElementById('btnSync');
   btn.disabled = true; btn.textContent = '⏳ Đang đồng bộ...';
   try{
+    // 1) Đảm bảo mọi trạm đều tồn tại
+    const uniqueStations = [...new Set(
+      equipmentList.map(d=>(d.stationName||'').trim()).filter(Boolean)
+    )];
+    for(const name of uniqueStations) await ensureStation(name);
+
+    // 2) Sync từng device
     for(const dev of equipmentList){
-      if(dev._synced !== false) continue; // chỉ sync cái mới thay đổi
-      const station = stations.find(s=>s.name === dev.stationName);
+      if(dev._synced !== false) continue;
+      const st = stations.find(s=>s.name === dev.stationName);
       const rec = {
         id: dev.id,
-        stationId: station ? station.id : (dev.stationId || ''),
+        stationId: st ? st.id : '',
         code: String(dev.code||'').toUpperCase(),
         name: dev.name || '',
-        type: dev.type || '',
-        model: dev.model || '',
-        serial: dev.serial || '',
-        manufacturer: dev.brand || '',
-        year: dev.year || '',
-        installDate: dev.installDate || '',
-        location: dev.location || dev.stationName || '',
-        note: dev.note || '',
+        type: '', model: '', serial: '', manufacturer: '',
+        year: '', installDate: '',
+        location: '', note: dev.note || '',
         images: JSON.stringify({
           result: dev.resultImages || [],
           nameplate: dev.nameplateImages || []
@@ -395,11 +510,12 @@ async function syncNow(){
       };
       await apiPost({action:'saveDevice', record: rec});
       dev._synced = true;
+      dev.stationId = rec.stationId;
     }
-    // Lưu thêm Settings (cycle) nếu cần
     dirty = false;
-    setSyncState('', '✅ Đã đồng bộ lên Sheet lúc ' + new Date().toLocaleTimeString('vi-VN'));
+    setSyncState('', '✅ Đã đồng bộ lúc ' + new Date().toLocaleTimeString('vi-VN'));
     toast('Đồng bộ thành công', 'success');
+    renderDashboard();
   }catch(err){
     setSyncState('error', '❌ Lỗi sync: ' + err.message);
     toast('Lỗi sync: ' + err.message, 'error');
@@ -410,14 +526,46 @@ async function syncNow(){
 }
 
 /* ============================================================
-   RENDER
+   FILTER HELPER
    ============================================================ */
-function render(){
-  const search = document.getElementById('searchBox').value.toLowerCase();
+function getFilteredList(){
+  const search = document.getElementById('searchBox').value.toLowerCase().trim();
   const fStation = document.getElementById('filterStation').value;
   const fReport = document.getElementById('filterReport').value;
+  const df = document.getElementById('filterDateField').value;
+  const dFrom = document.getElementById('filterDateFrom').value;
+  const dTo = document.getElementById('filterDateTo').value;
 
-  // Filter trạm
+  return equipmentList.filter(e=>{
+    if(search){
+      const hay = [e.name, e.code, e.stationName, e.note].map(x=>(x||'').toLowerCase()).join(' ');
+      if(!hay.includes(search)) return false;
+    }
+    if(fStation && e.stationName !== fStation) return false;
+    if(fReport && (e.reportStatus||'Chưa làm') !== fReport) return false;
+
+    // Date filter
+    if(dFrom || dTo){
+      const val = dateOnly(e[df] || '');
+      if(!val) return false;
+      if(dFrom && val < dFrom) return false;
+      if(dTo && val > dTo) return false;
+    }
+    return true;
+  });
+}
+
+function clearDateFilter(){
+  document.getElementById('filterDateFrom').value = '';
+  document.getElementById('filterDateTo').value = '';
+  render();
+}
+
+/* ============================================================
+   RENDER LIST
+   ============================================================ */
+function render(){
+  // Update station filter options
   const stNames = [...new Set(equipmentList.map(e=>e.stationName).filter(Boolean))].sort();
   const fs = document.getElementById('filterStation');
   const cur = fs.value;
@@ -427,20 +575,12 @@ function render(){
   document.getElementById('stationList').innerHTML =
     stNames.map(s=>`<option value="${s}">`).join('');
 
-  const filtered = equipmentList.filter(e=>{
-    const okS = !search ||
-      (e.name||'').toLowerCase().includes(search) ||
-      (e.code||'').toLowerCase().includes(search) ||
-      (e.stationName||'').toLowerCase().includes(search) ||
-      (e.serial||'').toLowerCase().includes(search);
-    const okSt = !fStation || e.stationName === fStation;
-    const okR = !fReport || e.reportStatus === fReport;
-    return okS && okSt && okR;
-  });
+  const filtered = getFilteredList();
 
   const tbody = document.getElementById('tableBody');
   if(filtered.length === 0){
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Chưa có dữ liệu. Nhấn "➕ Thêm thiết bị" để bắt đầu.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">
+      Không có thiết bị nào khớp điều kiện lọc.</td></tr>`;
   }else{
     tbody.innerHTML = filtered.map((e,i)=>{
       const rc = e.reportStatus === 'Đã xong' ? 'badge-green' :
@@ -458,8 +598,8 @@ function render(){
         <td><strong>${e.stationName||'-'}</strong></td>
         <td class="code-cell">${e.code||''}</td>
         <td>${e.name||'<i style="color:#aaa">(chưa đặt tên)</i>'}</td>
-        <td>${e.samplingDate?formatDate(e.samplingDate):'-'}</td>
-        <td>${e.testDate?formatDate(e.testDate):'-'}</td>
+        <td>${e.samplingDate?fmtDate(e.samplingDate):'-'}</td>
+        <td>${e.testDate?fmtDate(e.testDate):'-'}</td>
         <td>${rImgs}</td>
         <td>${nImgs}</td>
         <td><span class="badge ${rc}">${e.reportStatus||'Chưa làm'}</span></td>
@@ -477,12 +617,168 @@ function render(){
   const doing = equipmentList.filter(e=>e.reportStatus==='Đang làm').length;
   const noR = equipmentList.filter(e=>!e.reportStatus||e.reportStatus==='Chưa làm').length;
   document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="num">${total}</div><div class="label">Tổng thiết bị</div></div>
+    <div class="stat-card"><div class="num">${total}</div><div class="label">Tổng TB</div></div>
     <div class="stat-card"><div class="num">${stNames.length}</div><div class="label">Số trạm</div></div>
     <div class="stat-card"><div class="num" style="color:#28a745">${done}</div><div class="label">BB đã xong</div></div>
     <div class="stat-card"><div class="num" style="color:#ffc107">${doing}</div><div class="label">Đang làm BB</div></div>
     <div class="stat-card"><div class="num" style="color:#dc3545">${noR}</div><div class="label">Chưa làm BB</div></div>
   `;
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard(){
+  const byStation = {};
+  const byMonth = {};
+  const matrix = {}; // matrix[station][month] = {done, total}
+
+  equipmentList.forEach(d=>{
+    const st = (d.stationName||'(Chưa có trạm)').trim() || '(Chưa có trạm)';
+    const rs = d.reportStatus || 'Chưa làm';
+    const dStr = d.testDate || d.samplingDate;
+    const mk = monthKey(dStr);
+
+    if(!byStation[st]) byStation[st] = {total:0, chuaLam:0, dangLam:0, daXong:0};
+    byStation[st].total++;
+    if(rs==='Đã xong') byStation[st].daXong++;
+    else if(rs==='Đang làm') byStation[st].dangLam++;
+    else byStation[st].chuaLam++;
+
+    if(!byMonth[mk]) byMonth[mk] = {total:0, chuaLam:0, dangLam:0, daXong:0};
+    byMonth[mk].total++;
+    if(rs==='Đã xong') byMonth[mk].daXong++;
+    else if(rs==='Đang làm') byMonth[mk].dangLam++;
+    else byMonth[mk].chuaLam++;
+
+    if(!matrix[st]) matrix[st] = {};
+    if(!matrix[st][mk]) matrix[st][mk] = {total:0, done:0};
+    matrix[st][mk].total++;
+    if(rs==='Đã xong') matrix[st][mk].done++;
+  });
+
+  // ---- BY STATION ----
+  const stKeys = Object.keys(byStation).sort();
+  if(stKeys.length === 0){
+    document.getElementById('dashByStation').innerHTML =
+      '<p style="color:#999;padding:20px;text-align:center">Chưa có dữ liệu</p>';
+  }else{
+    let sumT=0, sumC=0, sumD=0, sumX=0;
+    const rows = stKeys.map(st=>{
+      const r = byStation[st];
+      sumT+=r.total; sumC+=r.chuaLam; sumD+=r.dangLam; sumX+=r.daXong;
+      const pct = r.total ? Math.round(r.daXong*100/r.total) : 0;
+      const pctClass = pct>=80?'pct-good':pct>=40?'pct-warn':'pct-bad';
+      return `<tr>
+        <td>${st}</td>
+        <td class="num-big">${r.total}</td>
+        <td style="color:#dc3545">${r.chuaLam}</td>
+        <td style="color:#ffc107">${r.dangLam}</td>
+        <td style="color:#28a745">${r.daXong}</td>
+        <td class="${pctClass}">${pct}%
+          <span class="progress"><div style="width:${pct}%"></div></span></td>
+      </tr>`;
+    }).join('');
+    const pctAll = sumT ? Math.round(sumX*100/sumT) : 0;
+    document.getElementById('dashByStation').innerHTML = `
+      <table class="dash-table">
+        <thead><tr>
+          <th>Trạm</th><th>Tổng</th>
+          <th>Chưa làm</th><th>Đang làm</th><th>Đã xong</th>
+          <th>% Hoàn thành</th>
+        </tr></thead>
+        <tbody>
+          ${rows}
+          <tr class="total-row">
+            <td>TỔNG CỘNG</td>
+            <td class="num-big">${sumT}</td>
+            <td>${sumC}</td><td>${sumD}</td><td>${sumX}</td>
+            <td>${pctAll}%</td>
+          </tr>
+        </tbody>
+      </table>`;
+  }
+
+  // ---- BY MONTH ----
+  const mKeys = Object.keys(byMonth).sort();
+  if(mKeys.length === 0){
+    document.getElementById('dashByMonth').innerHTML =
+      '<p style="color:#999;padding:20px;text-align:center">Chưa có dữ liệu</p>';
+  }else{
+    const rows = mKeys.map(mk=>{
+      const r = byMonth[mk];
+      const pct = r.total ? Math.round(r.daXong*100/r.total) : 0;
+      const pctClass = pct>=80?'pct-good':pct>=40?'pct-warn':'pct-bad';
+      const label = mk==='Chưa có' ? 'Chưa có ngày' : mk;
+      return `<tr>
+        <td>${label}</td>
+        <td class="num-big">${r.total}</td>
+        <td style="color:#dc3545">${r.chuaLam}</td>
+        <td style="color:#ffc107">${r.dangLam}</td>
+        <td style="color:#28a745">${r.daXong}</td>
+        <td class="${pctClass}">${pct}%</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('dashByMonth').innerHTML = `
+      <table class="dash-table">
+        <thead><tr>
+          <th>Tháng</th><th>Tổng</th>
+          <th>Chưa làm</th><th>Đang làm</th><th>Đã xong</th>
+          <th>% Hoàn thành</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  // ---- MATRIX Station × Month ----
+  const allMonths = [...new Set(
+    Object.values(matrix).flatMap(o=>Object.keys(o))
+  )].sort();
+  if(stKeys.length === 0 || allMonths.length === 0){
+    document.getElementById('dashMatrix').innerHTML =
+      '<p style="color:#999;padding:20px;text-align:center">Chưa có dữ liệu</p>';
+  }else{
+    const header = `<tr><th>Trạm \\ Tháng</th>${allMonths.map(m=>
+      `<th>${m==='Chưa có'?'—':m}</th>`).join('')}<th>Tổng</th></tr>`;
+    const rows = stKeys.map(st=>{
+      const rowCells = allMonths.map(m=>{
+        const cell = (matrix[st]||{})[m];
+        if(!cell) return '<td style="color:#ddd">—</td>';
+        const pct = Math.round(cell.done*100/cell.total);
+        const cls = pct===100?'pct-good':pct>0?'pct-warn':'pct-bad';
+        return `<td class="${cls}">${cell.done}/${cell.total}</td>`;
+      }).join('');
+      const total = byStation[st].total;
+      return `<tr><td>${st}</td>${rowCells}<td class="num-big">${total}</td></tr>`;
+    }).join('');
+    const colTotals = allMonths.map(m=>{
+      const t = stKeys.reduce((s,st)=>s + ((matrix[st]||{})[m]?.total||0), 0);
+      const d = stKeys.reduce((s,st)=>s + ((matrix[st]||{})[m]?.done||0), 0);
+      return `<td class="num-big">${d}/${t}</td>`;
+    }).join('');
+    const grandTotal = equipmentList.length;
+    document.getElementById('dashMatrix').innerHTML = `
+      <table class="dash-table">
+        <thead>${header}</thead>
+        <tbody>
+          ${rows}
+          <tr class="total-row">
+            <td>TỔNG</td>${colTotals}<td>${grandTotal}</td>
+          </tr>
+        </tbody>
+      </table>`;
+  }
+}
+
+/* ============================================================
+   TAB SWITCH
+   ============================================================ */
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>
+    t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab' + (name==='list'?'List':'Dashboard')).classList.add('active');
+  if(name==='dashboard') renderDashboard();
 }
 
 /* ============================================================
@@ -496,7 +792,6 @@ function openAddModal(){
   renderPreviews();
   document.getElementById('modalBg').classList.add('active');
 }
-
 function editEquipment(id){
   const e = equipmentList.find(x=>x.id===id);
   if(!e) return;
@@ -505,12 +800,8 @@ function editEquipment(id){
   document.getElementById('fStation').value = e.stationName || '';
   document.getElementById('fCode').value = e.code || '';
   document.getElementById('fName').value = e.name || '';
-  document.getElementById('fModel').value = e.model || '';
-  document.getElementById('fSerial').value = e.serial || '';
-  document.getElementById('fBrand').value = e.brand || '';
-  document.getElementById('fLocation').value = e.location || '';
-  document.getElementById('fSamplingDate').value = (e.samplingDate||'').split('T')[0];
-  document.getElementById('fTestDate').value = (e.testDate||'').split('T')[0];
+  document.getElementById('fSamplingDate').value = dateOnly(e.samplingDate);
+  document.getElementById('fTestDate').value = dateOnly(e.testDate);
   document.getElementById('fReport').value = e.reportStatus || 'Chưa làm';
   document.getElementById('fNote').value = e.note || '';
   tempResultImgs = [...(e.resultImages||[])];
@@ -518,57 +809,46 @@ function editEquipment(id){
   renderPreviews();
   document.getElementById('modalBg').classList.add('active');
 }
-
 function closeModal(){
   document.getElementById('modalBg').classList.remove('active');
   tempResultImgs = []; tempNameplateImgs = [];
 }
 
 /* ============================================================
-   ẢNH – PICK → NÉN → UPLOAD DRIVE
+   ẢNH
    ============================================================ */
 async function handleImgPick(input, type){
   const files = Array.from(input.files);
   input.value = '';
   for(const file of files){
-    const placeholder = {
-      fileId: null, dataUrl: null, name: file.name, uploading: true, type
-    };
+    const placeholder = {fileId:null, dataUrl:null, name:file.name, uploading:true};
     const arr = type==='result' ? tempResultImgs : tempNameplateImgs;
     arr.push(placeholder);
     renderPreviews();
     try{
-      // 1) Nén
       const compressed = await compressImage(file);
-      // 2) Upload Drive
       const up = await uploadImageToDrive(compressed);
-      // 3) Thay placeholder
       placeholder.fileId = up.fileId;
       placeholder.name = up.name;
       placeholder.dataUrl = driveImageUrl(up.fileId, 200);
       placeholder.uploading = false;
-      placeholder.originalKB = compressed.originalKB;
-      placeholder.compressedKB = compressed.compressedKB;
-      console.log(`Ảnh ${file.name}: ${compressed.originalKB}KB → ${compressed.compressedKB}KB (lưu Drive ${up.sizeKB}KB)`);
-      toast(`Đã nén ${compressed.originalKB}KB → ${compressed.compressedKB}KB và upload Drive`, 'success');
+      toast(`Nén ${compressed.originalKB}KB → ${compressed.compressedKB}KB → Drive OK`, 'success');
     }catch(err){
-      // fallback: giữ dataUrl local (chưa upload)
-      console.warn('Upload Drive thất bại, giữ ảnh local:', err);
+      console.warn('Upload lỗi:', err);
       try{
         const compressed = await compressImage(file);
         placeholder.dataUrl = compressed.dataUrl;
         placeholder.uploading = false;
-        toast('Upload Drive lỗi – ảnh giữ local, sẽ sync sau', 'error');
+        toast('Upload Drive lỗi – giữ ảnh local', 'error');
       }catch(e2){
         const idx = arr.indexOf(placeholder);
         if(idx>=0) arr.splice(idx,1);
-        toast('Không xử lý được ảnh: ' + err.message, 'error');
+        toast('Không xử lý được ảnh', 'error');
       }
     }
     renderPreviews();
   }
 }
-
 function renderPreviews(){
   const r = document.getElementById('resultPreview');
   const n = document.getElementById('nameplatePreview');
@@ -589,7 +869,6 @@ function renderPreviews(){
     </div>`;
   }).join('');
 }
-
 function removeImg(type, idx){
   if(type==='result') tempResultImgs.splice(idx,1);
   else tempNameplateImgs.splice(idx,1);
@@ -604,21 +883,25 @@ function saveEquipment(ev){
   const id = document.getElementById('eqId').value || uid('dev');
   const stationName = document.getElementById('fStation').value.trim();
   const code = document.getElementById('fCode').value.trim().toUpperCase();
+  if(!stationName){ toast('Trạm bắt buộc', 'error'); return; }
   if(!code){ toast('Mã thiết bị bắt buộc', 'error'); return; }
 
-  // check trùng code (local)
-  const dup = equipmentList.find(x=>x.id!==id && (x.code||'').toUpperCase()===code);
-  if(dup){ toast('Mã thiết bị đã tồn tại: ' + code, 'error'); return; }
+  // ✅ Unique theo (station + code)
+  const dup = equipmentList.find(x=>
+    x.id !== id &&
+    (x.code||'').toUpperCase() === code &&
+    (x.stationName||'').trim() === stationName
+  );
+  if(dup){
+    toast(`Mã "${code}" đã tồn tại trong trạm "${stationName}"`, 'error');
+    return;
+  }
 
   const data = {
     id,
     stationName,
     code,
     name: document.getElementById('fName').value.trim(),
-    model: document.getElementById('fModel').value.trim(),
-    serial: document.getElementById('fSerial').value.trim(),
-    brand: document.getElementById('fBrand').value.trim(),
-    location: document.getElementById('fLocation').value.trim(),
     samplingDate: document.getElementById('fSamplingDate').value,
     testDate: document.getElementById('fTestDate').value,
     reportStatus: document.getElementById('fReport').value,
@@ -635,8 +918,7 @@ function saveEquipment(ev){
   render();
   closeModal();
   markDirty();
-  toast('Đã lưu – đang chờ đồng bộ lên Sheet...', 'success');
-  // Tự sync ngay (không đợi 60s)
+  toast('Đã lưu – đang đồng bộ lên Sheet...', 'success');
   setTimeout(()=>syncNow(), 300);
 }
 
@@ -646,7 +928,7 @@ function deleteEquipment(id){
     try{
       await apiPost({action:'deleteDevice', id});
       equipmentList = equipmentList.filter(x=>x.id!==id);
-      render();
+      render(); renderDashboard();
       toast('Đã xóa', 'success');
     }catch(err){
       toast('Lỗi xóa: ' + err.message, 'error');
@@ -658,8 +940,7 @@ function deleteEquipment(id){
    LIGHTBOX
    ============================================================ */
 function openLightbox(src, kind){
-  let url = src;
-  if(kind==='drive') url = driveImageUrl(src, 1600);
+  const url = kind==='drive' ? driveImageUrl(src, 1600) : src;
   document.getElementById('lightboxImg').src = url;
   document.getElementById('lightbox').classList.add('active');
 }
@@ -673,6 +954,9 @@ function closeLightbox(){
 document.getElementById('searchBox').addEventListener('input', render);
 document.getElementById('filterStation').addEventListener('change', render);
 document.getElementById('filterReport').addEventListener('change', render);
+document.getElementById('filterDateField').addEventListener('change', render);
+document.getElementById('filterDateFrom').addEventListener('change', render);
+document.getElementById('filterDateTo').addEventListener('change', render);
 
 window.addEventListener('beforeunload', e=>{
   if(dirty){ e.preventDefault(); e.returnValue=''; }

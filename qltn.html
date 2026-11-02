@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản lý Trạm – Thiết bị – Nhật ký TN</title>
+<style>
+:root{--bg:#f1f5f9;--card:#fff;--line:#e2e8f0;--txt:#0f172a;--mut:#64748b;--pri:#2563eb;--ok:#16a34a;--warn:#d97706;--err:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;background:var(--bg);color:var(--txt)}
+header{background:#0f172a;color:#fff;padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header strong{font-size:15px}
+header input{flex:1;min-width:220px;padding:7px 10px;border-radius:6px;border:none}
+header button,button{font-family:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer}
+header button{background:#1e293b;color:#e2e8f0;border-color:#334155}
+button:hover{background:#f8fafc}
+button.primary{background:var(--pri);color:#fff;border-color:var(--pri)}
+button.danger{color:var(--err);border-color:#fecaca}
+nav{display:flex;gap:4px;padding:8px 16px 0;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav button{border:none;border-bottom:3px solid transparent;border-radius:0;background:none;padding:10px 14px;color:var(--mut);font-weight:600}
+nav button.active{color:var(--pri);border-bottom-color:var(--pri)}
+main{padding:16px;max-width:1500px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 12px;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mut);font-weight:600}
+input,select,textarea{padding:7px 9px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:13px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid #bfdbfe;border-color:var(--pri)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:#f8fafc;font-size:12px;color:var(--mut);text-transform:uppercase;white-space:nowrap}
+tbody tr:hover{background:#f8fafc}
+td.acts{white-space:nowrap;text-align:right}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.b-ok{background:#dcfce7;color:#166534}
+.b-warn{background:#fef3c7;color:#92400e}
+.b-err{background:#fee2e2;color:#991b1b}
+.b-mut{background:#f1f5f9;color:#475569}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat .n{font-size:26px;font-weight:800}
+.stat .l{font-size:12px;color:var(--mut);margin-top:4px}
+.thumb{width:46px;height:34px;object-fit:cover;border-radius:4px;border:1px solid var(--line);margin-right:3px;cursor:pointer;background:#f1f5f9}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto;z-index:50}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:12px;width:100%;max-width:760px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);font-weight:700}
+.modal-body{padding:18px;max-height:66vh;overflow:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.imgs{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.imgbox{position:relative;border:1px solid var(--line);border-radius:8px;padding:4px;background:#f8fafc}
+.imgbox img{width:110px;height:80px;object-fit:cover;border-radius:5px;display:block;cursor:pointer}
+.imgbox .x{position:absolute;top:-7px;right:-7px;background:var(--err);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer}
+.hint{font-size:12px;color:var(--mut);margin:4px 0 0}
+.empty{padding:24px;text-align:center;color:var(--mut)}
+.spinner{display:none;position:fixed;top:0;left:0;right:0;background:var(--pri);color:#fff;text-align:center;padding:4px;font-size:12px;z-index:100}
+.spinner.show{display:block}
+@media(max-width:600px){main{padding:10px}th,td{padding:6px}}
+</style>
+</head>
+<body>
+<div class="spinner" id="spinner">⏳ Đang đồng bộ với Google Drive / Sheets...</div>
+
+<header>
+  <strong>⚡ QUẢN LÝ TRẠM – THIẾT BỊ</strong>
+  <input id="globalSearch" placeholder="Tìm: mã/tên TB, serial, model, số BBTT...">
+  <button onclick="reloadData()">🔄 Tải lại</button>
+</header>
+
+<nav id="tabs">
+  <button data-tab="dash" class="active">Tổng quan</button>
+  <button data-tab="stations">Trạm</button>
+  <button data-tab="devices">Thiết bị</button>
+  <button data-tab="tests">Nhật ký TN / BBTT</button>
+  <button data-tab="settings">Cài đặt</button>
+</nav>
+
+<main id="view"><div class="empty">Đang tải dữ liệu từ Google Sheets...</div></main>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><span id="modalTitle"></span><button onclick="closeModal()">✕</button></div>
+    <div id="modalBody" class="modal-body"></div>
+    <div class="modal-foot">
+      <button onclick="closeModal()">Hủy</button>
+      <button class="primary" id="modalSave">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/************************************************************
+ *  ⚠️ SỬA 1 DÒNG DUY NHẤT – dán URL Web App của bạn
+ ************************************************************/
+const API_URL = 'https://script.google.com/macros/s/AKfycbyieaXYce1J8I-e5BbGkJSp8jSvORExKP0dD4Rh7lMNBKYVtwWB3zfnk6oNGWuEfTg/exec';
+
+/* ------------------ Helpers ------------------ */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const fmtDate = d => d ? String(d).split('-').reverse().join('/') : '';
+const todayISO = () => new Date().toISOString().slice(0,10);
+
+/* ------------------ API layer ------------------ */
+async function api(action, payload = {}){
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...payload })
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || 'Lỗi API');
+  return json.data;
+}
+function showBusy(on){ $('#spinner').classList.toggle('show', !!on); }
+
+/* ------------------ State ------------------ */
+const S = {
+  stations: [], devices: [], tests: [],
+  settings: { cycle: 12 },
+  tab: 'dash', q: '', filterStation: ''
+};
+let editingId = null;
+let currentImages = [];   // [{fileId, name, type}]
+let origImages = [];
+
+/* ------------------ Image URL helpers ------------------ */
+function thumbUrl(fileId, size){
+  if (!fileId) return '';
+  return `https://drive.google.com/thumbnail?id=${fileId}&sz=w${size||400}`;
+}
+function fullUrl(fileId){
+  if (!fileId) return '';
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+}
+function openFileUrl(fileId){
+  return `https://drive.google.com/file/d/${fileId}/view`;
+}
+
+/* ------------------ Boot ------------------ */
+(async function boot(){
+  bindEvents();
+  await reloadData();
+})();
+
+async function reloadData(){
+  showBusy(true);
+  try{
+    const data = await api('getAll');
+    S.stations = data.stations || [];
+    S.devices  = data.devices  || [];
+    S.tests    = data.tests    || [];
+    S.settings = Object.assign({ cycle: 12 }, data.settings || {});
+    render();
+  }catch(e){
+    alert('Không tải được dữ liệu: ' + e.message);
+  }finally{ showBusy(false); }
+}
+
+function bindEvents(){
+  $$('#tabs button').forEach(b => b.onclick = () => { S.tab = b.dataset.tab; render(); });
+  $('#globalSearch').oninput = e => {
+    S.q = e.target.value.trim().toLowerCase();
+    if (['devices','tests','dash'].includes(S.tab)) render();
+  };
+}
+
+/* ------------------ Business helpers ------------------ */
+const deviceTests = id => S.tests.filter(t => t.deviceId === id).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+const lastTest = id => deviceTests(id)[0] || null;
+function addMonths(d, m){ const x = new Date(d); if (isNaN(x)) return null; x.setMonth(x.getMonth()+m); return x; }
+function isOverdue(d){
+  const lt = lastTest(d.id);
+  if (!lt || !lt.date) return false;
+  const due = addMonths(lt.date, Number(S.settings.cycle)||12);
+  return due && due < new Date();
+}
+
+/* ------------------ Render ------------------ */
+function render(){
+  $$('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === S.tab));
+  const v = $('#view');
+  if      (S.tab === 'dash')     v.innerHTML = viewDash();
+  else if (S.tab === 'stations') v.innerHTML = viewStations();
+  else if (S.tab === 'devices')  v.innerHTML = viewDevices();
+  else if (S.tab === 'tests')    v.innerHTML = viewTests();
+  else                           v.innerHTML = viewSettings();
+}
+
+/* ------------------ Dashboard ------------------ */
+function viewDash(){
+  const noBB = S.devices.filter(d => { const lt = lastTest(d.id); return !lt || !lt.hasBB; });
+  const overdue = S.devices.filter(isOverdue);
+  const rowsNoBB = noBB.slice(0,30).map(d => {
+    const st = S.stations.find(s=>s.id===d.stationId); const lt = lastTest(d.id);
+    return `<tr><td><b>${esc(d.code)}</b></td><td>${esc(d.name)}</td><td>${esc(st?st.code:'')}</td>
+      <td>${lt ? fmtDate(lt.date) : '<span class="badge b-mut">Chưa TN</span>'}</td>
+      <td class="acts"><button onclick="openTestModal(null,'${d.id}')">+ Lập BBTT</button></td></tr>`;
+  }).join('');
+  const rowsOver = overdue.slice(0,30).map(d => {
+    const lt = lastTest(d.id); const st = S.stations.find(s=>s.id===d.stationId);
+    const due = addMonths(lt.date, Number(S.settings.cycle)||12);
+    return `<tr><td><b>${esc(d.code)}</b></td><td>${esc(d.name)}</td><td>${esc(st?st.code:'')}</td>
+      <td>${fmtDate(lt.date)}</td><td><span class="badge b-err">${fmtDate(due.toISOString().slice(0,10))}</span></td></tr>`;
+  }).join('');
+  return `
+  <div class="stats">
+    <div class="stat"><div class="n">${S.stations.length}</div><div class="l">Trạm</div></div>
+    <div class="stat"><div class="n">${S.devices.length}</div><div class="l">Thiết bị</div></div>
+    <div class="stat"><div class="n">${S.tests.length}</div><div class="l">Lần TN</div></div>
+    <div class="stat"><div class="n" style="color:var(--warn)">${noBB.length}</div><div class="l">Chưa có BBTT</div></div>
+    <div class="stat"><div class="n" style="color:var(--err)">${overdue.length}</div><div class="l">Quá hạn TN</div></div>
+  </div>
+  <div class="card"><h3>⚠️ Thiết bị chưa có BBTT (${noBB.length})</h3>
+    ${noBB.length ? `<div class="tw"><table><thead><tr><th>Mã TB</th><th>Tên</th><th>Trạm</th><th>TN gần nhất</th><th></th></tr></thead><tbody>${rowsNoBB}</tbody></table></div>` : '<div class="empty">Tất cả đã có BBTT 🎉</div>'}
+  </div>
+  <div class="card"><h3>⏰ Đến hạn TN lại (chu kỳ ${S.settings.cycle} tháng)</h3>
+    ${overdue.length ? `<div class="tw"><table><thead><tr><th>Mã TB</th><th>Tên</th><th>Trạm</th><th>TN gần nhất</th><th>Đến hạn</th></tr></thead><tbody>${rowsOver}</tbody></table></div>` : '<div class="empty">Chưa có thiết bị quá hạn.</div>'}
+  </div>`;
+}
+
+/* ------------------ Stations ------------------ */
+function viewStations(){
+  const rows = S.stations.map(s => {
+    const n = S.devices.filter(d => d.stationId === s.id).length;
+    return `<tr><td><b>${esc(s.code)}</b></td><td>${esc(s.name)}</td><td>${esc(s.address)}</td>
+      <td style="text-align:center">${n}</td><td>${esc(s.note)}</td>
+      <td class="acts"><button onclick="editStation('${s.id}')">Sửa</button>
+        <button class="danger" onclick="delStation('${s.id}')">Xóa</button></td></tr>`;
+  }).join('') || `<tr><td colspan="6" class="empty">Chưa có trạm nào.</td></tr>`;
+  return `
+  <div class="card"><h3>Thêm trạm</h3>
+    <div class="grid">
+      <label>Mã trạm *<input id="stCode"></label>
+      <label>Tên trạm *<input id="stName"></label>
+      <label>Địa chỉ<input id="stAddr"></label>
+      <label>Ghi chú<input id="stNote"></label>
+    </div>
+    <button class="primary" onclick="addStation()">+ Thêm trạm</button>
+  </div>
+  <div class="card"><h3>Danh sách trạm (${S.stations.length})</h3>
+    <div class="tw"><table><thead><tr><th>Mã</th><th>Tên</th><th>Địa chỉ</th><th>TB</th><th>Ghi chú</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>`;
+}
+async function addStation(){
+  const code = $('#stCode').value.trim(), name = $('#stName').value.trim();
+  if (!code || !name) return alert('Nhập mã & tên trạm');
+  showBusy(true);
+  try{
+    await api('saveStation', { record: {
+      id: uid(), code, name, address: $('#stAddr').value.trim(), note: $('#stNote').value.trim()
+    }});
+    await reloadData();
+  }catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+function editStation(id){
+  const s = S.stations.find(x=>x.id===id); if (!s) return;
+  showModal('Sửa trạm', `
+    <div class="grid">
+      <label>Mã trạm<input id="eCode" value="${esc(s.code)}"></label>
+      <label>Tên trạm<input id="eName" value="${esc(s.name)}"></label>
+      <label>Địa chỉ<input id="eAddr" value="${esc(s.address)}"></label>
+      <label>Ghi chú<input id="eNote" value="${esc(s.note)}"></label>
+    </div>`, async () => {
+      showBusy(true);
+      try{
+        await api('saveStation', { record: {
+          id, code: $('#eCode').value.trim(), name: $('#eName').value.trim(),
+          address: $('#eAddr').value.trim(), note: $('#eNote').value.trim()
+        }});
+        closeModal(); await reloadData();
+      }catch(e){ alert(e.message); }finally{ showBusy(false); }
+  });
+}
+async function delStation(id){
+  const n = S.devices.filter(d=>d.stationId===id).length;
+  if (!confirm(`Xóa trạm này?${n?'\n⚠️ Có '+n+' thiết bị thuộc trạm (không bị xóa, chỉ mồ côi).':''}`)) return;
+  showBusy(true);
+  try{ await api('deleteStation', { id }); await reloadData(); }
+  catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+
+/* ------------------ Devices ------------------ */
+function viewDevices(){
+  let list = S.devices.slice();
+  if (S.filterStation) list = list.filter(d=>d.stationId===S.filterStation);
+  if (S.q) list = list.filter(d =>
+    [d.code,d.name,d.model,d.serial,d.manufacturer,d.location,d.type].join(' ').toLowerCase().includes(S.q));
+  list.sort((a,b)=>(a.code||'').localeCompare(b.code||''));
+  const stOpts = `<option value="">— Tất cả trạm —</option>` + S.stations.map(s =>
+    `<option value="${s.id}" ${S.filterStation===s.id?'selected':''}>${esc(s.code)} – ${esc(s.name)}</option>`).join('');
+  const rows = list.map(d => {
+    const st = S.stations.find(s=>s.id===d.stationId);
+    const lt = lastTest(d.id);
+    const thumbs = (d.images||[]).slice(0,3)
+      .map(id=>`<img class="thumb" src="${thumbUrl(id,100)}" onclick="viewImage('${id}')" alt="">`).join('');
+    let bb = '<span class="badge b-mut">Chưa TN</span>';
+    if (lt) bb = lt.hasBB ? '<span class="badge b-ok">Đã có BBTT</span>' : '<span class="badge b-warn">Chưa BBTT</span>';
+    if (isOverdue(d)) bb += ' <span class="badge b-err">Quá hạn</span>';
+    return `<tr>
+      <td><b>${esc(d.code)}</b></td>
+      <td>${esc(d.name)}<div class="hint">${esc(d.type||'')}</div></td>
+      <td>${esc(st?st.code:'—')}</td>
+      <td>${esc(d.model)}${d.serial?'<div class="hint">SN: '+esc(d.serial)+'</div>':''}</td>
+      <td>${esc(d.manufacturer)}</td>
+      <td>${esc(d.year)}</td>
+      <td>${thumbs||'<span class="hint">—</span>'}</td>
+      <td>${deviceTests(d.id).length}</td>
+      <td>${lt?fmtDate(lt.date):'—'}</td>
+      <td>${bb}</td>
+      <td class="acts">
+        <button onclick="openTestModal(null,'${d.id}')">+ TN</button>
+        <button onclick="openDeviceModal('${d.id}')">Sửa</button>
+        <button class="danger" onclick="delDevice('${d.id}')">Xóa</button>
+      </td></tr>`;
+  }).join('') || `<tr><td colspan="11" class="empty">Không có thiết bị.</td></tr>`;
+  return `
+  <div class="card">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <label style="flex:1;min-width:230px">Lọc trạm
+        <select onchange="S.filterStation=this.value;render()">${stOpts}</select>
+      </label>
+      <button class="primary" onclick="openDeviceModal(null)">+ Thêm thiết bị</button>
+    </div>
+  </div>
+  <div class="card"><h3>Thiết bị (${list.length})</h3>
+    <div class="tw"><table><thead><tr>
+      <th>Mã</th><th>Tên</th><th>Trạm</th><th>Model/SN</th><th>Hãng</th><th>Năm</th>
+      <th>Nameplate</th><th>Số TN</th><th>TN gần</th><th>BBTT</th><th></th>
+    </tr></thead><tbody>${rows}</tbody></table></div>
+  </div>`;
+}
+async function openDeviceModal(id){
+  editingId = id || null;
+  const d = id ? S.devices.find(x=>x.id===id) :
+    { stationId: S.filterStation || (S.stations[0]?S.stations[0].id:''), code:'', name:'', type:'',
+      model:'', serial:'', manufacturer:'', year:'', installDate:'', location:'', note:'', images:[] };
+  origImages = (d.images||[]).slice();
+  currentImages = origImages.map(fid => ({ fileId: fid, name:'', type:'image/*' }));
+  const stOpts = S.stations.map(s =>
+    `<option value="${s.id}" ${s.id===d.stationId?'selected':''}>${esc(s.code)} – ${esc(s.name)}</option>`).join('')
+    || `<option value="">(Chưa có trạm – hãy tạo trạm)</option>`;
+  showModal(id?'Sửa thiết bị':'Thêm thiết bị', `
+    <div class="grid">
+      <label>Trạm<select id="dvStation">${stOpts}</select></label>
+      <label>Mã TB *<input id="dvCode" value="${esc(d.code)}"></label>
+      <label>Tên TB *<input id="dvName" value="${esc(d.name)}"></label>
+      <label>Loại<input id="dvType" value="${esc(d.type)}"></label>
+      <label>Model<input id="dvModel" value="${esc(d.model)}"></label>
+      <label>Serial<input id="dvSerial" value="${esc(d.serial)}"></label>
+      <label>Hãng SX<input id="dvMfr" value="${esc(d.manufacturer)}"></label>
+      <label>Năm SX<input id="dvYear" value="${esc(d.year)}"></label>
+      <label>Ngày lắp<input type="date" id="dvInstall" value="${esc(d.installDate)}"></label>
+      <label>Vị trí<input id="dvLoc" value="${esc(d.location)}"></label>
+    </div>
+    <label>Ghi chú<textarea id="dvNote" rows="2">${esc(d.note)}</textarea></label>
+    <div style="margin-top:14px">
+      <label style="font-size:13px;color:var(--txt)">📷 Ảnh nameplate (tải thẳng lên Google Drive)
+        <input type="file" accept="image/*" multiple onchange="addImages(this.files);this.value=''">
+      </label>
+      <p class="hint">Ảnh nén ~300KB/ảnh trước khi upload. Điện thoại KHÔNG lưu file.</p>
+      <div class="imgs" id="imgList"></div>
+    </div>
+  `, saveDevice);
+  renderModalImages();
+}
+function renderModalImages(){
+  const box = $('#imgList'); if (!box) return;
+  box.innerHTML = currentImages.map(im => {
+    const isImg = !im.type || im.type.startsWith('image/');
+    return `<div class="imgbox">
+      ${isImg ? `<img src="${thumbUrl(im.fileId,200)}" onclick="viewImage('${im.fileId}')">`
+              : `<div style="width:110px;height:80px;display:flex;align-items:center;justify-content:center;font-size:12px">📄 ${esc(im.name||'File')}</div>`}
+      <button class="x" onclick="removeImage('${im.fileId}')">✕</button>
+    </div>`;
+  }).join('') || '<span class="hint">Chưa có ảnh nào.</span>';
+}
+function removeImage(fileId){
+  currentImages = currentImages.filter(x=>x.fileId!==fileId);
+  renderModalImages();
+}
+function fileToBase64(f){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  });
+}
+function shrinkImage(file, maxSide=1600, q=0.85){
+  return new Promise(res => {
+    if (!file.type.startsWith('image/')) return res(file);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const s = Math.min(1, maxSide / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * s);
+      c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => { URL.revokeObjectURL(url); res(new File([b], file.name, { type:'image/jpeg' })); }, 'image/jpeg', q);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+    img.src = url;
+  });
+}
+async function addImages(files){
+  for (const f of files){
+    const compressed = await shrinkImage(f);
+    if (compressed.size > 20 * 1024 * 1024){ alert('File "'+f.name+'" quá lớn (>20MB). Bỏ qua.'); continue; }
+    showBusy(true);
+    try{
+      const b64 = await fileToBase64(compressed);
+      const r = await api('uploadImage', { name: compressed.name, type: compressed.type, data: b64 });
+      currentImages.push({ fileId: r.fileId, name: r.name, type: compressed.type });
+    }catch(e){ alert('Upload lỗi: ' + e.message); }
+    finally{ showBusy(false); }
+  }
+  renderModalImages();
+}
+async function saveDevice(){
+  const g = id => ($('#'+id) ? $('#'+id).value.trim() : '');
+  if (!g('dvCode')) return alert('Nhập mã thiết bị');
+  if (!g('dvName')) return alert('Nhập tên thiết bị');
+  const rec = {
+    id: editingId || uid(),
+    stationId: g('dvStation'),
+    code: g('dvCode'), name: g('dvName'), type: g('dvType'),
+    model: g('dvModel'), serial: g('dvSerial'), manufacturer: g('dvMfr'),
+    year: g('dvYear'), installDate: g('dvInstall'), location: g('dvLoc'),
+    note: g('dvNote'),
+    images: currentImages.map(i => i.fileId)
+  };
+  showBusy(true);
+  try{
+    await api('saveDevice', { record: rec });
+    closeModal(); await reloadData();
+  }catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+async function delDevice(id){
+  const d = S.devices.find(x=>x.id===id); if (!d) return;
+  const n = S.tests.filter(t=>t.deviceId===id).length;
+  if (!confirm(`Xóa thiết bị "${d.code}"?${n?'\n⚠️ Sẽ xóa '+n+' lần TN liên quan.':''}`)) return;
+  showBusy(true);
+  try{
+    for (const t of S.tests.filter(t=>t.deviceId===id)) await api('deleteTest', { id: t.id });
+    await api('deleteDevice', { id });
+    await reloadData();
+  }catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+
+/* ------------------ Tests ------------------ */
+function viewTests(){
+  let list = S.tests.slice();
+  if (S.q) list = list.filter(t => {
+    const d = S.devices.find(x=>x.id===t.deviceId);
+    return [t.tester,t.content,t.result,t.bbNo,t.bbMaker,t.note,d?d.code:'',d?d.name:'']
+      .join(' ').toLowerCase().includes(S.q);
+  });
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const rows = list.map(t => {
+    const d = S.devices.find(x=>x.id===t.deviceId);
+    const st = d ? S.stations.find(s=>s.id===d.stationId) : null;
+    const imgs = (t.images||[]).slice(0,2)
+      .map(id=>`<img class="thumb" src="${thumbUrl(id,100)}" onclick="viewImage('${id}')">`).join('');
+    return `<tr>
+      <td>${fmtDate(t.date)}</td>
+      <td><b>${esc(d?d.code:'(đã xóa)')}</b><div class="hint">${esc(d?d.name:'')}</div></td>
+      <td>${esc(st?st.code:'')}</td>
+      <td>${esc(t.tester)}</td>
+      <td>${esc(t.content)}</td>
+      <td>${esc(t.result)}</td>
+      <td>${t.hasBB?'<span class="badge b-ok">Có</span>':'<span class="badge b-warn">Chưa</span>'}</td>
+      <td>${esc(t.bbNo)}</td>
+      <td>${esc(t.bbMaker)}</td>
+      <td>${fmtDate(t.bbDate)}</td>
+      <td>${imgs||'<span class="hint">—</span>'}</td>
+      <td class="acts">
+        <button onclick="openTestModal('${t.id}')">Sửa</button>
+        <button class="danger" onclick="delTest('${t.id}')">Xóa</button>
+      </td></tr>`;
+  }).join('') || `<tr><td colspan="12" class="empty">Chưa có lần TN nào.</td></tr>`;
+  return `
+  <div class="card">
+    <button class="primary" onclick="openTestModal(null)">+ Thêm lần TN</button>
+    <span class="hint" style="margin-left:10px">Tổng: ${list.length}</span>
+  </div>
+  <div class="card"><h3>Nhật ký thí nghiệm</h3>
+    <div class="tw"><table><thead><tr>
+      <th>Ngày TN</th><th>Thiết bị</th><th>Trạm</th><th>Người TN</th>
+      <th>Nội dung</th><th>KQ</th><th>BBTT</th><th>Số BB</th><th>Người lập</th><th>Ngày BB</th><th>Ảnh</th><th></th>
+    </tr></thead><tbody>${rows}</tbody></table></div>
+  </div>`;
+}
+async function openTestModal(id, presetDeviceId){
+  editingId = id || null;
+  const t = id ? S.tests.find(x=>x.id===id) :
+    { deviceId: presetDeviceId || '', date: todayISO(), tester:'', content:'', result:'Đạt',
+      hasBB:false, bbNo:'', bbMaker:'', bbDate:'', note:'', images:[] };
+  origImages = (t.images||[]).slice();
+  currentImages = origImages.map(fid => ({ fileId: fid, name:'', type:'image/*' }));
+  const groups = S.stations.map(s => {
+    const ds = S.devices.filter(d=>d.stationId===s.id);
+    if (!ds.length) return '';
+    return `<optgroup label="${esc(s.code)} – ${esc(s.name)}">` +
+      ds.map(d=>`<option value="${d.id}" ${d.id===t.deviceId?'selected':''}>${esc(d.code)} – ${esc(d.name)}</option>`).join('') +
+      `</optgroup>`;
+  }).join('');
+  const orphan = S.devices.filter(d => !S.stations.some(s=>s.id===d.stationId));
+  const orphanOpts = orphan.length
+    ? `<optgroup label="(Chưa gán trạm)">` + orphan.map(d =>
+        `<option value="${d.id}" ${d.id===t.deviceId?'selected':''}>${esc(d.code)}</option>`).join('') + `</optgroup>` : '';
+  showModal(id?'Sửa lần TN':'Thêm lần TN', `
+    <div class="grid">
+      <label>Thiết bị *<select id="tsDevice">${groups}${orphanOpts}</select></label>
+      <label>Ngày TN *<input type="date" id="tsDate" value="${esc(t.date)}"></label>
+      <label>Người TN<input id="tsTester" value="${esc(t.tester)}"></label>
+      <label>Kết quả<select id="tsResult">${['Đạt','Không đạt','Đạt có điều kiện','Chưa có KQ']
+        .map(r=>`<option ${r===t.result?'selected':''}>${r}</option>`).join('')}</select></label>
+    </div>
+    <label>Nội dung<textarea id="tsContent" rows="2">${esc(t.content)}</textarea></label>
+    <div style="margin:14px 0;padding:12px;background:#f8fafc;border:1px solid var(--line);border-radius:8px">
+      <label style="flex-direction:row;align-items:center;gap:8px;font-size:13px;color:var(--txt);font-weight:700">
+        <input type="checkbox" id="tsHasBB" ${t.hasBB?'checked':''} style="width:auto"
+               onchange="document.getElementById('bbBox').style.display=this.checked?'block':'none'">
+        Đã lập BBTT
+      </label>
+      <div id="bbBox" style="display:${t.hasBB?'block':'none'};margin-top:10px">
+        <div class="grid">
+          <label>Số BBTT<input id="tsBbNo" value="${esc(t.bbNo)}"></label>
+          <label>Người lập BB<input id="tsBbMaker" value="${esc(t.bbMaker)}"></label>
+          <label>Ngày lập BB<input type="date" id="tsBbDate" value="${esc(t.bbDate)}"></label>
+        </div>
+      </div>
+    </div>
+    <label>Ghi chú<textarea id="tsNote" rows="2">${esc(t.note)}</textarea></label>
+    <div style="margin-top:14px">
+      <label style="font-size:13px;color:var(--txt)">📄 Ảnh scan BBTT / biên bản (ảnh hoặc PDF)
+        <input type="file" accept="image/*,application/pdf" multiple onchange="addImages(this.files);this.value=''">
+      </label>
+      <div class="imgs" id="imgList"></div>
+    </div>
+  `, saveTest);
+  renderModalImages();
+}
+async function saveTest(){
+  const g = id => ($('#'+id) ? $('#'+id).value.trim() : '');
+  const ck = id => !!($('#'+id) && $('#'+id).checked);
+  if (!g('tsDevice')) return alert('Chọn thiết bị');
+  if (!g('tsDate'))   return alert('Nhập ngày TN');
+  const rec = {
+    id: editingId || uid(),
+    deviceId: g('tsDevice'), date: g('tsDate'),
+    tester: g('tsTester'), content: g('tsContent'), result: g('tsResult'),
+    hasBB: ck('tsHasBB'), bbNo: g('tsBbNo'), bbMaker: g('tsBbMaker'), bbDate: g('tsBbDate'),
+    note: g('tsNote'),
+    images: currentImages.map(i => i.fileId)
+  };
+  showBusy(true);
+  try{ await api('saveTest', { record: rec }); closeModal(); await reloadData(); }
+  catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+async function delTest(id){
+  if (!confirm('Xóa lần TN này?')) return;
+  showBusy(true);
+  try{ await api('deleteTest', { id }); await reloadData(); }
+  catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+
+/* ------------------ Settings ------------------ */
+function viewSettings(){
+  return `
+  <div class="card"><h3>⚙️ Cấu hình</h3>
+    <div class="grid">
+      <label>Chu kỳ TN lại (tháng)<input type="number" id="setCycle" min="1" value="${esc(S.settings.cycle)}"></label>
+    </div>
+    <button class="primary" onclick="saveSettings()">Lưu cấu hình</button>
+  </div>
+  <div class="card"><h3>☁️ Đồng bộ</h3>
+    <p class="hint">Dữ liệu &amp; ảnh lưu trên Google Drive + Google Sheets. Điện thoại chỉ cache tạm.</p>
+    <button class="primary" onclick="reloadData()">🔄 Tải lại từ Google Sheets</button>
+    <p class="hint" style="margin-top:10px">API: <code style="font-size:11px;word-break:break-all">${esc(API_URL)}</code></p>
+  </div>
+  <div class="card"><h3>📊 Xuất CSV (xem offline)</h3>
+    <button onclick="exportDevicesCSV()">Thiết bị</button>
+    <button onclick="exportTestsCSV()" style="margin-left:6px">Nhật ký TN</button>
+  </div>`;
+}
+async function saveSettings(){
+  const cycle = Number($('#setCycle').value)||12;
+  showBusy(true);
+  try{
+    await api('saveSettings', { settings: { ...S.settings, cycle } });
+    await reloadData();
+    alert('Đã lưu');
+  }catch(e){ alert(e.message); }finally{ showBusy(false); }
+}
+function download(content, filename, type){
+  const b = new Blob([content], { type: type||'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 3000);
+}
+function toCSV(rows){
+  return '\uFEFF' + rows.map(r => r.map(c => '"' + String(c??'').replace(/"/g,'""') + '"').join(',')).join('\r\n');
+}
+function exportDevicesCSV(){
+  const head = ['Mã trạm','Tên trạm','Mã TB','Tên TB','Loại','Model','Serial','Hãng SX','Năm SX','Ngày lắp','Vị trí','Số TN','TN gần nhất','BBTT','Quá hạn'];
+  const rows = [head];
+  for (const d of S.devices){
+    const st = S.stations.find(s=>s.id===d.stationId);
+    const lt = lastTest(d.id);
+    rows.push([st?st.code:'',st?st.name:'',d.code,d.name,d.type,d.model,d.serial,d.manufacturer,
+      d.year,d.installDate,d.location,deviceTests(d.id).length,lt?lt.date:'',lt?(lt.hasBB?'Có':'Chưa'):'',isOverdue(d)?'Có':'']);
+  }
+  download(toCSV(rows), `thiet-bi-${todayISO()}.csv`, 'text/csv;charset=utf-8');
+}
+function exportTestsCSV(){
+  const head = ['Ngày TN','Mã TB','Tên TB','Trạm','Người TN','Nội dung','KQ','Có BBTT','Số BB','Người lập','Ngày BB','Ghi chú'];
+  const rows = [head];
+  const list = S.tests.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  for (const t of list){
+    const d = S.devices.find(x=>x.id===t.deviceId);
+    const st = d ? S.stations.find(s=>s.id===d.stationId) : null;
+    rows.push([t.date,d?d.code:'',d?d.name:'',st?st.code:'',t.tester,t.content,t.result,
+      t.hasBB?'Có':'Chưa',t.bbNo,t.bbMaker,t.bbDate,t.note]);
+  }
+  download(toCSV(rows), `nhat-ky-tn-${todayISO()}.csv`, 'text/csv;charset=utf-8');
+}
+
+/* ------------------ Modal & Image viewer ------------------ */
+function showModal(title, html, onSave){
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = html;
+  const btn = $('#modalSave');
+  btn.style.display = onSave ? 'inline-block' : 'none';
+  btn.onclick = onSave || null;
+  $('#modal').classList.add('show');
+}
+function closeModal(){
+  $('#modal').classList.remove('show');
+  $('#modalBody').innerHTML = '';
+  $('#modalSave').style.display = 'inline-block';
+}
+function viewImage(fileId){
+  const w = window.open('', '_blank');
+  w.document.write(`
+    <html><head><title>Xem file</title></head>
+    <body style="margin:0;background:#111;text-align:center">
+      <img src="${fullUrl(fileId)}" style="max-width:100%;max-height:100vh"
+           onerror="this.outerHTML='<p style=color:#fff;padding:20px>Không xem trước được. <a href=\\'${openFileUrl(fileId)}\\' target=_blank style=color:#60a5fa>Mở bằng Google Drive</a></p>'">
+    </body></html>`);
+}
+</script>
+</body>
+</html>

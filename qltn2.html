@@ -10,7 +10,6 @@
   .container{max-width:1400px;margin:0 auto}
   h1{color:#1a5490;margin-bottom:16px;text-align:center;font-size:22px}
 
-  /* Sync bar */
   .sync-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;
     background:#fff;border-radius:8px;margin-bottom:14px;font-size:13px;
     box-shadow:0 2px 5px rgba(0,0,0,.08)}
@@ -19,7 +18,6 @@
   .sync-bar.error .dot{background:#dc3545}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-  /* Tabs */
   .tabs{display:flex;gap:6px;margin-bottom:14px}
   .tab{padding:10px 18px;border:none;border-radius:8px 8px 0 0;
     background:#e1e5ea;color:#555;cursor:pointer;font-weight:600;font-size:13px}
@@ -27,7 +25,6 @@
   .tab-content{display:none}
   .tab-content.active{display:block}
 
-  /* Toolbar */
   .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;
     background:#fff;padding:10px;border-radius:8px;
     box-shadow:0 2px 5px rgba(0,0,0,.08)}
@@ -48,7 +45,6 @@
   .btn-secondary{background:#6c757d;color:#fff}
   button:disabled{opacity:.5;cursor:not-allowed}
 
-  /* Stats */
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
     gap:10px;margin-bottom:14px}
   .stat-card{background:#fff;padding:12px;border-radius:8px;text-align:center;
@@ -56,7 +52,6 @@
   .stat-card .num{font-size:22px;font-weight:bold;color:#1a5490}
   .stat-card .label{font-size:11px;color:#666;margin-top:4px}
 
-  /* Table */
   .table-wrap{overflow-x:auto}
   table{width:100%;background:#fff;border-collapse:collapse;border-radius:8px;
     overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -79,7 +74,6 @@
 
   .row-actions button{padding:4px 8px;font-size:11px;margin-right:2px}
 
-  /* Modal */
   .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);
     z-index:1000;align-items:center;justify-content:center;padding:15px}
   .modal-bg.active{display:flex}
@@ -96,16 +90,47 @@
   .form-group input.uppercase{text-transform:uppercase;font-family:monospace}
   .hint{font-size:11px;color:#888;margin-top:3px}
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-  .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .img-preview .img-wrap{position:relative}
-  .img-preview img{width:70px;height:70px;object-fit:cover;
-    border-radius:6px;border:1px solid #ddd}
-  .img-preview .del-img{position:absolute;top:-6px;right:-6px;background:#dc3545;
-    color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;
-    line-height:1;cursor:pointer;border:none;padding:0}
-  .img-preview .uploading{opacity:.5}
 
-  /* Dashboard */
+  /* Autocomplete trạm */
+  .autocomplete-wrap{position:relative}
+  .autocomplete-wrap input{padding-right:32px;width:100%}
+  .autocomplete-wrap input.uppercase{text-transform:uppercase}
+  .ac-toggle{position:absolute;right:1px;top:1px;bottom:1px;width:30px;
+    background:#eef4fb;border:none;border-left:1px solid #ddd;border-radius:0 6px 6px 0;
+    cursor:pointer;color:#1a5490;font-size:11px}
+  .ac-toggle:hover{background:#dce8f5}
+  .ac-list{display:none;position:absolute;top:100%;left:0;right:0;
+    background:#fff;border:1px solid #1a5490;border-radius:6px;max-height:240px;
+    overflow-y:auto;z-index:100;box-shadow:0 4px 14px rgba(0,0,0,.18);margin-top:2px}
+  .ac-list.show{display:block}
+  .ac-item{padding:8px 12px;cursor:pointer;font-size:13px;
+    border-bottom:1px solid #f0f0f0;color:#222}
+  .ac-item:last-child{border-bottom:none}
+  .ac-item:hover,.ac-item.active{background:#eef4fb;color:#1a5490}
+  .ac-item.new{color:#1a5490;font-style:italic;font-weight:600;
+    background:#f0f7ff;border-top:2px dashed #b0c8e0}
+  .ac-item.new:hover{background:#e0efff}
+  .ac-count{font-size:10px;color:#888;float:right;font-weight:normal}
+  .ac-empty{padding:12px;color:#999;text-align:center;font-size:12px}
+
+  /* Preview ảnh */
+  .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .img-preview .img-wrap{position:relative;width:76px;text-align:center}
+  .img-preview img{width:70px;height:70px;object-fit:cover;
+    border-radius:6px;border:1px solid #ddd;background:#f5f5f5;display:block;margin:0 auto}
+  .img-preview .ph{width:70px;height:70px;border-radius:6px;background:#eef4fb;
+    display:flex;align-items:center;justify-content:center;font-size:11px;
+    color:#1a5490;margin:0 auto;border:1px dashed #b0c8e0}
+  .img-preview .del-img{position:absolute;top:-6px;right:2px;background:#dc3545;
+    color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;
+    line-height:1;cursor:pointer;border:none;padding:0;z-index:2}
+  .img-preview .prog{font-size:9px;color:#1a5490;margin-top:2px;
+    display:block;line-height:1.2}
+  .img-preview .prog.ok{color:#28a745}
+  .img-preview .prog.err{color:#dc3545}
+  .img-preview .img-wrap.uploading img{opacity:.55}
+  .img-preview .img-wrap.uploading .ph{animation:pulse 1.2s infinite}
+
   .dash-grid{display:grid;grid-template-columns:1fr;gap:18px}
   .dash-card{background:#fff;border-radius:10px;padding:18px;
     box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -129,7 +154,6 @@
     display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden}
   .progress > div{height:100%;background:#28a745}
 
-  /* Lightbox / Toast */
   .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);
     z-index:2000;align-items:center;justify-content:center}
   .lightbox.active{display:flex}
@@ -219,7 +243,7 @@
         <div id="dashByStation"></div>
       </div>
       <div class="dash-card">
-        <h3>📅 Thống kê theo Tháng <span class="hint">(dựa trên Ngày thí nghiệm, nếu trống dùng Ngày lấy mẫu)</span></h3>
+        <h3>📅 Thống kê theo Tháng <span class="hint">(dựa trên Ngày TN, nếu trống dùng Ngày lấy mẫu)</span></h3>
         <div id="dashByMonth"></div>
       </div>
       <div class="dash-card">
@@ -239,21 +263,30 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Trạm <span class="req">*</span></label>
-          <input type="text" id="fStation" required class="uppercase" required list="stationList" 
-                 placeholder="VD: Trạm 1">
-          <datalist id="stationList"></datalist>
-          <div class="hint">Gõ tên trạm mới để tự tạo</div>
+          <div class="autocomplete-wrap">
+            <input type="text" id="fStation" required class="uppercase"
+                   placeholder="Gõ hoặc chọn trạm..."
+                   autocomplete="off"
+                   oninput="onStationInput(this.value)"
+                   onfocus="onStationFocus()">
+            <button type="button" class="ac-toggle" onclick="toggleStationList(event)"
+                    tabindex="-1">▼</button>
+            <div class="ac-list" id="stationDropdown"></div>
+          </div>
+          <div class="hint">Chọn từ danh sách hoặc gõ tên mới để tự tạo</div>
         </div>
         <div class="form-group">
           <label>Mã thiết bị <span class="req">*</span></label>
           <input type="text" id="fCode" required class="uppercase"
                  placeholder="VD: TB-001"
                  oninput="this.value=this.value.toUpperCase()">
-          <!--div class="hint">Tự động IN HOA. Trùng mã OK nếu khác trạm.</div-->
+          <div class="hint">Tự IN HOA. Trùng mã OK nếu khác trạm.</div>
         </div>
         <div class="form-group full">
           <label>Tên thiết bị <span style="color:#888;font-weight:normal">(không bắt buộc)</span></label>
-          <input type="text" id="fName" placeholder="VD: Máy cắt">
+          <input type="text" id="fName" class="uppercase"
+                 placeholder="VD: MÁY ĐO ĐIỆN TRỞ ĐẤT"
+                 oninput="this.value=this.value.toUpperCase()">
         </div>
         <div class="form-group">
           <label>Ngày lấy mẫu</label>
@@ -277,13 +310,13 @@
                     placeholder="Model / Serial / Hãng SX / Vị trí / ghi chú khác..."></textarea>
         </div>
         <div class="form-group full">
-          <label>📷 Ảnh kết quả</label>
+          <label>📷 Ảnh kết quả thí nghiệm</label>
           <input type="file" id="fResultImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'result')">
           <div class="img-preview" id="resultPreview"></div>
         </div>
         <div class="form-group full">
-          <label>🏷️ Ảnh Nameplate</label>
+          <label>🏷️ Ảnh nameplate</label>
           <input type="file" id="fNameplateImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'nameplate')">
           <div class="img-preview" id="nameplatePreview"></div>
@@ -348,52 +381,110 @@ function fmtDate(d){
   const [y,m,dd] = s.split('-');
   return dd && m && y ? `${dd}/${m}/${y}` : s;
 }
-function dateOnly(d){
-  if(!d) return '';
-  return String(d).split('T')[0]; // YYYY-MM-DD
-}
-function monthKey(d){
-  const s = dateOnly(d);
-  return s ? s.slice(0,7) : 'Chưa có';
-}
+function dateOnly(d){ return d ? String(d).split('T')[0] : ''; }
+function monthKey(d){ const s = dateOnly(d); return s ? s.slice(0,7) : 'Chưa có'; }
 
 /* ============================================================
-   NÉN ẢNH
+   NÉN ẢNH – TỐC ĐỘ CAO
    ============================================================ */
-const MAX_DIM = 1280;
-const JPEG_QUALITY = 0.75;
-function compressImage(file){
+const IMG_CONFIG = {
+  result:    { maxDim: 1200, quality: 0.72 },
+  nameplate: { maxDim: 1400, quality: 0.80 }
+};
+
+function fileToDataUrl(fileOrBlob){
   return new Promise((resolve, reject)=>{
-    if(!file.type.startsWith('image/')) return reject(new Error('Không phải ảnh'));
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = ()=>{
-      URL.revokeObjectURL(url);
-      let {width:w, height:h} = img;
-      const scale = Math.min(1, MAX_DIM / Math.max(w,h));
-      w = Math.round(w*scale); h = Math.round(h*scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      canvas.toBlob(blob=>{
-        if(!blob) return reject(new Error('Nén thất bại'));
-        const reader = new FileReader();
-        reader.onload = e=>{
-          resolve({
-            base64: e.target.result.split(',')[1],
-            dataUrl: e.target.result,
-            type: 'image/jpeg',
-            name: (file.name||'img').replace(/\.[^.]+$/, '') + '.jpg',
-            originalKB: Math.round(file.size/1024),
-            compressedKB: Math.round(blob.size/1024)
-          });
-        };
-        reader.readAsDataURL(blob);
-      }, 'image/jpeg', JPEG_QUALITY);
-    };
-    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh')); };
-    img.src = url;
+    const r = new FileReader();
+    r.onload = e=>resolve(e.target.result);
+    r.onerror = ()=>reject(new Error('FileReader error'));
+    r.readAsDataURL(fileOrBlob);
   });
+}
+
+async function compressImage(file, type='result'){
+  const cfg = IMG_CONFIG[type] || IMG_CONFIG.result;
+
+  // 1) Decode nhanh
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+  } catch(e){
+    bitmap = await new Promise((resolve, reject)=>{
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = ()=>{ URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('Decode fail')); };
+      img.src = url;
+    });
+  }
+
+  const srcW = bitmap.width  || bitmap.naturalWidth;
+  const srcH = bitmap.height || bitmap.naturalHeight;
+
+  // 2) Skip nếu ảnh đã nhỏ + JPEG
+  if(srcW <= cfg.maxDim && srcH <= cfg.maxDim
+     && file.size < 400*1024 && file.type === 'image/jpeg'){
+    if(bitmap.close) bitmap.close();
+    const dataUrl = await fileToDataUrl(file);
+    const b64 = dataUrl.split(',')[1];
+    return {
+      base64: b64, dataUrl, type:'image/jpeg',
+      name: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+      originalKB: Math.round(file.size/1024),
+      compressedKB: Math.round(b64.length * 0.75 / 1024),
+      skipped: true
+    };
+  }
+
+  // 3) Resize
+  const scale = Math.min(1, cfg.maxDim / Math.max(srcW, srcH));
+  const w = Math.round(srcW * scale);
+  const h = Math.round(srcH * scale);
+
+  let canvas, ctx;
+  if(typeof OffscreenCanvas !== 'undefined'){
+    canvas = new OffscreenCanvas(w, h);
+    ctx = canvas.getContext('2d', { alpha: false });
+  } else {
+    canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    ctx = canvas.getContext('2d', { alpha: false });
+  }
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, 0, 0, w, h);
+  if(bitmap.close) bitmap.close();
+
+  // 4) Encode JPEG
+  let dataUrl;
+  if(canvas.convertToBlob){
+    const blob = await canvas.convertToBlob({ type:'image/jpeg', quality: cfg.quality });
+    dataUrl = await fileToDataUrl(blob);
+  } else {
+    dataUrl = canvas.toDataURL('image/jpeg', cfg.quality);
+  }
+
+  const b64 = dataUrl.split(',')[1];
+  return {
+    base64: b64, dataUrl, type:'image/jpeg',
+    name: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+    originalKB: Math.round(file.size/1024),
+    compressedKB: Math.round(b64.length * 0.75 / 1024)
+  };
+}
+
+async function processWithLimit(items, fn, concurrency = 3){
+  const results = new Array(items.length);
+  let idx = 0;
+  async function worker(){
+    while(idx < items.length){
+      const i = idx++;
+      results[i] = await fn(items[i], i);
+    }
+  }
+  const workers = Array.from({ length: Math.min(concurrency, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
 }
 
 /* ============================================================
@@ -427,24 +518,27 @@ async function loadFromServer(showToast=false){
     const json = await res.json();
     if(!json.success) throw new Error(json.error);
     const d = json.data;
-    stations = d.stations || [];
+    stations = (d.stations || []).map(s=>({
+      ...s,
+      name: (s.name||'').trim().toUpperCase()
+    }));
     equipmentList = (d.devices || []).map(dev=>{
       const st = stations.find(s=>s.id === dev.stationId);
-      // Parse images JSON
-      let imgs = {result:[], nameplate:[]};
-      try{ imgs = typeof dev.images === 'string' ? JSON.parse(dev.images) : (dev.images || imgs); }
-      catch(e){}
+      let imgs = { result: [], nameplate: [] };
+      try{
+        imgs = typeof dev.images === 'string' ? JSON.parse(dev.images) : (dev.images || imgs);
+      }catch(e){}
       return {
         ...dev,
-        stationName: st ? st.name : '',
-        resultImages: Array.isArray(imgs.result) ? imgs.result : [],
+        stationName: (st ? st.name : '').toUpperCase(),
+        code: (dev.code||'').trim().toUpperCase(),
+        name: (dev.name||'').trim().toUpperCase(),
+        resultImages:    Array.isArray(imgs.result)    ? imgs.result    : [],
         nameplateImages: Array.isArray(imgs.nameplate) ? imgs.nameplate : [],
-        reportStatus: dev.hasBB ? 'Đã xong' : (dev.bbNo ? 'Đang làm' : 'Chưa làm'),
+        reportStatus: dev.reportStatus || 'Chưa làm',
         _synced: true
       };
     });
-    // Note: hasBB/bbNo có thể không có trên Devices sheet — bỏ qua fallback này
-    // Nếu có dùng Tests để tính reportStatus cần mapping riêng. Ở đây tạm để "Chưa làm".
     dirty = false;
     render();
     renderDashboard();
@@ -457,17 +551,26 @@ async function loadFromServer(showToast=false){
 }
 
 /* ============================================================
-   STATIONS: đảm bảo tồn tại (auto-create nếu gõ mới)
+   STATION: đảm bảo tồn tại
    ============================================================ */
 async function ensureStation(name){
-  if(!name) return null;
-  const norm = name.trim();
+  const norm = (name||'').trim().toUpperCase();
   if(!norm) return null;
-  const found = stations.find(s=>s.name === norm);
-  if(found) return found;
+
+  let found = stations.find(s=>(s.name||'').toUpperCase() === norm);
+  if(found){
+    if(found.name !== norm){
+      try{
+        await apiPost({action:'saveStation', record:{...found, name: norm}});
+        found.name = norm;
+      }catch(e){}
+    }
+    return found;
+  }
+
   const newSt = {
     id: uid('st'),
-    code: norm.toUpperCase().replace(/\s+/g,'_').slice(0,30),
+    code: norm.replace(/\s+/g,'_').slice(0,30),
     name: norm,
     address: '',
     note: ''
@@ -478,6 +581,80 @@ async function ensureStation(name){
 }
 
 /* ============================================================
+   AUTOCOMPLETE TRẠM
+   ============================================================ */
+function getAllStationNames(){
+  const fromSheet = (stations||[]).map(s=>(s.name||'').trim().toUpperCase()).filter(Boolean);
+  const fromDevices = (equipmentList||[]).map(d=>(d.stationName||'').trim().toUpperCase()).filter(Boolean);
+  return [...new Set([...fromSheet, ...fromDevices])].sort((a,b)=>a.localeCompare(b,'vi'));
+}
+function onStationFocus(){
+  showStationDropdown(document.getElementById('fStation').value);
+}
+function onStationInput(val){
+  showStationDropdown(val);
+}
+function showStationDropdown(filter){
+  const all = getAllStationNames();
+  const f = (filter||'').trim().toUpperCase();
+  const matches = f ? all.filter(s=>s.includes(f)) : all;
+
+  const dd = document.getElementById('stationDropdown');
+  let html = '';
+
+  if(matches.length > 0){
+    html += matches.map(s=>{
+      let display = s;
+      if(f){
+        const i = s.indexOf(f);
+        if(i >= 0){
+          display = s.slice(0,i) +
+            '<strong style="color:#dc3545">' + s.slice(i,i+f.length) + '</strong>' +
+            s.slice(i+f.length);
+        }
+      }
+      const safe = s.replace(/'/g,"\\'");
+      return `<div class="ac-item" onmousedown="pickStation(event,'${safe}')">
+        🏢 ${display} <span class="ac-count">trong DS</span>
+      </div>`;
+    }).join('');
+  }
+
+  if(f && !all.includes(f)){
+    const safe = f.replace(/'/g,"\\'");
+    html += `<div class="ac-item new" onmousedown="pickStation(event,'${safe}')">
+      ➕ Tạo trạm mới: "${f}"
+    </div>`;
+  }
+
+  if(!html){
+    html = `<div class="ac-empty">
+      ${all.length===0
+        ? 'Chưa có trạm nào. Gõ tên trạm mới để tạo.'
+        : 'Không khớp. Gõ tên mới để tạo trạm.'}
+    </div>`;
+  }
+
+  dd.innerHTML = html;
+  dd.classList.add('show');
+}
+function pickStation(ev, name){
+  if(ev) ev.preventDefault();
+  document.getElementById('fStation').value = name.toUpperCase();
+  document.getElementById('stationDropdown').classList.remove('show');
+}
+function toggleStationList(ev){
+  if(ev) ev.preventDefault();
+  const dd = document.getElementById('stationDropdown');
+  if(dd.classList.contains('show')){
+    dd.classList.remove('show');
+  } else {
+    document.getElementById('fStation').focus();
+    showStationDropdown(document.getElementById('fStation').value);
+  }
+}
+
+/* ============================================================
    SYNC
    ============================================================ */
 async function syncNow(){
@@ -485,16 +662,14 @@ async function syncNow(){
   const btn = document.getElementById('btnSync');
   btn.disabled = true; btn.textContent = '⏳ Đang đồng bộ...';
   try{
-    // 1) Đảm bảo mọi trạm đều tồn tại
     const uniqueStations = [...new Set(
-      equipmentList.map(d=>(d.stationName||'').trim()).filter(Boolean)
+      equipmentList.map(d=>(d.stationName||'').trim().toUpperCase()).filter(Boolean)
     )];
     for(const name of uniqueStations) await ensureStation(name);
 
-    // 2) Sync từng device
     for(const dev of equipmentList){
       if(dev._synced !== false) continue;
-      const st = stations.find(s=>s.name === dev.stationName);
+      const st = stations.find(s=>(s.name||'').toUpperCase() === (dev.stationName||'').toUpperCase());
       const rec = {
         id: dev.id,
         stationId: st ? st.id : '',
@@ -526,7 +701,7 @@ async function syncNow(){
 }
 
 /* ============================================================
-   FILTER HELPER
+   FILTER
    ============================================================ */
 function getFilteredList(){
   const search = document.getElementById('searchBox').value.toLowerCase().trim();
@@ -543,8 +718,6 @@ function getFilteredList(){
     }
     if(fStation && e.stationName !== fStation) return false;
     if(fReport && (e.reportStatus||'Chưa làm') !== fReport) return false;
-
-    // Date filter
     if(dFrom || dTo){
       const val = dateOnly(e[df] || '');
       if(!val) return false;
@@ -554,7 +727,6 @@ function getFilteredList(){
     return true;
   });
 }
-
 function clearDateFilter(){
   document.getElementById('filterDateFrom').value = '';
   document.getElementById('filterDateTo').value = '';
@@ -565,18 +737,14 @@ function clearDateFilter(){
    RENDER LIST
    ============================================================ */
 function render(){
-  // Update station filter options
   const stNames = [...new Set(equipmentList.map(e=>e.stationName).filter(Boolean))].sort();
   const fs = document.getElementById('filterStation');
   const cur = fs.value;
   fs.innerHTML = '<option value="">-- Tất cả trạm --</option>' +
     stNames.map(s=>`<option value="${s}">${s}</option>`).join('');
   fs.value = cur;
-  document.getElementById('stationList').innerHTML =
-    stNames.map(s=>`<option value="${s}">`).join('');
 
   const filtered = getFilteredList();
-
   const tbody = document.getElementById('tableBody');
   if(filtered.length === 0){
     tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">
@@ -585,14 +753,20 @@ function render(){
     tbody.innerHTML = filtered.map((e,i)=>{
       const rc = e.reportStatus === 'Đã xong' ? 'badge-green' :
                  e.reportStatus === 'Đang làm' ? 'badge-yellow' : 'badge-red';
-      const rImgs = (e.resultImages||[]).slice(0,2).map(img=>{
-        const src = img.fileId ? driveImageUrl(img.fileId, 80) : (img.dataUrl||'');
-        return src ? `<img class="thumb" src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">` : '';
-      }).join('') || '<div class="thumb-empty">Trống</div>';
-      const nImgs = (e.nameplateImages||[]).slice(0,2).map(img=>{
-        const src = img.fileId ? driveImageUrl(img.fileId, 80) : (img.dataUrl||'');
-        return src ? `<img class="thumb" src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">` : '';
-      }).join('') || '<div class="thumb-empty">Trống</div>';
+      const buildThumb = (img)=>{
+        // ✅ Ưu tiên dataUrl local nếu có (hiển thị ngay, không phụ thuộc Drive)
+        const localSrc = img.dataUrl && img.dataUrl.startsWith('data:') ? img.dataUrl : null;
+        const driveSrc = img.fileId ? driveImageUrl(img.fileId, 80) : null;
+        const primary = localSrc || driveSrc;
+        const fallback = localSrc && driveSrc ? driveSrc : null;
+        if(!primary) return '';
+        return `<img class="thumb" src="${primary}" ${fallback?`onerror="this.src='${fallback}'"`:''}
+                onclick="openLightbox('${img.fileId||''}','${primary}')">`;
+      };
+      const rImgs = (e.resultImages||[]).slice(0,2).map(buildThumb).join('')
+                    || '<div class="thumb-empty">Trống</div>';
+      const nImgs = (e.nameplateImages||[]).slice(0,2).map(buildThumb).join('')
+                    || '<div class="thumb-empty">Trống</div>';
       return `<tr>
         <td>${i+1}</td>
         <td><strong>${e.stationName||'-'}</strong></td>
@@ -611,7 +785,6 @@ function render(){
     }).join('');
   }
 
-  // Stats
   const total = equipmentList.length;
   const done = equipmentList.filter(e=>e.reportStatus==='Đã xong').length;
   const doing = equipmentList.filter(e=>e.reportStatus==='Đang làm').length;
@@ -629,9 +802,7 @@ function render(){
    DASHBOARD
    ============================================================ */
 function renderDashboard(){
-  const byStation = {};
-  const byMonth = {};
-  const matrix = {}; // matrix[station][month] = {done, total}
+  const byStation = {}, byMonth = {}, matrix = {};
 
   equipmentList.forEach(d=>{
     const st = (d.stationName||'(Chưa có trạm)').trim() || '(Chưa có trạm)';
@@ -657,7 +828,6 @@ function renderDashboard(){
     if(rs==='Đã xong') matrix[st][mk].done++;
   });
 
-  // ---- BY STATION ----
   const stKeys = Object.keys(byStation).sort();
   if(stKeys.length === 0){
     document.getElementById('dashByStation').innerHTML =
@@ -699,7 +869,6 @@ function renderDashboard(){
       </table>`;
   }
 
-  // ---- BY MONTH ----
   const mKeys = Object.keys(byMonth).sort();
   if(mKeys.length === 0){
     document.getElementById('dashByMonth').innerHTML =
@@ -730,7 +899,6 @@ function renderDashboard(){
       </table>`;
   }
 
-  // ---- MATRIX Station × Month ----
   const allMonths = [...new Set(
     Object.values(matrix).flatMap(o=>Object.keys(o))
   )].sort();
@@ -804,8 +972,9 @@ function editEquipment(id){
   document.getElementById('fTestDate').value = dateOnly(e.testDate);
   document.getElementById('fReport').value = e.reportStatus || 'Chưa làm';
   document.getElementById('fNote').value = e.note || '';
-  tempResultImgs = [...(e.resultImages||[])];
-  tempNameplateImgs = [...(e.nameplateImages||[])];
+  // ✅ Copy + giữ nguyên dataUrl (nếu ảnh cũ chỉ có fileId thì vẫn hiển thị bằng Drive link)
+  tempResultImgs = (e.resultImages||[]).map(img=>({...img}));
+  tempNameplateImgs = (e.nameplateImages||[]).map(img=>({...img}));
   renderPreviews();
   document.getElementById('modalBg').classList.add('active');
 }
@@ -815,60 +984,114 @@ function closeModal(){
 }
 
 /* ============================================================
-   ẢNH
+   ẢNH – PICK + NÉN + UPLOAD (giữ dataUrl local làm fallback)
    ============================================================ */
 async function handleImgPick(input, type){
   const files = Array.from(input.files);
   input.value = '';
-  for(const file of files){
-    const placeholder = {fileId:null, dataUrl:null, name:file.name, uploading:true};
-    const arr = type==='result' ? tempResultImgs : tempNameplateImgs;
-    arr.push(placeholder);
-    renderPreviews();
+  if(!files.length) return;
+
+  const arr = type==='result' ? tempResultImgs : tempNameplateImgs;
+  const items = files.map(file=>{
+    const ph = {
+      fileId: null,
+      dataUrl: null,
+      name: file.name,
+      uploading: true,
+      progress: 'Đang nén...',
+      progType: ''
+    };
+    arr.push(ph);
+    return { file, ph };
+  });
+  renderPreviews();
+
+  let totalOriginal = 0, totalCompressed = 0, okCount = 0, errCount = 0;
+
+  await processWithLimit(items, async ({file, ph})=>{
     try{
-      const compressed = await compressImage(file);
+      // 1) NÉN
+      ph.progress = 'Đang nén...';
+      ph.progType = '';
+      renderPreviews();
+      const compressed = await compressImage(file, type);
+      totalOriginal += compressed.originalKB;
+      totalCompressed += compressed.compressedKB;
+
+      // ✅ LƯU dataUrl LOCAL ngay → ảnh luôn hiển thị dù Drive chậm/lỗi
+      ph.dataUrl = compressed.dataUrl;
+      ph.originalKB = compressed.originalKB;
+      ph.compressedKB = compressed.compressedKB;
+
+      // 2) UPLOAD DRIVE
+      ph.progress = 'Đang upload...';
+      renderPreviews();
       const up = await uploadImageToDrive(compressed);
-      placeholder.fileId = up.fileId;
-      placeholder.name = up.name;
-      placeholder.dataUrl = driveImageUrl(up.fileId, 200);
-      placeholder.uploading = false;
-      toast(`Nén ${compressed.originalKB}KB → ${compressed.compressedKB}KB → Drive OK`, 'success');
-    }catch(err){
-      console.warn('Upload lỗi:', err);
-      try{
-        const compressed = await compressImage(file);
-        placeholder.dataUrl = compressed.dataUrl;
-        placeholder.uploading = false;
-        toast('Upload Drive lỗi – giữ ảnh local', 'error');
-      }catch(e2){
-        const idx = arr.indexOf(placeholder);
-        if(idx>=0) arr.splice(idx,1);
-        toast('Không xử lý được ảnh', 'error');
+
+      ph.fileId = up.fileId;
+      ph.name = up.name;
+      ph.uploading = false;
+      ph.progress = `✓ ${compressed.originalKB}→${compressed.compressedKB}KB`;
+      ph.progType = 'ok';
+      okCount++;
+    } catch(err){
+      console.warn('Xử lý ảnh lỗi:', err);
+      // Nếu đã nén được (có dataUrl) → vẫn giữ ảnh hiển thị, chỉ thiếu fileId
+      if(ph.dataUrl){
+        ph.uploading = false;
+        ph.progress = '⚠ Drive lỗi, giữ local';
+        ph.progType = 'err';
+      } else {
+        const i = arr.indexOf(ph);
+        if(i >= 0) arr.splice(i, 1);
+        errCount++;
       }
     }
     renderPreviews();
+  }, 3);
+
+  if(okCount > 0){
+    const saved = totalOriginal > 0
+      ? Math.round((1 - totalCompressed/totalOriginal) * 100) : 0;
+    toast(`${okCount} ảnh OK: ${totalOriginal}KB → ${totalCompressed}KB (tiết kiệm ${saved}%)`, 'success');
+  }
+  if(errCount > 0){
+    toast(`${errCount} ảnh không xử lý được`, 'error');
   }
 }
+
 function renderPreviews(){
   const r = document.getElementById('resultPreview');
   const n = document.getElementById('nameplatePreview');
-  r.innerHTML = tempResultImgs.map((img,i)=>{
-    const src = img.fileId ? driveImageUrl(img.fileId,150) : (img.dataUrl||'');
-    return `<div class="img-wrap ${img.uploading?'uploading':''}">
-      ${src?`<img src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">`:''}
-      ${img.uploading?'<div style="font-size:10px;text-align:center">Đang nén...</div>':''}
-      <button type="button" class="del-img" onclick="removeImg('result',${i})">&times;</button>
+  const build = (list, kind) => list.map((img,i)=>{
+    // ✅ Ưu tiên dataUrl local (hiển thị ngay), fallback Drive link
+    const localSrc = img.dataUrl && img.dataUrl.startsWith('data:') ? img.dataUrl : null;
+    const driveSrc = img.fileId ? driveImageUrl(img.fileId, 150) : null;
+    const src = localSrc || driveSrc;
+
+    let imgTag;
+    if(src){
+      // Nếu đang dùng local và có drive → set onerror fallback ngược lại
+      // (hiếm khi xảy ra vì local luôn đúng)
+      imgTag = `<img src="${src}" onclick="openLightbox('${img.fileId||''}','${src}')">`;
+    } else {
+      imgTag = `<div class="ph">⏳</div>`;
+    }
+
+    const prog = img.progress
+      ? `<span class="prog ${img.progType||''}">${img.progress}</span>`
+      : '';
+
+    return `<div class="img-wrap ${img.uploading?'uploading':''}" title="${img.name||''}">
+      ${imgTag}
+      ${prog}
+      <button type="button" class="del-img" onclick="removeImg('${kind}',${i})">&times;</button>
     </div>`;
   }).join('');
-  n.innerHTML = tempNameplateImgs.map((img,i)=>{
-    const src = img.fileId ? driveImageUrl(img.fileId,150) : (img.dataUrl||'');
-    return `<div class="img-wrap ${img.uploading?'uploading':''}">
-      ${src?`<img src="${src}" onclick="openLightbox('${img.fileId||src}','${img.fileId?'drive':''}')">`:''}
-      ${img.uploading?'<div style="font-size:10px;text-align:center">Đang nén...</div>':''}
-      <button type="button" class="del-img" onclick="removeImg('nameplate',${i})">&times;</button>
-    </div>`;
-  }).join('');
+  r.innerHTML = build(tempResultImgs, 'result');
+  n.innerHTML = build(tempNameplateImgs, 'nameplate');
 }
+
 function removeImg(type, idx){
   if(type==='result') tempResultImgs.splice(idx,1);
   else tempNameplateImgs.splice(idx,1);
@@ -881,33 +1104,47 @@ function removeImg(type, idx){
 function saveEquipment(ev){
   ev.preventDefault();
   const id = document.getElementById('eqId').value || uid('dev');
-  const stationName = document.getElementById('fStation').value.trim();
-  const code = document.getElementById('fCode').value.trim().toUpperCase();
+
+  const stationName = document.getElementById('fStation').value.trim().toUpperCase();
+  const code        = document.getElementById('fCode').value.trim().toUpperCase();
+  const name        = document.getElementById('fName').value.trim().toUpperCase();
+
   if(!stationName){ toast('Trạm bắt buộc', 'error'); return; }
   if(!code){ toast('Mã thiết bị bắt buộc', 'error'); return; }
 
-  // ✅ Unique theo (station + code)
   const dup = equipmentList.find(x=>
     x.id !== id &&
     (x.code||'').toUpperCase() === code &&
-    (x.stationName||'').trim() === stationName
+    (x.stationName||'').toUpperCase() === stationName
   );
   if(dup){
     toast(`Mã "${code}" đã tồn tại trong trạm "${stationName}"`, 'error');
     return;
   }
 
+  // ✅ Chỉ lưu các field cần thiết – bỏ dataUrl base64 khỏi Sheet (nặng)
+  // Nhưng giữ dataUrl trong bộ nhớ để hiển thị ngay trên bảng
+  const cleanImgs = (arr) => arr
+    .filter(i=>i.fileId || (i.dataUrl && !i.uploading))
+    .map(i=>({
+      fileId: i.fileId || null,
+      name: i.name || '',
+      dataUrl: i.fileId ? null : i.dataUrl,   // chỉ giữ dataUrl khi không có fileId
+      originalKB: i.originalKB,
+      compressedKB: i.compressedKB
+    }));
+
   const data = {
     id,
     stationName,
     code,
-    name: document.getElementById('fName').value.trim(),
+    name,
     samplingDate: document.getElementById('fSamplingDate').value,
-    testDate: document.getElementById('fTestDate').value,
+    testDate:     document.getElementById('fTestDate').value,
     reportStatus: document.getElementById('fReport').value,
-    note: document.getElementById('fNote').value.trim(),
-    resultImages: tempResultImgs.filter(i=>i.fileId||i.dataUrl),
-    nameplateImages: tempNameplateImgs.filter(i=>i.fileId||i.dataUrl),
+    note:         document.getElementById('fNote').value.trim(),
+    resultImages:    cleanImgs(tempResultImgs),
+    nameplateImages: cleanImgs(tempNameplateImgs),
     _synced: false
   };
 
@@ -939,9 +1176,18 @@ function deleteEquipment(id){
 /* ============================================================
    LIGHTBOX
    ============================================================ */
-function openLightbox(src, kind){
-  const url = kind==='drive' ? driveImageUrl(src, 1600) : src;
-  document.getElementById('lightboxImg').src = url;
+function openLightbox(fileId, fallbackSrc){
+  let url = null;
+  if(fileId){
+    url = driveImageUrl(fileId, 1600);
+  }
+  const img = document.getElementById('lightboxImg');
+  img.src = url || fallbackSrc;
+  // Nếu Drive link lỗi → fallback về local
+  img.onerror = ()=>{
+    if(fallbackSrc) img.src = fallbackSrc;
+    img.onerror = null;
+  };
   document.getElementById('lightbox').classList.add('active');
 }
 function closeLightbox(){
@@ -957,6 +1203,12 @@ document.getElementById('filterReport').addEventListener('change', render);
 document.getElementById('filterDateField').addEventListener('change', render);
 document.getElementById('filterDateFrom').addEventListener('change', render);
 document.getElementById('filterDateTo').addEventListener('change', render);
+
+document.addEventListener('mousedown', e=>{
+  if(!e.target.closest('.autocomplete-wrap')){
+    document.getElementById('stationDropdown')?.classList.remove('show');
+  }
+});
 
 window.addEventListener('beforeunload', e=>{
   if(dirty){ e.preventDefault(); e.returnValue=''; }

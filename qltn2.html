@@ -239,7 +239,7 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Trạm <span class="req">*</span></label>
-          <input type="text" id="fStation" required list="stationList"
+          <input type="text" id="fStation" required class="uppercase" required list="stationList" 
                  placeholder="VD: Trạm 1">
           <datalist id="stationList"></datalist>
           <div class="hint">Gõ tên trạm mới để tự tạo</div>
@@ -249,11 +249,11 @@
           <input type="text" id="fCode" required class="uppercase"
                  placeholder="VD: TB-001"
                  oninput="this.value=this.value.toUpperCase()">
-          <div class="hint">Tự động IN HOA. Trùng mã OK nếu khác trạm.</div>
+          <!--div class="hint">Tự động IN HOA. Trùng mã OK nếu khác trạm.</div-->
         </div>
         <div class="form-group full">
           <label>Tên thiết bị <span style="color:#888;font-weight:normal">(không bắt buộc)</span></label>
-          <input type="text" id="fName" placeholder="VD: Máy đo điện trở đất">
+          <input type="text" id="fName" placeholder="VD: Máy cắt">
         </div>
         <div class="form-group">
           <label>Ngày lấy mẫu</label>
@@ -277,13 +277,13 @@
                     placeholder="Model / Serial / Hãng SX / Vị trí / ghi chú khác..."></textarea>
         </div>
         <div class="form-group full">
-          <label>📷 Ảnh kết quả thí nghiệm</label>
+          <label>📷 Ảnh kết quả</label>
           <input type="file" id="fResultImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'result')">
           <div class="img-preview" id="resultPreview"></div>
         </div>
         <div class="form-group full">
-          <label>🏷️ Ảnh nameplate</label>
+          <label>🏷️ Ảnh Nameplate</label>
           <input type="file" id="fNameplateImgs" accept="image/*" multiple
                  onchange="handleImgPick(this,'nameplate')">
           <div class="img-preview" id="nameplatePreview"></div>

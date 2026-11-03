@@ -535,7 +535,7 @@ async function syncNow(){
     for(const dev of equipmentList){
       if(dev._synced !== false) continue;
 
-      // ✅ Fix: Thử upload lại ảnh nếu trước đó lỗi (có dataUrl nhưng chưa có fileId)
+      // Tự động upload lại ảnh nếu lỗi mạng
       const allImgs = [...(dev.resultImages||[]), ...(dev.nameplateImages||[])];
       for(const img of allImgs){
         if(!img.fileId && img.dataUrl){
@@ -543,7 +543,7 @@ async function syncNow(){
             const base64 = img.dataUrl.split(',')[1];
             const up = await uploadImageToDrive({base64, type:'image/jpeg', name: img.name||'img.jpg'});
             img.fileId = up.fileId;
-            img.dataUrl = null; // Xoá local sau khi up thành công để nhẹ Sheet
+            img.dataUrl = null;
           } catch(e) {
             throw new Error("Lỗi upload ảnh Drive: " + e.message);
           }
@@ -551,11 +551,17 @@ async function syncNow(){
       }
 
       const st = stations.find(s=>(s.name||'').toUpperCase() === (dev.stationName||'').toUpperCase());
+      
       const rec = {
         id: dev.id,
         stationId: st ? st.id : '',
         code: String(dev.code||'').toUpperCase(),
         name: dev.name || '',
+        // ✅ BỔ SUNG 3 DÒNG QUAN TRỌNG NÀY:
+        samplingDate: dev.samplingDate || '',
+        testDate:     dev.testDate || '',
+        reportStatus: dev.reportStatus || 'Chưa làm',
+        
         type: '', model: '', serial: '', manufacturer: '', year: '', installDate: '', location: '',
         note: dev.note || '',
         images: {

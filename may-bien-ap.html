@@ -786,71 +786,137 @@ function applyHistoryData(index) {
         return el.value || "";
     }
 
-    // ============================================================
-    // 2. BẢNG RCD MBA
-    // ============================================================
-   function renderRcdTable() {
+// ============================================================
+// 2. BẢNG RCD MBA (CHIA 3 TAB PHA A, B, C)
+// ============================================================
+let rcdCurrentTab = 'A'; // Biến lưu trạng thái tab hiện tại
+
+function renderRcdTable() {
     const container = document.getElementById('table_rcd_container');
     if (!container) return;
+
     const temp = document.getElementById('mba_temp').value || '--';
-    if(document.getElementById('mba_rcd_temp_display')) document.getElementById('mba_rcd_temp_display').textContent = temp;
+    if(document.getElementById('mba_rcd_temp_display'))
+        document.getElementById('mba_rcd_temp_display').textContent = temp;
+
+    // Hàm con tạo bảng cho từng pha
+    const generateTableHTML = (pha) => {
+        let html = `
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Đối tượng đo</th>
+                            <th colspan="3">Giá trị đo (MΩ)</th>
+                            <th class="hidden-col" rowspan="2">K<sub>ht</sub></th>
+                            <th class="hidden-col" rowspan="2">PI</th>
+                            <th rowspan="2">Điện áp đo (V)</th>
+                        </tr>
+                        <tr>
+                            <th>15"</th>
+                            <th>60"</th>
+                            <th>600"</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        const items = [
+            { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ' },
+            { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ' },
+            { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ' },
+            { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung' },
+            { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ' },
+            { id: 'lv_e', label: 'Hạ ~ Vỏ' },
+            { id: 'core_e', label: 'Lõi từ - Vỏ' },
+            { id: 'clamp_e', label: 'Gông từ - Vỏ' },
+            { id: 'core_clamp', label: 'Lõi từ - Gông từ' }
+        ];
+
+        items.forEach(item => {
+            html += `
+                <tr>
+                    <td style="text-align:left;font-size:10px;">${item.label}</td>
+                    <td style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_15_${pha}_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                        <div id="mba_rcd_15_20c_${pha}_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_60_${pha}_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                        <div id="mba_rcd_60_20c_${pha}_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                    </td>
+                    <td style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_600_${pha}_${item.id}" oninput="handleNewInput(event); calculateAll()">
+                        <div id="mba_rcd_600_20c_${pha}_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
+                    </td>
+                    <td class="hidden-col" style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_kht_${pha}_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;">
+                    </td>
+                    <td class="hidden-col" style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_pi_${pha}_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;">
+                    </td>
+                    <td style="vertical-align:top;">
+                        <input type="number" id="mba_rcd_volt_${pha}_${item.id}" step="500" value="5000" oninput="handleNewInput(event); calculateAll()">
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table></div>`;
+        return html;
+    };
 
     let html = `
-    <table>
-        <thead>
-            <tr>
-                <th rowspan="2">Đối tượng đo</th>
-                <th colspan="3">Giá trị đo (MΩ)</th>
-                <th class="hidden-col" rowspan="2">K<sub>ht</sub></th>
-                <th class="hidden-col" rowspan="2">PI</th>
-                <th rowspan="2">Điện áp đo (V)</th>
-            </tr>
-            <tr>
-                <th>15"</th>
-                <th>60"</th>
-                <th>600"</th>
-            </tr>
-        </thead>
-        <tbody>
+        <!-- Tabs -->
+        <div style="display:flex; gap:5px; margin:10px 0; flex-wrap:wrap; border-bottom:2px solid #e0e0e0; padding-bottom:5px;">
+            <button class="rcd-tab-btn ${rcdCurrentTab === 'A' ? 'active' : ''}" 
+                data-tab="A" onclick="switchRcdTab('A')"
+                style="padding:6px 14px; border:none; border-radius:4px 4px 0 0; cursor:pointer; font-weight:600; font-size:12px; background:${rcdCurrentTab === 'A' ? 'var(--primary)' : '#f5f5f5'}; color:${rcdCurrentTab === 'A' ? 'white' : '#333'};">
+                Pha A
+            </button>
+            <button class="rcd-tab-btn ${rcdCurrentTab === 'B' ? 'active' : ''}" 
+                data-tab="B" onclick="switchRcdTab('B')"
+                style="padding:6px 14px; border:none; border-radius:4px 4px 0 0; cursor:pointer; font-weight:600; font-size:12px; background:${rcdCurrentTab === 'B' ? 'var(--primary)' : '#f5f5f5'}; color:${rcdCurrentTab === 'B' ? 'white' : '#333'};">
+                Pha B
+            </button>
+            <button class="rcd-tab-btn ${rcdCurrentTab === 'C' ? 'active' : ''}" 
+                data-tab="C" onclick="switchRcdTab('C')"
+                style="padding:6px 14px; border:none; border-radius:4px 4px 0 0; cursor:pointer; font-weight:600; font-size:12px; background:${rcdCurrentTab === 'C' ? 'var(--primary)' : '#f5f5f5'}; color:${rcdCurrentTab === 'C' ? 'white' : '#333'};">
+                Pha C
+            </button>
+        </div>
+
+        <!-- Nội dung các tab -->
+        <div id="rcd_tab_A" style="display:${rcdCurrentTab === 'A' ? 'block' : 'none'};">
+            ${generateTableHTML('A')}
+        </div>
+        <div id="rcd_tab_B" style="display:${rcdCurrentTab === 'B' ? 'block' : 'none'};">
+            ${generateTableHTML('B')}
+        </div>
+        <div id="rcd_tab_C" style="display:${rcdCurrentTab === 'C' ? 'block' : 'none'};">
+            ${generateTableHTML('C')}
+        </div>
     `;
 
-    const items = [
-        { id: 'hv_mv_lv_e', label: 'Cao, Trung ~ Hạ, Vỏ' },
-        { id: 'lv_hv_mv_e', label: 'Hạ ~ Cao, Trung, Vỏ' },
-        { id: 'hv_mv_lv_e2', label: 'Cao, Trung, Hạ ~ Vỏ' },
-        { id: 'lv_hv_mv', label: 'Hạ ~ Cao, Trung' },
-        { id: 'hv_mv_e', label: 'Cao, Trung ~ Vỏ' },
-        { id: 'lv_e', label: 'Hạ ~ Vỏ' },
-        { id: 'core_e', label: 'Lõi từ - Vỏ' },
-        { id: 'clamp_e', label: 'Gông từ - Vỏ' },
-        { id: 'core_clamp', label: 'Lõi từ - Gông từ' }
-    ];
+    container.innerHTML = html;
+}
 
-    items.forEach(item => {
-        html += `
-<tr>
-                <td style="text-align:left;font-size:10px;">${item.label}</td>
-                <td style="vertical-align:top;">
-                    <input type="number" id="mba_rcd_15_${item.id}" oninput="handleNewInput(event); calculateAll()">
-                    <div id="mba_rcd_15_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
-                </td>
-                <td style="vertical-align:top;">
-                    <input type="number" id="mba_rcd_60_${item.id}" oninput="handleNewInput(event); calculateAll()">
-                    <div id="mba_rcd_60_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
-                </td>
-                <td style="vertical-align:top;">
-                    <input type="number" id="mba_rcd_600_${item.id}" oninput="handleNewInput(event); calculateAll()">
-                    <div id="mba_rcd_600_20c_${item.id}" class="sub-val" style="color:#d84315; font-size:9px; margin-top:4px;"></div>
-                </td>
-                <td class="hidden-col"; style="vertical-align:top;"><input type="number" id="mba_rcd_kht_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;" ></td>
-                <td class="hidden-col"; style="vertical-align:top;"><input type="number" id="mba_rcd_pi_${item.id}" readonly style="background:#f5f5f5; font-weight:bold; color:#0288d1; border:none;" ></td>
-                <td style="vertical-align:top;"><input type="number" id="mba_rcd_volt_${item.id}" step="500" value="5000" oninput="handleNewInput(event); calculateAll()"></td>
-            </tr>
-        `;
+// Hàm chuyển tab RCD
+function switchRcdTab(tab) {
+    rcdCurrentTab = tab;
+    
+    // Cập nhật style nút tab
+    document.querySelectorAll('.rcd-tab-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        btn.style.background = isActive ? 'var(--primary)' : '#f5f5f5';
+        btn.style.color = isActive ? 'white' : '#333';
+        btn.classList.toggle('active', isActive);
     });
 
-    html += `</tbody></table>`;
-    container.innerHTML = html;
+    // Hiển thị tab được chọn
+    document.getElementById('rcd_tab_A').style.display = tab === 'A' ? 'block' : 'none';
+    document.getElementById('rcd_tab_B').style.display = tab === 'B' ? 'block' : 'none';
+    document.getElementById('rcd_tab_C').style.display = tab === 'C' ? 'block' : 'none';
 }
 
     // ============================================================
@@ -2555,65 +2621,68 @@ function calculateRdcDelta() {
 
     const k1Factor = (!isNaN(temp)) ? getTemperatureCorrectionFactor(temp, 20) : 1;
 
- // --- ĐÁNH GIÁ RCD ---
+// --- ĐÁNH GIÁ RCD (Quét cho cả 3 pha A, B, C) ---
     const rcdWindingItems = ['hv_mv_lv_e', 'lv_hv_mv_e', 'hv_mv_lv_e2', 'lv_hv_mv', 'hv_mv_e', 'lv_e'];
     const rcdCoreItems = ['core_e', 'clamp_e', 'core_clamp'];
     const allRcdItems = rcdWindingItems.concat(rcdCoreItems);
+    const phases = ['A', 'B', 'C'];
 
-    allRcdItems.forEach(id => {
-        const el15 = document.getElementById(`mba_rcd_15_${id}`);
-        const el60 = document.getElementById(`mba_rcd_60_${id}`);
-        const el600 = document.getElementById(`mba_rcd_600_${id}`);
-        const elKht = document.getElementById(`mba_rcd_kht_${id}`);
-        const elPi = document.getElementById(`mba_rcd_pi_${id}`);
-        
-        const display15_20c = document.getElementById(`mba_rcd_15_20c_${id}`);
-        const display60_20c = document.getElementById(`mba_rcd_60_20c_${id}`);
-        const display600_20c = document.getElementById(`mba_rcd_600_20c_${id}`);
-
-        let r15 = el15 ? parseFloat(el15.value) : 0;
-        let r60 = el60 ? parseFloat(el60.value) : 0;
-        let r600 = el600 ? parseFloat(el600.value) : 0;
-
-        // Tính Kht và PI
-        if (elKht) elKht.value = (r15 > 0 && r60 > 0) ? (r60 / r15).toFixed(2) : "";
-        if (elPi) elPi.value = (r60 > 0 && r600 > 0) ? (r600 / r60).toFixed(2) : "";
-
-        // Quy đổi R15 về 20°C
-        if (r15 > 0 && !isNaN(temp)) {
-            let r15_20 = (temp > 20) ? (r15 * k1Factor) : (r15 / k1Factor);
-            if (display15_20c) display15_20c.textContent = `QĐ 20°C: ${r15_20.toFixed(0)} MΩ`;
-        } else {
-            if (display15_20c) display15_20c.textContent = "";
-        }
-
-        // Quy đổi R60 về 20°C và đánh giá màu sắc
-        if (r60 > 0 && !isNaN(temp)) {
-            let r60_20 = (temp > 20) ? (r60 * k1Factor) : (r60 / k1Factor);
-            if (display60_20c) display60_20c.textContent = `QĐ 20°C: ${r60_20.toFixed(0)} MΩ`;
+    phases.forEach(pha => {
+        allRcdItems.forEach(id => {
+            const el15 = document.getElementById(`mba_rcd_15_${pha}_${id}`);
+            const el60 = document.getElementById(`mba_rcd_60_${pha}_${id}`);
+            const el600 = document.getElementById(`mba_rcd_600_${pha}_${id}`);
+            const elKht = document.getElementById(`mba_rcd_kht_${pha}_${id}`);
+            const elPi = document.getElementById(`mba_rcd_pi_${pha}_${id}`);
             
-            let isPass = rcdWindingItems.includes(id) ? (r60_20 >= windingThreshold) : (r60_20 >= 500);
-            if (el60) {
-                el60.style.color = isPass ? '#1565c0' : '#c62828';
-                el60.style.fontWeight = 'bold';
-            }
-        } else {
-            if (display60_20c) display60_20c.textContent = "";
-            if (el60) { el60.style.color = ''; el60.style.fontWeight = ''; }
-        }
+            const display15_20c = document.getElementById(`mba_rcd_15_20c_${pha}_${id}`);
+            const display60_20c = document.getElementById(`mba_rcd_60_20c_${pha}_${id}`);
+            const display600_20c = document.getElementById(`mba_rcd_600_20c_${pha}_${id}`);
 
-        // Quy đổi R600 về 20°C
-        if (r600 > 0 && !isNaN(temp)) {
-            let r600_20 = (temp > 20) ? (r600 * k1Factor) : (r600 / k1Factor);
-            if (display600_20c) display600_20c.textContent = `QĐ 20°C: ${r600_20.toFixed(0)} MΩ`;
-            if (el600) {
-                el600.style.color = '#1565c0';
-                el600.style.fontWeight = 'bold';
+            let r15 = el15 ? parseFloat(el15.value) : 0;
+            let r60 = el60 ? parseFloat(el60.value) : 0;
+            let r600 = el600 ? parseFloat(el600.value) : 0;
+
+            // Tính Kht và PI
+            if (elKht) elKht.value = (r15 > 0 && r60 > 0) ? (r60 / r15).toFixed(2) : "";
+            if (elPi) elPi.value = (r60 > 0 && r600 > 0) ? (r600 / r60).toFixed(2) : "";
+
+            // Quy đổi R15 về 20°C
+            if (r15 > 0 && !isNaN(temp)) {
+                let r15_20 = (temp > 20) ? (r15 * k1Factor) : (r15 / k1Factor);
+                if (display15_20c) display15_20c.textContent = `QĐ 20°C: ${r15_20.toFixed(0)} MΩ`;
+            } else {
+                if (display15_20c) display15_20c.textContent = "";
             }
-        } else {
-            if (display600_20c) display600_20c.textContent = "";
-            if (el600) { el600.style.color = ''; el600.style.fontWeight = ''; }
-        }
+
+            // Quy đổi R60 về 20°C và đánh giá màu sắc
+            if (r60 > 0 && !isNaN(temp)) {
+                let r60_20 = (temp > 20) ? (r60 * k1Factor) : (r60 / k1Factor);
+                if (display60_20c) display60_20c.textContent = `QĐ 20°C: ${r60_20.toFixed(0)} MΩ`;
+                
+                let isPass = rcdWindingItems.includes(id) ? (r60_20 >= windingThreshold) : (r60_20 >= 500);
+                if (el60) {
+                    el60.style.color = isPass ? '#1565c0' : '#c62828';
+                    el60.style.fontWeight = 'bold';
+                }
+            } else {
+                if (display60_20c) display60_20c.textContent = "";
+                if (el60) { el60.style.color = ''; el60.style.fontWeight = ''; }
+            }
+
+            // Quy đổi R600 về 20°C
+            if (r600 > 0 && !isNaN(temp)) {
+                let r600_20 = (temp > 20) ? (r600 * k1Factor) : (r600 / k1Factor);
+                if (display600_20c) display600_20c.textContent = `QĐ 20°C: ${r600_20.toFixed(0)} MΩ`;
+                if (el600) {
+                    el600.style.color = '#1565c0';
+                    el600.style.fontWeight = 'bold';
+                }
+            } else {
+                if (display600_20c) display600_20c.textContent = "";
+                if (el600) { el600.style.color = ''; el600.style.fontWeight = ''; }
+            }
+        });
     });
     // --- TÍNH TỈ SỐ BIẾN---
 	calculateRatioDelta ();
